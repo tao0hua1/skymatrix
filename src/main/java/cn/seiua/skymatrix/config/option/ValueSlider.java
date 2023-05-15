@@ -1,8 +1,11 @@
 package cn.seiua.skymatrix.config.option;
 
-import cn.seiua.skymatrix.config.UIComponent;
+import cn.seiua.skymatrix.client.module.Signs;
+import cn.seiua.skymatrix.gui.UIComponent;
+import cn.seiua.skymatrix.gui.ui.UI;
+import cn.seiua.skymatrix.gui.ui.UISlider;
+import cn.seiua.skymatrix.utils.OptionInfo;
 import com.alibaba.fastjson.annotation.JSONField;
-
 
 import java.io.Serializable;
 
@@ -17,6 +20,30 @@ public class ValueSlider <V extends Number> implements Serializable , UIComponen
 
     public V getValue() {
         return value;
+    }
+
+    public V getMin() {
+        return min;
+    }
+
+    public void setMin(V min) {
+        this.min = min;
+    }
+
+    public V getMax() {
+        return max;
+    }
+
+    public void setMax(V max) {
+        this.max = max;
+    }
+
+    public V getInterval() {
+        return interval;
+    }
+
+    public void setInterval(V interval) {
+        this.interval = interval;
     }
 
     public void setValue(V value) {
@@ -34,4 +61,14 @@ public class ValueSlider <V extends Number> implements Serializable , UIComponen
     public String getID() {
         return "ValueSlider";
     }
+
+    @Override
+    public UI build(String module, String category, String name, Signs sign) {
+
+        OptionInfo<ValueSlider> optionInfo = new OptionInfo<>(this, category + "." + name, name, module, category, sign);
+        UISlider slider = new UISlider(optionInfo);
+        return slider;
+    }
+
+
 }
