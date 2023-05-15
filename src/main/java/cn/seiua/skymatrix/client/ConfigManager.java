@@ -1,7 +1,6 @@
 package cn.seiua.skymatrix.client;
 
 import cn.seiua.skymatrix.client.component.*;
-import cn.seiua.skymatrix.client.component.Module;
 import cn.seiua.skymatrix.client.module.ModuleManager;
 import cn.seiua.skymatrix.config.ExtraConfig;
 import cn.seiua.skymatrix.config.LocalConfigStore;
@@ -12,10 +11,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.sun.jna.Native;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -67,9 +64,9 @@ public class ConfigManager {
         writeConfig();
     }
     public String getConfigName(Class c){
-        Category category= (Category) c.getAnnotation(Category.class);
-        Module module= (Module) c.getAnnotation(Module.class);
-        Config config= (Config) c.getAnnotation(Config.class);
+        Category category = (Category) c.getAnnotation(Category.class);
+        SModule module = (SModule) c.getAnnotation(SModule.class);
+        Config config = (Config) c.getAnnotation(Config.class);
         String name=null;
         if(category!=null){
             name=CATEGORY+"."+category.name();
@@ -106,16 +103,22 @@ public class ConfigManager {
             throw new RuntimeException(e);
         }
         for (String key: jo.keySet()) {
-            if(key==EXTRA)continue;
-            Object current=configs.get(key);
-            if(current==null){
+            if (key == EXTRA) continue;
+            Object current = configs.get(key);
+            if (current == null) {
 
-                logger.warn("Removed setting: key: "+key);
+                logger.warn("Removed setting: key: " + key);
                 continue;
             }
-            logger.info("Loaded setting: "+key);
-            Object o=jo.getJSONObject(key).toJavaObject(current.getClass());
-            ReflectUtils.copyData(current,o);
+            logger.info("Loaded setting: " + key);
+            try {
+                Object o = jo.getJSONObject(key).toJavaObject(current.getClass());
+                ReflectUtils.copyData(current, o);
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                logger.warn("配置文件加载似乎出现了一个问题 ： key " + key);
+            }
+
         }
     }
     private void writeConfig(){

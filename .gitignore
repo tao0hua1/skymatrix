@@ -41,3 +41,4 @@ replay_*.log
 /src/main/java/cn/seiua/skymatrix/client/modules/combat/
 /src/main/java/cn/seiua/skymatrix/mixin/mixins/
 /src/main/java/cn/seiua/skymatrix/event/events/
+/src/main/resources/assets/skymatrix/font/

@@ -1,6 +1,8 @@
 package cn.seiua.skymatrix.config.option;
 
-import cn.seiua.skymatrix.config.UIComponent;
+import cn.seiua.skymatrix.client.module.Signs;
+import cn.seiua.skymatrix.gui.UIComponent;
+import cn.seiua.skymatrix.gui.ui.UI;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
@@ -30,4 +32,11 @@ public class MultipleChoice<V> implements Serializable , UIComponent {
     public String getID() {
         return "MultipleChoice";
     }
+
+    @Override
+    public UI build(String module, String category, String name, Signs sign) {
+        return null;
+    }
+
+
 }

@@ -1,11 +1,10 @@
 package cn.seiua.skymatrix.client.module;
 
 import cn.seiua.skymatrix.client.component.*;
-import cn.seiua.skymatrix.client.component.Module;
 import cn.seiua.skymatrix.config.Value;
 import cn.seiua.skymatrix.config.option.MapValueHolder;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -33,10 +32,10 @@ public class ModuleManager {
     public void handle() {
         modules=new HashMap<>();
         for (Object o: components) {
-            Class c=o.getClass();
-            Annotation annotation=c.getAnnotation(Module.class);
+            Class c = o.getClass();
+            Annotation annotation = c.getAnnotation(SModule.class);
             if(annotation!=null){
-                Module module= (Module) annotation;
+                SModule module = (SModule) annotation;
                 modules.put(getModuleName(module),new ModuleObj(o,false,module.name(),module.category()));
                 valueHolder.value.put(getModuleName(module),false);
                 logger.info("Module loaded: "+c.getName()+" "+getModuleName(module));
@@ -60,8 +59,8 @@ public class ModuleManager {
         }
     }
 
-    public String getModuleName(Module module){
-        return module.category()+"."+module.name();
+    public String getModuleName(SModule module) {
+        return module.category() + "." + module.name();
     }
 
 
