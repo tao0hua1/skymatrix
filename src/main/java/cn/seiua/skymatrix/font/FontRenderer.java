@@ -1,16 +1,10 @@
 package cn.seiua.skymatrix.font;
 
 import cn.seiua.skymatrix.utils.ColorUtils;
-import cn.seiua.skymatrix.utils.GlUtils;
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.texture.DynamicTexture;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
@@ -21,7 +15,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-
 import java.util.Map;
 
 public class FontRenderer {
@@ -55,11 +48,11 @@ public class FontRenderer {
     /**
      * 当前的颜色
      */
-    private Color color;
+    private Color color = Color.white;
     /**
      * 之前的颜色 当你 setColor(Color) 后back将会是上一次设置的颜色
      */
-    private Color back;
+    private Color back = Color.white;
     /**
      * 绘制文字的大小 单位px
      */
@@ -86,7 +79,7 @@ public class FontRenderer {
     private int side;
     private int outlineSize=1;
     private Color outlineColor;
-    private Color shadowColor=new Color(0,0,0,255);
+    private Color shadowColor;
 
 
     public void setOutlineSize(int outlineSize) {
@@ -209,6 +202,7 @@ public class FontRenderer {
         y=this.y;
         String text =str;
         if(centeredV)x-=getStringWidth(str)/2;
+
         for (char c: text.toCharArray()) {
             CharInfo charInfo=getCharImg(c);
             if(outline){
@@ -220,29 +214,38 @@ public class FontRenderer {
                 setBack();
             }
             if(shadow){
-                setColor(shadowColor);
-                drawChar(matrixStack,x+1,y+1,charInfo);
+                setColor(ColorUtils.darkenColor(color, 0.5f));
+                drawChar(matrixStack, x + 1, y + 1, charInfo);
                 setBack();
             }
-            drawChar(matrixStack,x,y,charInfo);
-            x+=charInfo.getWidth()/rate;
+            drawChar(matrixStack, x, y, charInfo);
+            x += charInfo.getWidth();
         }
-    }
-    private void drawChar(MatrixStack matrixStack,int x,int y,CharInfo charInfo)
-    {
 
-        if(centeredV)y-=getStringHeight()/2;
-        GlStateManager._enableBlend();
-        GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderTexture(0,charInfo.getGlid());
-        RenderSystem.setShaderColor(color.getRed()/255f,color.getGreen()/255f,color.getBlue()/255f,color.getAlpha()/255f);
-        DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, (int)(charInfo.getWidth()/rate), (int)(charInfo.getHeight()/rate), (int)(charInfo.getWidth()/rate), (int)(charInfo.getHeight()/rate));
-        GlStateManager._disableBlend();
-        RenderSystem.setShaderColor(1,1,1,1);
-        if(underline){
-            DrawableHelper.fill(matrixStack,x,y+getStringHeight()/2, (int) (x+charInfo.getWidth()/rate),y+getStringHeight()/2+1,this.color.getRGB());
-        }
     }
+    private void drawChar(MatrixStack matrixStack,int x,int y,CharInfo charInfo) {
+        float tx = x;
+        float ty = y;
+        if (centeredH) y -= getStringHeight() / 2;
+
+        GlStateManager._enableBlend();
+        RenderSystem.setShaderTexture(0, charInfo.getGlid());
+        RenderSystem.enableCull();
+        RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_MIN_FILTER, GlConst.GL_LINEAR);
+        RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_MAG_FILTER, GlConst.GL_LINEAR);
+
+        DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, (charInfo.getWidth()), (charInfo.getHeight()), (charInfo.getWidth()), (charInfo.getHeight()));
+        GlStateManager._disableBlend();
+        RenderSystem.setShaderColor(1, 1, 1, 1);
+        if (underline) {
+            DrawableHelper.fill(matrixStack, x, y + getStringHeight() / 2, (int) (x + charInfo.getWidth()), (int) y + getStringHeight() / 2 + 1, this.color.getRGB());
+        }
+
+    }
+
     private int x;
     private int y;
 
@@ -268,22 +271,24 @@ public class FontRenderer {
 
     /**
      * 以当前设置的绘制大小，获取字符串的宽度
-     * @param str
-     * @return
+     *
+     * @param str str
+     * @return Width
      */
     public int getStringWidth(@NotNull String str){
         int retv=0;
         for (char c: str.toCharArray()) {
-            retv+=getCharImg(c).getWidth()/rate;
+            retv += getCharImg(c).getWidth();
         }
         return retv;
     }
+
     /**
      * 以当前设置的绘制大小，获取字符的高度
-     * @return
+     * @return height
      */
     public int getStringHeight(){
-        return (int) (height/rate);
+        return (int) (height);
     }
 
     private byte[] toByteArray(BufferedImage image)
@@ -298,8 +303,9 @@ public class FontRenderer {
         }
     }
 
-    public void drawStringWithRainBowColor(MatrixStack matrixStack,int x,int y,String str){
+    public void drawStringWithRainBowColor(MatrixStack matrixStack, float x, float y, String str){
     }
+
 
 
 
