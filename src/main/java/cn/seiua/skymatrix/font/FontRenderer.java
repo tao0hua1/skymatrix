@@ -186,44 +186,49 @@ public class FontRenderer {
     }
     public void drawStringWithOutline(MatrixStack matrixStack,int x,int y,String str){
         this.outline=true;
-        this.drawString(matrixStack,x,y,str);
-        this.outline=false;
-    }
-    public void drawStringWithUnderLine(MatrixStack matrixStack,int x,int y,String str){
-        this.underline=true;
-        this.drawString(matrixStack,x,y,str);
-        this.underline=false;
+        this.drawString(matrixStack, x, y, str);
+        this.outline = false;
     }
 
-    public void drawString(MatrixStack matrixStack,int x,int y,String str)
-    {
-        setSide(x,y,str);
-        x=this.x;
-        y=this.y;
-        String text =str;
-        if(centeredV)x-=getStringWidth(str)/2;
+    public void drawStringWithUnderLine(MatrixStack matrixStack, int x, int y, String str) {
+        this.underline = true;
+        this.drawString(matrixStack, x, y, str);
+        this.underline = false;
+    }
 
-        for (char c: text.toCharArray()) {
-            CharInfo charInfo=getCharImg(c);
-            if(outline){
+    public void drawString(MatrixStack matrixStack, int x, int y, String str) {
+        drawString(matrixStack, x, y, 0, str);
+    }
+
+    public void drawString(MatrixStack matrixStack, int x, int y, int z, String str) {
+        setSide(x, y, str);
+        x = this.x;
+        y = this.y;
+        String text = str;
+        if (centeredV) x -= getStringWidth(str) / 2;
+
+        for (char c : text.toCharArray()) {
+            CharInfo charInfo = getCharImg(c);
+            if (outline) {
                 setColor(getOutlineColor(this.color));
-                drawChar(matrixStack,x+this.getOutlineSize(),y,charInfo);
-                drawChar(matrixStack,x-this.getOutlineSize(),y,charInfo);
-                drawChar(matrixStack,x,y-this.getOutlineSize(),charInfo);
-                drawChar(matrixStack,x,y+this.getOutlineSize(),charInfo);
+                drawChar(matrixStack, x + this.getOutlineSize(), y, z, charInfo);
+                drawChar(matrixStack, x - this.getOutlineSize(), y, z, charInfo);
+                drawChar(matrixStack, x, y - this.getOutlineSize(), z, charInfo);
+                drawChar(matrixStack, x, y + this.getOutlineSize(), z, charInfo);
                 setBack();
             }
-            if(shadow){
+            if (shadow) {
                 setColor(ColorUtils.darkenColor(color, 0.5f));
-                drawChar(matrixStack, x + 1, y + 1, charInfo);
+                drawChar(matrixStack, x + 1, y + 1, z, charInfo);
                 setBack();
             }
-            drawChar(matrixStack, x, y, charInfo);
+            drawChar(matrixStack, x, y, z, charInfo);
             x += charInfo.getWidth();
         }
 
     }
-    private void drawChar(MatrixStack matrixStack,int x,int y,CharInfo charInfo) {
+
+    private void drawChar(MatrixStack matrixStack, int x, int y, int z, CharInfo charInfo) {
         float tx = x;
         float ty = y;
         if (centeredH) y -= getStringHeight() / 2;
@@ -237,11 +242,11 @@ public class FontRenderer {
         RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_MIN_FILTER, GlConst.GL_LINEAR);
         RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_MAG_FILTER, GlConst.GL_LINEAR);
 
-        DrawableHelper.drawTexture(matrixStack, x, y, 0, 0, (charInfo.getWidth()), (charInfo.getHeight()), (charInfo.getWidth()), (charInfo.getHeight()));
+        DrawableHelper.drawTexture(matrixStack, x, y, z, 0, 0, (charInfo.getWidth()), (charInfo.getHeight()), (charInfo.getWidth()), (charInfo.getHeight()));
         GlStateManager._disableBlend();
         RenderSystem.setShaderColor(1, 1, 1, 1);
         if (underline) {
-            DrawableHelper.fill(matrixStack, x, y + getStringHeight() / 2, (int) (x + charInfo.getWidth()), (int) y + getStringHeight() / 2 + 1, this.color.getRGB());
+            DrawableHelper.fill(matrixStack, x, y + getStringHeight() / 2, z, (int) (x + charInfo.getWidth()), (int) y + getStringHeight() / 2 + 1, this.color.getRGB());
         }
 
     }
