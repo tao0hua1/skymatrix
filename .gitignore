@@ -38,7 +38,5 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
-/src/main/java/cn/seiua/skymatrix/client/modules/combat/
-/src/main/java/cn/seiua/skymatrix/mixin/mixins/
-/src/main/java/cn/seiua/skymatrix/event/events/
+/src/main/java/cn/seiua/skymatrix/client/modules
 /src/main/resources/assets/skymatrix/font/
