@@ -34,7 +34,6 @@ public class UIModules extends UI {
         modules.add(moduleInfo);
         UIModule uiModule = new UIModule(moduleInfo);
         uiModules.add(uiModule);
-
         String category = moduleInfo.getCategory();
         String name = moduleInfo.getName();
         Object o = moduleInfo.getTarget();
@@ -60,6 +59,12 @@ public class UIModules extends UI {
         }
 
         uiModule.setUis(temp);
+    }
+
+    public void update(int x, int y) {
+        UiInfo uiInfo = ClickGui.getValue(cateInfo.getFullName() + ".state");
+        setX(uiInfo.getX());
+        setY(uiInfo.getY());
     }
 
     @Override

@@ -120,6 +120,7 @@ public class ClickGui extends Screen {
                     this.modules.put(category, u);
                     u.setX(500);
                     u.setY(yt);
+                    u.update(-1, -1);
                     yt += 58;
                 }
                 u = this.modules.get(category);
