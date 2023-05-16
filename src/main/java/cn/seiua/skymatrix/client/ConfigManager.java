@@ -2,10 +2,7 @@ package cn.seiua.skymatrix.client;
 
 import cn.seiua.skymatrix.client.component.*;
 import cn.seiua.skymatrix.client.module.ModuleManager;
-import cn.seiua.skymatrix.config.ExtraConfig;
-import cn.seiua.skymatrix.config.LocalConfigStore;
-import cn.seiua.skymatrix.config.Store;
-import cn.seiua.skymatrix.config.Value;
+import cn.seiua.skymatrix.config.*;
 import cn.seiua.skymatrix.utils.ReflectUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -16,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +29,7 @@ public class ConfigManager {
     @Use
     public LocalConfigStore localConfigStore;
 
+    public static final String MODULE = "module";
     @Use
     public ModuleManager moduleManager;
     public Store store1= (Store) Native.loadLibrary(Store.class);
@@ -39,30 +38,7 @@ public class ConfigManager {
 
     private static final Logger logger = LoggerFactory.getLogger("ConfigManager");
     public Map<String,Object> configs;
-
-    @Init(level = 9999999)
-    public void handle() {
-        configs=new HashMap<>();
-        switchStore(localConfigStore);
-        for (Object o: components) {
-            Class target=o.getClass();
-            String config=getConfigName(target);
-            if(config==null)continue;
-            for (Field field: target.getDeclaredFields()) {
-                String value=getValueName(field);
-                if(value==null)continue;
-                String cname=config+"."+value;
-                try {
-                    configs.put(cname,field.get(o));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-        }
-        bindConfigFromFile();
-        writeConfig();
-    }
+    public static final String NORMAIL = "common";
     public String getConfigName(Class c){
         Category category = (Category) c.getAnnotation(Category.class);
         SModule module = (SModule) c.getAnnotation(SModule.class);
@@ -81,8 +57,34 @@ public class ConfigManager {
     }
 
     public static final String CATEGORY="category";
-    public static final String MODULE="module";
-    public static final String NORMAIL="normal";
+    private List<Run> callbacks = new ArrayList<>();
+
+    @Init(level = 9999999)
+    public void handle() {
+        configs=new HashMap<>();
+        switchStore(localConfigStore);
+        for (Object o: components) {
+            Class target=o.getClass();
+            String config=getConfigName(target);
+            if(config==null)continue;
+            for (Field field: target.getDeclaredFields()) {
+                String value=getValueName(field);
+                if(value==null)continue;
+                String cname=config+"."+value;
+                try {
+                    configs.put(cname, field.get(o));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        }
+        bindConfigFromFile();
+        writeConfig();
+        for (Run run : callbacks) {
+            run.run();
+        }
+    }
 
 
     public String getValueName(Field field){
@@ -110,10 +112,15 @@ public class ConfigManager {
                 logger.warn("Removed setting: key: " + key);
                 continue;
             }
+
+
             logger.info("Loaded setting: " + key);
             try {
                 Object o = jo.getJSONObject(key).toJavaObject(current.getClass());
                 ReflectUtils.copyData(current, o);
+                if (current instanceof ConfigInit) {
+                    ((ConfigInit) current).init();
+                }
             } catch (NullPointerException e) {
                 e.printStackTrace();
                 logger.warn("配置文件加载似乎出现了一个问题 ： key " + key);
@@ -121,7 +128,15 @@ public class ConfigManager {
 
         }
     }
-    private void writeConfig(){
+
+    public void addCallBack(Run run) {
+        if (run != null) {
+            this.callbacks.add(run);
+        }
+
+    }
+
+    public void writeConfig() {
 //        for (ExtraConfig extraConfig: extraConfigs) {
 //           Object o =extraConfig.read();
 //           HashMap hashMap=new HashMap();
@@ -129,7 +144,7 @@ public class ConfigManager {
 //            configs.put(EXTRA,hashMap);
 //
 //        }
-        store.write(JSON.toJSONString(configs, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat).getBytes(),uuid);
+        store.write(JSON.toJSONString(configs, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect).getBytes(), uuid);
     }
 
     public void switchStore(Store store){

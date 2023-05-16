@@ -1,12 +1,14 @@
 package cn.seiua.skymatrix.utils;
 
-public class AnimationTransition {
+public class LinearTransition {
 
     private long startTime;
 
+    private long i;
 
-    public AnimationTransition() {
+    public LinearTransition(long i) {
         startTime = System.currentTimeMillis();
+        this.i = i;
     }
 
 
@@ -14,10 +16,10 @@ public class AnimationTransition {
 
         long elapsedTime = currentTime - startTime;
 
-        if (elapsedTime >= 1000) {
+        if (elapsedTime >= i) {
             return 1;
         } else {
-            return (double) elapsedTime / 1000.0;
+            return (double) elapsedTime / i;
         }
     }
 }

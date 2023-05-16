@@ -63,11 +63,11 @@ public class UIToggle extends UI {
         RenderUtils.setColor(optionInfo.getSign().color);
         RenderUtils.drawRound2D(new Box(getX() + 124, getY(), 0, getX() + 127, getY() + 40, 0), matrixStack, 0);
         RenderUtils.resetCent();
-        ClickGui.fontRenderer20.centeredH();
-        ClickGui.fontRenderer20.setColor(Theme.getInstance().THEME.geColor());
-        ClickGui.fontRenderer20.drawString(matrixStack, drawLine.get(25), getY(), upperFirst(optionInfo.getName()));
-        ClickGui.fontRenderer20.resetCenteredH();
-        ClickGui.fontRenderer20.resetCenteredV();
+        ClickGui.fontRenderer16.centeredH();
+        ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());
+        ClickGui.fontRenderer16.drawString(matrixStack, drawLine.get(25), getY(), upperFirst(optionInfo.getName()));
+        ClickGui.fontRenderer16.resetCenteredH();
+        ClickGui.fontRenderer16.resetCenteredV();
         ClickGui.iconfontRenderer24.centeredH();
         ClickGui.iconfontRenderer24.centeredV();
         drawLine(matrixStack);

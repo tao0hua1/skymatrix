@@ -1,6 +1,6 @@
 package cn.seiua.skymatrix.gui.ui;
 
-import cn.seiua.skymatrix.config.option.ValueSlider;
+import cn.seiua.skymatrix.config.option.DoubleValueSlider;
 import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.gui.DrawLine;
 import cn.seiua.skymatrix.gui.Theme;
@@ -12,10 +12,10 @@ import net.minecraft.util.math.Box;
 
 import java.awt.*;
 
-public class UISlider extends UI {
+public class UIDoubleSlider extends UI {
     public static final double TR = 8;
     private DrawLine drawLine = new DrawLine(250);
-    private OptionInfo<ValueSlider> optionInfo;
+    private OptionInfo<DoubleValueSlider> optionInfo;
     private double rate;
     private float o = 0;
     private double min;
@@ -23,8 +23,9 @@ public class UISlider extends UI {
     private double interval;
     private double w;
     private boolean hd;
+    private boolean hd2;
 
-    public UISlider(OptionInfo<ValueSlider> optionInfo) {
+    public UIDoubleSlider(OptionInfo<DoubleValueSlider> optionInfo) {
         this.optionInfo = optionInfo;
         min = this.optionInfo.getTarget().getMin().doubleValue();
         max = this.optionInfo.getTarget().getMax().doubleValue();
@@ -88,37 +89,71 @@ public class UISlider extends UI {
         ClickGui.fontRenderer16.drawString(matrixStack, drawLine.get(25), getY() - 10, upperFirst(optionInfo.getName()));
         drawLine.append(ClickGui.fontRenderer16.getStringWidth(upperFirst(optionInfo.getName())));
         ClickGui.fontRenderer16.centeredV();
-        ClickGui.fontRenderer16.drawString(matrixStack, getX() + 96, getY() - 10, upperFirst(optionInfo.getTarget().getValue() + ""));
+
+        double minv = Math.min(optionInfo.getTarget().getValue().doubleValue(), optionInfo.getTarget().getValua().doubleValue());
+        double maxv = Math.max(optionInfo.getTarget().getValue().doubleValue(), optionInfo.getTarget().getValua().doubleValue());
+
+        String v = minv + "-" + maxv;
+        int w = ClickGui.fontRenderer16.getStringWidth(v);
+        ClickGui.fontRenderer16.drawString(matrixStack, getX() + 96 - w / 2, getY() - 10, v);
         ClickGui.fontRenderer16.resetCenteredH();
         ClickGui.fontRenderer16.resetCenteredV();
 
 
         double uw = 200;
 
-        ClickGui.iconfontRenderer24.centeredH();
-        ClickGui.iconfontRenderer24.centeredV();
-        ClickGui.iconfontRenderer24.setColor(getBoardColoar());
-        ClickGui.iconfontRenderer24.centeredV();
-        ClickGui.iconfontRenderer24.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 8, "\uE904");
-        ClickGui.iconfontRenderer24.resetCenteredH();
-        ClickGui.iconfontRenderer24.resetCenteredV();
+        // true v1 max false v1 min
 
+        boolean v1max = (Math.max(this.optionInfo.getTarget().getValue().doubleValue(), this.optionInfo.getTarget().getValua().doubleValue()) == this.optionInfo.getTarget().getValue().doubleValue());
+
+        ClickGui.iconfontRenderer28.centeredH();
+        ClickGui.iconfontRenderer28.centeredV();
+        ClickGui.iconfontRenderer28.setColor(getBoardColoar());
+        ClickGui.iconfontRenderer28.centeredV();
+        ClickGui.iconfontRenderer28.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 8, v1max ? "\uE900" : "\uE901");
+        ClickGui.iconfontRenderer28.resetCenteredH();
+        ClickGui.iconfontRenderer28.resetCenteredV();
+
+        ClickGui.iconfontRenderer28.centeredH();
+        ClickGui.iconfontRenderer28.centeredV();
+        ClickGui.iconfontRenderer28.setColor(getBoardColoar());
+        ClickGui.iconfontRenderer28.centeredV();
+        ClickGui.iconfontRenderer28.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget2()), getY() + 8, v1max ? "\uE901" : "\uE900");
+        ClickGui.iconfontRenderer28.resetCenteredH();
+        ClickGui.iconfontRenderer28.resetCenteredV();
         if (isInButton(mouseX, mouseY) || hd) {
+            ClickGui.iconfontRenderer22.centeredH();
+            ClickGui.iconfontRenderer22.centeredV();
+            ClickGui.iconfontRenderer22.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
+            ClickGui.iconfontRenderer22.centeredV();
+            ClickGui.iconfontRenderer22.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 9, v1max ? "\uE900" : "\uE901");
+            ClickGui.iconfontRenderer22.resetCenteredH();
+            ClickGui.iconfontRenderer22.resetCenteredV();
+        } else {
             ClickGui.iconfontRenderer18.centeredH();
             ClickGui.iconfontRenderer18.centeredV();
-            ClickGui.iconfontRenderer18.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
+            ClickGui.iconfontRenderer18.setColor(Theme.getInstance().THEME.geColor());
             ClickGui.iconfontRenderer18.centeredV();
-            ClickGui.iconfontRenderer18.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 9, "\uE904");
+            ClickGui.iconfontRenderer18.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 9, v1max ? "\uE900" : "\uE901");
             ClickGui.iconfontRenderer18.resetCenteredH();
             ClickGui.iconfontRenderer18.resetCenteredV();
+        }
+        if (isInButton2(mouseX, mouseY) || hd2) {
+            ClickGui.iconfontRenderer22.centeredH();
+            ClickGui.iconfontRenderer22.centeredV();
+            ClickGui.iconfontRenderer22.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
+            ClickGui.iconfontRenderer22.centeredV();
+            ClickGui.iconfontRenderer22.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget2()), getY() + 9, v1max ? "\uE901" : "\uE900");
+            ClickGui.iconfontRenderer22.resetCenteredH();
+            ClickGui.iconfontRenderer22.resetCenteredV();
         } else {
-            ClickGui.iconfontRenderer16.centeredH();
-            ClickGui.iconfontRenderer16.centeredV();
-            ClickGui.iconfontRenderer16.setColor(Theme.getInstance().THEME.geColor());
-            ClickGui.iconfontRenderer16.centeredV();
-            ClickGui.iconfontRenderer16.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 9, "\uE904");
-            ClickGui.iconfontRenderer16.resetCenteredH();
-            ClickGui.iconfontRenderer16.resetCenteredV();
+            ClickGui.iconfontRenderer18.centeredH();
+            ClickGui.iconfontRenderer18.centeredV();
+            ClickGui.iconfontRenderer18.setColor(Theme.getInstance().THEME.geColor());
+            ClickGui.iconfontRenderer18.centeredV();
+            ClickGui.iconfontRenderer18.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget2()), getY() + 9, v1max ? "\uE901" : "\uE900");
+            ClickGui.iconfontRenderer18.resetCenteredH();
+            ClickGui.iconfontRenderer18.resetCenteredV();
         }
 
 
@@ -126,6 +161,12 @@ public class UISlider extends UI {
 
     public double getTarget() {
         rate = (this.optionInfo.getTarget().getValue().doubleValue() - this.min) / w;
+        double target = rate * 200;
+        return target;
+    }
+
+    public double getTarget2() {
+        rate = (this.optionInfo.getTarget().getValua().doubleValue() - this.min) / w;
         double target = rate * 200;
         return target;
     }
@@ -150,6 +191,16 @@ public class UISlider extends UI {
         return false;
     }
 
+    public boolean isInButton2(double mouseX, double mouseY) {
+        double x = (getX() - 100 + getTarget2());
+        double y = getY() + 9;
+        double r = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
+        if (r <= TR) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
         if (hd) {
@@ -161,6 +212,17 @@ public class UISlider extends UI {
             double v = ((value - min) / 200) * w + this.min;
             v = MathUtils.findClosest(this.min, this.max, this.interval, v);
             this.optionInfo.getTarget().setValue(v);
+            return;
+        }
+        if (hd2) {
+            double max = (getX() + 100);
+            double min = (getX() - 100);
+            double value = mouseX;
+            if (value > max) value = max;
+            if (value < min) value = min;
+            double v = ((value - min) / 200) * w + this.min;
+            v = MathUtils.findClosest(this.min, this.max, this.interval, v);
+            this.optionInfo.getTarget().setValua(v);
         }
         super.mouseMoved(mouseX, mouseY);
     }
@@ -171,6 +233,9 @@ public class UISlider extends UI {
             if (isInButton(mouseX, mouseY)) {
                 hd = true;
             }
+            if (isInButton2(mouseX, mouseY)) {
+                hd2 = true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -179,7 +244,9 @@ public class UISlider extends UI {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (button == 0) {
             hd = false;
+            hd2 = false;
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
+
 }

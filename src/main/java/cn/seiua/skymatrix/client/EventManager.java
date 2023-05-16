@@ -1,6 +1,9 @@
 package cn.seiua.skymatrix.client;
 
-import cn.seiua.skymatrix.client.component.*;
+import cn.seiua.skymatrix.client.component.Component;
+import cn.seiua.skymatrix.client.component.Event;
+import cn.seiua.skymatrix.client.component.Init;
+import cn.seiua.skymatrix.client.component.Use;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +42,7 @@ public class EventManager {
     }
     public void unregister(Class c){
 
-        cn.seiua.skymatrix.event.EventManager.unregister(c);
+        cn.seiua.skymatrix.event.EventManager.unregister(events.get(c));
     }
 
 

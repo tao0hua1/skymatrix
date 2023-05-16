@@ -1,5 +1,7 @@
 package cn.seiua.skymatrix.client.module;
 
+import cn.seiua.skymatrix.client.ConfigManager;
+import cn.seiua.skymatrix.client.EventManager;
 import cn.seiua.skymatrix.client.component.*;
 import cn.seiua.skymatrix.config.Value;
 import cn.seiua.skymatrix.config.option.MapValueHolder;
@@ -18,44 +20,66 @@ import java.util.Map;
 public class ModuleManager {
     @Use
     public List<Object> components;
+    @Use
+    public EventManager eventManager;
+    @Use
+    public ConfigManager configManager;
 
     private static final Logger logger = LoggerFactory.getLogger("ModuleManager");
-
-    private Map<String,Object> modules;
-
     @Value(name = "state")
-    public MapValueHolder<String,Boolean> valueHolder= new MapValueHolder<String, Boolean>(new HashMap<>());
+    public MapValueHolder<String, Boolean, Boolean> valueHolder = new MapValueHolder<String, Boolean, Boolean>(new HashMap<>());
+    private Map<String, ModuleObj> modules;
 
     public static ModuleManager instance;
 
-    @Init
+    @Init(level = 999999)
     public void handle() {
         modules=new HashMap<>();
         for (Object o: components) {
             Class c = o.getClass();
             Annotation annotation = c.getAnnotation(SModule.class);
-            if(annotation!=null){
+            if (annotation != null) {
                 SModule module = (SModule) annotation;
-                modules.put(getModuleName(module),new ModuleObj(o,false,module.name(),module.category()));
-                valueHolder.value.put(getModuleName(module),false);
-                logger.info("Module loaded: "+c.getName()+" "+getModuleName(module));
+                modules.put(getModuleName(module), new ModuleObj(o, false, module.name(), module.category()));
+                valueHolder.value.put(getModuleName(module), false);
+                logger.info("Module loaded: " + c.getName() + " " + getModuleName(module));
             }
         }
-        instance=this;
+        instance = this;
+        configManager.addCallBack(this::registerEvents);
     }
 
-    public boolean isEnable(String moduleName){
-        if(!valueHolder.value.containsKey(moduleName)){
-            logger.warn("不存在的Modulename: "+moduleName);
+    public void registerEvents() {
+        for (Object key : valueHolder.value.keySet()) {
+            if (valueHolder.value.get(key)) {
+                eventManager.register(modules.get(key).getTarget().getClass());
+            }
+        }
+    }
+
+
+    public boolean isEnable(String moduleName) {
+        if (!valueHolder.value.containsKey(moduleName)) {
+            logger.warn("不存在的Modulename: " + moduleName);
+            valueHolder.value.put(moduleName, false);
             return false;
         }
         return valueHolder.value.get(moduleName);
     }
     public void toggle(String moduleName){
-        if(valueHolder.value.containsKey(moduleName)){
-            valueHolder.value.put(moduleName,!valueHolder.value.get(moduleName));
-        }else {
-            logger.warn("不存在的Modulename: "+moduleName);
+        if (valueHolder.value.containsKey(moduleName)) {
+
+            if (!valueHolder.value.get(moduleName).booleanValue()) {
+                eventManager.register(this.modules.get(moduleName).getTarget().getClass());
+                valueHolder.value.put(moduleName, true);
+            } else {
+                eventManager.unregister(this.modules.get(moduleName).getTarget().getClass());
+                valueHolder.value.put(moduleName, false);
+            }
+
+        } else {
+            valueHolder.value.put(moduleName, false);
+            logger.warn("不存在的Modulename: " + moduleName);
         }
     }
 

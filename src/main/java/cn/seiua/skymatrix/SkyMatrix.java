@@ -1,6 +1,9 @@
 package cn.seiua.skymatrix;
 
 
+import cn.seiua.skymatrix.client.Notice;
+import cn.seiua.skymatrix.client.NoticeType;
+import cn.seiua.skymatrix.client.Notification;
 import cn.seiua.skymatrix.client.component.ComponentHandler;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -24,21 +27,15 @@ public class SkyMatrix implements ModInitializer, ClientTickEvents.StartTick {
 
 
         dispatcher.register(
-                // 使用 literal 方法创建一个字面量参数节点，表示命令的名称
-                ClientCommandManager.literal("hello")
-                        // 使用 then 方法添加一个子节点，表示命令的参数
+                ClientCommandManager.literal("Test")
                         .then(
-                                // 使用 argument 方法创建一个参数节点，表示要打招呼的对象
-                                ClientCommandManager.argument("target", StringArgumentType.string())
-                                        // 使用 executes 方法添加一个执行器，表示命令的逻辑
+                                ClientCommandManager.argument("notice", StringArgumentType.string())
                                         .executes(context -> {
-                                            // 从上下文中获取参数的值
-                                            String target = StringArgumentType.getString(context, "target");
-                                            // 从上下文中获取命令源，即执行命令的玩家
                                             FabricClientCommandSource source = context.getSource();
-                                            // 向玩家发送一条消息，打招呼
-                                            source.sendFeedback(Text.literal("Hello, " + target + "!"));
-                                            // 返回命令的结果，0 表示成功
+                                            source.sendFeedback(Text.literal("notice"));
+                                            Notification.getInstance().push(new Notice("Test", "a test message", NoticeType.ERROR));
+                                            Notification.getInstance().push(new Notice("Test", "a test message", NoticeType.INFO));
+                                            Notification.getInstance().push(new Notice("Test", "a test message", NoticeType.WARN));
                                             return 1;
                                         })
                         )
@@ -50,7 +47,6 @@ public class SkyMatrix implements ModInitializer, ClientTickEvents.StartTick {
     public void onInitialize() {
         ClientCommandRegistrationCallback.EVENT.register(SkyMatrix::registerCommands);
         ClientTickEvents.START_CLIENT_TICK.register(this);
-        // 注册一个名为 /hello 的命令
 
     }
     private boolean flag;

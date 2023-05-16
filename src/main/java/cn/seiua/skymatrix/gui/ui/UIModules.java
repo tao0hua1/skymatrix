@@ -9,6 +9,7 @@ import cn.seiua.skymatrix.gui.UIComponent;
 import cn.seiua.skymatrix.utils.CateInfo;
 import cn.seiua.skymatrix.utils.ModuleInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import cn.seiua.skymatrix.utils.UiInfo;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
@@ -78,12 +79,15 @@ public class UIModules extends UI {
         ClickGui.fontRenderer24.resetCenteredH();
         ClickGui.fontRenderer24.resetCenteredV();
         int sty = getY() + 58;
-        for (UIModule uiModule : uiModules) {
-            uiModule.update(getX(), sty);
-            uiModule.render(matrixStack, mouseX, mouseY, delta);
-            sty += uiModule.getHeight();
-        }
+        if (isOpen()) {
 
+
+            for (UIModule uiModule : uiModules) {
+                uiModule.update(getX(), sty);
+                uiModule.render(matrixStack, mouseX, mouseY, delta);
+                sty += uiModule.getHeight();
+            }
+        }
     }
 
 
@@ -101,11 +105,26 @@ public class UIModules extends UI {
         super.mouseMoved(mouseX, mouseY);
     }
 
+    public boolean isOpen() {
+        UiInfo uiInfo = ClickGui.getValue(cateInfo.getFullName() + ".state");
+        return uiInfo.isValue();
+    }
+
+    private void setOpen(boolean b) {
+        ClickGui.getValue(cateInfo.getFullName() + ".state").setValue(b);
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-
-        for (UIModule uiModule : uiModules) {
-            uiModule.mouseClicked(mouseX, mouseY, button);
+        if (isInBox()) {
+            if (button == 1) {
+                setOpen(!isOpen());
+            }
+        }
+        if (isOpen()) {
+            for (UIModule uiModule : uiModules) {
+                uiModule.mouseClicked(mouseX, mouseY, button);
+            }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
@@ -113,7 +132,8 @@ public class UIModules extends UI {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-
+        ClickGui.getValue(cateInfo.getFullName() + ".state").setX(getX());
+        ClickGui.getValue(cateInfo.getFullName() + ".state").setY(getY());
         for (UIModule uiModule : uiModules) {
             uiModule.mouseReleased(mouseX, mouseY, button);
         }

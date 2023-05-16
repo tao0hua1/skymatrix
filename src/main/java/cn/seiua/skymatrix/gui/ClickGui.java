@@ -1,18 +1,20 @@
 package cn.seiua.skymatrix.gui;
 
 
-import cn.seiua.skymatrix.client.Client;
+import cn.seiua.skymatrix.client.*;
 import cn.seiua.skymatrix.client.component.Component;
 import cn.seiua.skymatrix.client.component.*;
 import cn.seiua.skymatrix.client.module.Sign;
 import cn.seiua.skymatrix.config.Value;
 import cn.seiua.skymatrix.config.option.KeyBind;
+import cn.seiua.skymatrix.config.option.MapValueHolder;
 import cn.seiua.skymatrix.font.FontRenderer;
 import cn.seiua.skymatrix.font.FontUtils;
 import cn.seiua.skymatrix.gui.ui.UI;
 import cn.seiua.skymatrix.gui.ui.UIModules;
 import cn.seiua.skymatrix.utils.CateInfo;
 import cn.seiua.skymatrix.utils.ModuleInfo;
+import cn.seiua.skymatrix.utils.UiInfo;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -26,9 +28,22 @@ import java.util.*;
 @Config(name = "clickgui")
 public class ClickGui extends Screen {
 
+    public static FontRenderer fontRenderer18;
+    public static FontRenderer fontRenderer16;
+
     public static FontRenderer fontRenderer24;
     public static FontRenderer fontRenderer22;
     public static FontRenderer fontRenderer20;
+    public static FontRenderer fontRenderer26;
+    public static FontRenderer fontRenderer28;
+    public static FontRenderer fontRenderer30;
+    public static FontRenderer fontRenderer32;
+    public static FontRenderer iconfontRenderer30;
+    public static FontRenderer iconfontRenderer28;
+    public static FontRenderer iconfontRenderer26;
+    private static ClickGui instance;
+    @Use
+    public Notification notification;
     public static FontRenderer iconfontRenderer24;
     public static FontRenderer iconfontRenderer22;
     public static FontRenderer iconfontRenderer20;
@@ -43,13 +58,43 @@ public class ClickGui extends Screen {
     public List<Object> component;
     private Map<String, UIModules> modules = new HashMap<>();
     private int t;
+    @Use
+    public ConfigManager configManager;
+    @Value(name = "state")
+    public MapValueHolder<String, UiInfo, UiInfo> valueHolder = new MapValueHolder<>(new HashMap(), new UiInfo());
 
     public ClickGui() {
         super(Text.empty());
     }
 
+    public static UiInfo getValue(String key) {
+        if (!instance.valueHolder.value.containsKey(key)) {
+            instance.valueHolder.value.put(key, new UiInfo());
+        }
+        return instance.valueHolder.value.get(key);
+    }
+
     @Init
     public void initClickGui() {
+        instance = this;
+        fontRenderer32 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 32);
+        fontRenderer30 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 30);
+        fontRenderer28 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 28);
+        fontRenderer26 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 26);
+        fontRenderer24 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 24);
+        fontRenderer22 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 22);
+        fontRenderer20 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 20);
+        fontRenderer18 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 18);
+        fontRenderer16 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 16);
+        iconfontRenderer30 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 30);
+        iconfontRenderer28 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 28);
+        iconfontRenderer26 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 26);
+        iconfontRenderer24 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 24);
+        iconfontRenderer22 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 22);
+        iconfontRenderer20 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 20);
+        iconfontRenderer18 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 18);
+        iconfontRenderer16 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 16);
+        iconfontRenderer40 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 70);
         Map<String, CateInfo> categorys = new HashMap<>();
         Map<String, ModuleInfo> modules = new HashMap<>();
         for (Object o : component) {
@@ -75,11 +120,10 @@ public class ClickGui extends Screen {
                     this.modules.put(category, u);
                     u.setX(500);
                     u.setY(yt);
-                    yt += 100;
+                    yt += 58;
                 }
                 u = this.modules.get(category);
                 u.addModuleInfo(moduleInfo);
-
             }
         }
     }
@@ -87,7 +131,8 @@ public class ClickGui extends Screen {
     @Override
     public void close() {
 
-
+        configManager.writeConfig();
+        notification.push(new Notice("Config", "config saved successfully", NoticeType.INFO));
         super.close();
     }
 
@@ -108,15 +153,6 @@ public class ClickGui extends Screen {
     protected void init() {
 
 
-        fontRenderer24 = FontUtils.getFontRenderer("fz.ttf", Font.BOLD, 24);
-        fontRenderer22 = FontUtils.getFontRenderer("fz.ttf", Font.PLAIN, 22);
-        fontRenderer20 = FontUtils.getFontRenderer("fz.ttf", Font.PLAIN, 18);
-        iconfontRenderer24 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 24);
-        iconfontRenderer22 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 22);
-        iconfontRenderer20 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 20);
-        iconfontRenderer18 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 18);
-        iconfontRenderer16 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 16);
-        iconfontRenderer40 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 70);
 
         super.init();
     }

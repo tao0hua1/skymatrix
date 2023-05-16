@@ -585,24 +585,25 @@ public abstract class MixinClientPlayNetworkHandler {
 //
 //
 //    }
-//
-//    public void onPlaySound(PlaySoundS2CPacket var1, CallbackInfo callbackInfo){
-//
-//        ServerPacketEvent event=new ServerPacketEvent(var1);
-//        event.call();
-//        if(event.isCancelled())callbackInfo.cancel();
-//
-//
-//    }
-//
-//    public void onPlaySoundFromEntity(PlaySoundFromEntityS2CPacket var1, CallbackInfo callbackInfo){
-//
-//        ServerPacketEvent event=new ServerPacketEvent(var1);
-//        event.call();
-//        if(event.isCancelled())callbackInfo.cancel();
-//
-//
-//    }
+@Inject(at = @At("HEAD"), method = "onPlaySound", cancellable = true)
+public void onPlaySound(PlaySoundS2CPacket var1, CallbackInfo callbackInfo) {
+
+    ServerPacketEvent event = new ServerPacketEvent(var1);
+    event.call();
+    if (event.isCancelled()) callbackInfo.cancel();
+
+
+}
+
+    @Inject(at = @At("HEAD"), method = "onPlaySoundFromEntity", cancellable = true)
+    public void onPlaySoundFromEntity(PlaySoundFromEntityS2CPacket var1, CallbackInfo callbackInfo) {
+
+        ServerPacketEvent event = new ServerPacketEvent(var1);
+        event.call();
+        if (event.isCancelled()) callbackInfo.cancel();
+
+
+    }
 //
 //    public void onItemPickupAnimation(ItemPickupAnimationS2CPacket var1, CallbackInfo callbackInfo){
 //

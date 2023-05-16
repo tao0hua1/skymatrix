@@ -5,6 +5,7 @@ import cn.seiua.skymatrix.gui.DrawLine;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.ModuleInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import cn.seiua.skymatrix.utils.UiInfo;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
@@ -27,6 +28,7 @@ public class UIModule extends UI {
         setInBoxLeft(this::toggle);
         setInBoxRight(this::toggle1);
     }
+
 
     public List<UI> getUis() {
         return uis;
@@ -89,7 +91,7 @@ public class UIModule extends UI {
         ClickGui.iconfontRenderer24.resetCenteredH();
         ClickGui.iconfontRenderer24.resetCenteredV();
 
-        if (moduleInfo.isOpen()) {
+        if (this.isOpen()) {
             int sty = getY() + 58 / 2;
             for (UI ui : uis) {
                 ui.update(getX(), sty);
@@ -107,12 +109,21 @@ public class UIModule extends UI {
     }
 
     public void toggle1() {
-        moduleInfo.setOpen(!moduleInfo.isOpen());
+        this.setOpen(!this.isOpen());
+    }
+
+    public boolean isOpen() {
+        UiInfo uiInfo = ClickGui.getValue(moduleInfo.getFullName() + ".state");
+        return uiInfo.isValue();
+    }
+
+    private void setOpen(boolean b) {
+        ClickGui.getValue(moduleInfo.getFullName() + ".state").setValue(b);
     }
 
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
-        if (moduleInfo.isOpen()) {
+        if (this.isOpen()) {
             for (UI ui : uis) {
                 ui.mouseMoved(mouseX, mouseY);
             }
@@ -129,7 +140,7 @@ public class UIModule extends UI {
         }
 
 
-        if (moduleInfo.isOpen()) {
+        if (this.isOpen()) {
             for (UI ui : uis) {
                 ui.mouseClicked(mouseX, mouseY, button);
             }
@@ -139,7 +150,8 @@ public class UIModule extends UI {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (moduleInfo.isOpen()) {
+
+        if (this.isOpen()) {
             for (UI ui : uis) {
                 ui.mouseReleased(mouseX, mouseY, button);
             }
@@ -152,6 +164,7 @@ public class UIModule extends UI {
     void initUI() {
 
     }
+
 
     @Override
     public int getHeight() {

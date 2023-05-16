@@ -72,14 +72,14 @@ public class UIColorSlider extends UI {
 
         drawLine(matrixStack);
 
-        ClickGui.fontRenderer20.centeredH();
-        ClickGui.fontRenderer20.setColor(Theme.getInstance().THEME.geColor());
-        ClickGui.fontRenderer20.drawString(matrixStack, drawLine.get(25), getY() - 10, upperFirst(optionInfo.getName()));
-        drawLine.append(ClickGui.fontRenderer20.getStringWidth(upperFirst(optionInfo.getName())));
-        ClickGui.fontRenderer20.centeredV();
+        ClickGui.fontRenderer16.centeredH();
+        ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());
+        ClickGui.fontRenderer16.drawString(matrixStack, drawLine.get(25), getY() - 10, upperFirst(optionInfo.getName()));
+        drawLine.append(ClickGui.fontRenderer16.getStringWidth(upperFirst(optionInfo.getName())));
+        ClickGui.fontRenderer16.centeredV();
 
-        ClickGui.fontRenderer20.resetCenteredH();
-        ClickGui.fontRenderer20.resetCenteredV();
+        ClickGui.fontRenderer16.resetCenteredH();
+        ClickGui.fontRenderer16.resetCenteredV();
 
 
         double uw = 200;
