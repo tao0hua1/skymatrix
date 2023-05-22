@@ -172,7 +172,7 @@ public class UIDoubleSlider extends UI {
     }
 
     @Override
-    void initUI() {
+    public void initUI() {
 
     }
 

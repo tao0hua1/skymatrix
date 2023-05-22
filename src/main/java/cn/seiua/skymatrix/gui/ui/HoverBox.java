@@ -9,7 +9,7 @@ public class HoverBox extends UI {
     }
 
     @Override
-    void initUI() {
+    public void initUI() {
 
     }
 

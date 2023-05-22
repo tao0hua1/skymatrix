@@ -1,6 +1,7 @@
 package cn.seiua.skymatrix.config.option;
 
 import cn.seiua.skymatrix.client.module.Signs;
+import cn.seiua.skymatrix.config.IHide;
 import cn.seiua.skymatrix.gui.UIComponent;
 import cn.seiua.skymatrix.gui.ui.UI;
 import cn.seiua.skymatrix.gui.ui.UIToggle;
@@ -10,7 +11,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.io.Serializable;
 
 
-public class ToggleSwitch implements Serializable , UIComponent {
+public class ToggleSwitch implements Serializable, UIComponent, IHide {
 
     public boolean isValue() {
         return value;
@@ -41,4 +42,8 @@ public class ToggleSwitch implements Serializable , UIComponent {
     }
 
 
+    @Override
+    public boolean canRender(String v) {
+        return isValue();
+    }
 }

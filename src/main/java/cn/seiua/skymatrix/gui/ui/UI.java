@@ -100,7 +100,7 @@ public abstract class UI {
         this.y = y;
     }
 
-    abstract void initUI();
+    public abstract void initUI();
 
     public abstract boolean keyReleased(int keyCode, int scanCode, int modifiers);
 

@@ -7,11 +7,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Value {
+public @interface Hide {
 
-    String name();
-
-    String desc() default "none";
-
+    String following();
 
 }

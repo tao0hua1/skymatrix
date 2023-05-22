@@ -1,7 +1,10 @@
 package cn.seiua.skymatrix.gui.ui;
 
 import cn.seiua.skymatrix.client.module.Sign;
+import cn.seiua.skymatrix.config.Hide;
+import cn.seiua.skymatrix.config.IHide;
 import cn.seiua.skymatrix.config.Value;
+import cn.seiua.skymatrix.config.option.KeyBind;
 import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.gui.DrawLine;
 import cn.seiua.skymatrix.gui.Theme;
@@ -15,6 +18,7 @@ import net.minecraft.util.math.Box;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class UIModules extends UI {
@@ -39,16 +43,33 @@ public class UIModules extends UI {
         Object o = moduleInfo.getTarget();
         Class c = moduleInfo.getaClass();
         List<UI> temp = new ArrayList<>();
+        HashMap<UI, IHide> hideMap = new HashMap<>();
+        HashMap<String, IHide> temp1 = new HashMap<>();
         for (Field field : c.getDeclaredFields()) {
             Value value = (Value) field.getAnnotation(Value.class);
             Sign sign = (Sign) field.getAnnotation(Sign.class);
             if (value != null) {
+
+
                 try {
+
                     Object uobj = field.get(o);
+                    if (value.name().equals("keyBind")) {
+                        moduleInfo.setKeyBind((KeyBind) uobj);
+                        continue;
+                    }
                     if (uobj instanceof UIComponent) {
                         UIComponent uiComponent = (UIComponent) uobj;
+                        if (uobj instanceof IHide) {
+                            temp1.put(value.name(), (IHide) uobj);
+                        }
+                        Hide hide = field.getAnnotation(Hide.class);
+
                         UI ui = uiComponent.build(name, category, value.name(), sign == null ? null : sign.sign());
                         if (ui != null) {
+                            if (hide != null) {
+                                hideMap.put(ui, temp1.get(hide.following()));
+                            }
                             temp.add(ui);
                         }
                     }
@@ -59,12 +80,21 @@ public class UIModules extends UI {
         }
 
         uiModule.setUis(temp);
+        uiModule.setHideMap(hideMap);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        for (UIModule uiModule : uiModules) {
+            uiModule.mouseScrolled(mouseX, mouseY, amount);
+
+        }
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     public void update(int x, int y) {
-        UiInfo uiInfo = ClickGui.getValue(cateInfo.getFullName() + ".state");
-        setX(uiInfo.getX());
-        setY(uiInfo.getY());
+        super.update(x, y);
+
     }
 
     @Override
@@ -77,6 +107,10 @@ public class UIModules extends UI {
         RenderUtils.setColor(Theme.getInstance().BOARD.geColor());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 250, getY() + 58, 0), matrixStack, 10);
         RenderUtils.resetCent();
+        if (isOpen()) {
+            RenderUtils.drawRound2D(new Box(getX() - getWidth() / 2, getY() + getHeight() / 4, 0, getX() + 250 / 2, getY() + 58 / 2, 0), matrixStack, 0);
+
+        }
         ClickGui.fontRenderer24.centeredH();
         ClickGui.fontRenderer24.setColor(Theme.getInstance().THEME.geColor());
         ClickGui.fontRenderer24.setDrawSize(32);
@@ -97,8 +131,14 @@ public class UIModules extends UI {
 
 
     @Override
-    void initUI() {
+    public void initUI() {
+        UiInfo uiInfo = ClickGui.getValue(cateInfo.getFullName() + ".state");
+        setX(uiInfo.getX());
+        setY(uiInfo.getY());
 
+        for (UI ui : uiModules) {
+            ui.initUI();
+        }
     }
 
 

@@ -2,6 +2,7 @@ package cn.seiua.skymatrix.config.option;
 
 import cn.seiua.skymatrix.client.KeyBindManger;
 import cn.seiua.skymatrix.client.Run;
+import cn.seiua.skymatrix.client.module.ModuleManager;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.List;
@@ -39,18 +40,33 @@ public class KeyBind {
         this.keys = keys;
     }
 
+    private String moduleName;
+
     public KeyBind(String name, List<Integer> keys, Run run) {
         this.name = name;
         this.keys = keys;
         this.run = run;
-        run1=true;
+        run1 = true;
     }
 
-    public static int getMouseKey(int k){
+    public KeyBind(List<Integer> keys, String moduleName) {
+        this.name = "toggle";
+        this.keys = keys;
+        this.run = this::toggle;
+        this.moduleName = moduleName;
+        run1 = true;
+    }
+
+    public static int getMouseKey(int k) {
         return k;
     }
-    public static int getKeyboardKey(int k){
-        return k+ KeyBindManger.MOUSE;
+
+    public static int getKeyboardKey(int k) {
+        return k + KeyBindManger.MOUSE;
+    }
+
+    public void toggle() {
+        ModuleManager.instance.toggle(moduleName);
     }
 
 }

@@ -168,38 +168,42 @@ public class RenderUtils {
 
 
         tessellator.draw();
-        bufferBuilder = tessellator.getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
-                VertexFormats.POSITION);
-        int spx = (int) (bb.maxX - r);
-        int spy = (int) (bb.minY + r);
-        float lx = 0;
-        float ly = 0;
-        boolean nmsl = true;
-        for (int i = 0; i <= 360; i++) {
-            if (i == 90) {
-                spx = (int) (bb.minX + r);
-                spy = (int) (bb.minY + r);
-                nmsl = false;
-            }
-            if (i == 180) {
-                spx = (int) (bb.minX + r);
-                spy = (int) (bb.maxY - r);
-                nmsl = true;
-            }
-            if (i == 270) {
-                spx = (int) (bb.maxX - r);
-                spy = (int) (bb.maxY - r);
-                nmsl = false;
-            }
-            ly = r * (float) Math.sin(Math.toRadians(i));
-            lx = r * (float) Math.cos(Math.toRadians(i));
-            bufferBuilder.vertex(matrix, (float) spx, (float) spy, (float) bb.minZ).next();
-            bufferBuilder.vertex(matrix, (float) spx + lx, (float) spy - ly, (float) bb.minZ).next();
-            bufferBuilder.vertex(matrix, nmsl ? (float) spx + ly : (float) spx - ly, nmsl ? (float) spy - lx : (float) spy + lx, (float) bb.minZ).next();
+        if (r > 0) {
 
+
+            bufferBuilder = tessellator.getBuffer();
+            bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
+                    VertexFormats.POSITION);
+            int spx = (int) (bb.maxX - r);
+            int spy = (int) (bb.minY + r);
+            float lx = 0;
+            float ly = 0;
+            boolean nmsl = true;
+            for (int i = 0; i <= 360; i++) {
+                if (i == 90) {
+                    spx = (int) (bb.minX + r);
+                    spy = (int) (bb.minY + r);
+                    nmsl = false;
+                }
+                if (i == 180) {
+                    spx = (int) (bb.minX + r);
+                    spy = (int) (bb.maxY - r);
+                    nmsl = true;
+                }
+                if (i == 270) {
+                    spx = (int) (bb.maxX - r);
+                    spy = (int) (bb.maxY - r);
+                    nmsl = false;
+                }
+                ly = r * (float) Math.sin(Math.toRadians(i));
+                lx = r * (float) Math.cos(Math.toRadians(i));
+                bufferBuilder.vertex(matrix, (float) spx, (float) spy, (float) bb.minZ).next();
+                bufferBuilder.vertex(matrix, (float) spx + lx, (float) spy - ly, (float) bb.minZ).next();
+                bufferBuilder.vertex(matrix, nmsl ? (float) spx + ly : (float) spx - ly, nmsl ? (float) spy - lx : (float) spy + lx, (float) bb.minZ).next();
+
+            }
+            tessellator.draw();
         }
-        tessellator.draw();
         GlStateManager._disableBlend();
         resetColor();
     }

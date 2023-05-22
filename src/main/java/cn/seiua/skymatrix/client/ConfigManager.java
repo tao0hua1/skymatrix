@@ -12,11 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ConfigManager {
@@ -24,109 +22,178 @@ public class ConfigManager {
     @Use
     public List<Object> components;
 
+    public static final String VERSION = "1.0";
     @Use
     public List<ExtraConfig> extraConfigs;
     @Use
     public LocalConfigStore localConfigStore;
-
     public static final String MODULE = "module";
     @Use
     public ModuleManager moduleManager;
-    public Store store1= (Store) Native.loadLibrary(Store.class);
+    public static final String COMMON = "common";
     private Store store;
     private String uuid;
+    public static final String CATEGORY = "category";
+    public Store store1 = (Store) Native.loadLibrary(Store.class);
+    public Map<String, Map<String, Map<String, Object>>> configs;
 
     private static final Logger logger = LoggerFactory.getLogger("ConfigManager");
-    public Map<String,Object> configs;
-    public static final String NORMAIL = "common";
-    public String getConfigName(Class c){
-        Category category = (Category) c.getAnnotation(Category.class);
-        SModule module = (SModule) c.getAnnotation(SModule.class);
-        Config config = (Config) c.getAnnotation(Config.class);
-        String name=null;
-        if(category!=null){
-            name=CATEGORY+"."+category.name();
-        }
-        if(module!=null){
-            name=MODULE+"."+module.category()+"."+module.name();
-        }
-        if(config!=null){
-            name=NORMAIL+"."+config.name();
-        }
-        return name;
+    private List<Object> configObjs;
+    private Map<String, Profile> profiles;
+    private Profile current;
+
+    public Object getConfigByKey(String cate, String gname, String cname) {
+        return null;
+
     }
 
-    public static final String CATEGORY="category";
+    private void putConfig(String cate, String gname, String cname, Object value) {
+        if (configs.get(cate) == null) configs.put(cate, new HashMap<>());
+        if (configs.get(cate).get(gname) == null) configs.get(cate).put(gname, new HashMap<>());
+        configs.get(cate)
+                .get(gname).put(cname, value);
+
+
+    }
+
     private List<Run> callbacks = new ArrayList<>();
+
+    public String reloadProfiles() {
+
+        String uuid = null;
+        String[] uuids = store.loadUUIDs();
+        for (String u : uuids) {
+            try {
+                String json = new String(store.load(u), "utf8");
+                Profile profile = JSON.parseObject(json, Profile.class);
+                if (profile.isSelected()) {
+                    uuid = profile.getUuid();
+                    this.current = profile;
+                } else {
+                    profile.setSelected(false);
+                }
+                profiles.put(profile.getUuid(), profile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (uuid == null) {
+            this.current = new Profile("default", UUID.randomUUID().toString(), VERSION);
+            this.current.setSelected(true);
+            uuid = this.current.getUuid();
+            this.profiles.put(current.getUuid(), current);
+        }
+        return uuid;
+    }
+
+    public void switchProfile(String uuid) {
+        if (current.getUuid() != uuid) {
+            if (this.profiles.containsKey(uuid)) {
+                Profile newp = this.profiles.get(uuid);
+                current.setSelected(false);
+                newp.setSelected(true);
+                this.saveProfiles();
+                this.current = newp;
+            }
+        }
+    }
+
+    public void saveProfiles() {
+        for (Profile profile : profiles.values()) {
+
+            byte[] data = new byte[0];
+            try {
+                data = JSON.toJSONString(profile, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect).getBytes("utf8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+            this.store.write(data, profile.getUuid());
+        }
+    }
+
+    public List<Object> getConfigsByClass(Class c) {
+        List<Object> temp = new ArrayList<>();
+        for (Object o : this.configObjs) {
+            if (o.getClass() == c) {
+                temp.add(o);
+            }
+        }
+        return temp;
+    }
 
     @Init(level = 9999999)
     public void handle() {
-        configs=new HashMap<>();
+        JSON.DEFAULT_GENERATE_FEATURE = SerializerFeature.DisableCircularReferenceDetect.getMask();
+        profiles = new HashMap<>();
+        configs = new HashMap<>();
+        configObjs = new ArrayList<>();
         switchStore(localConfigStore);
-        for (Object o: components) {
-            Class target=o.getClass();
-            String config=getConfigName(target);
-            if(config==null)continue;
-            for (Field field: target.getDeclaredFields()) {
-                String value=getValueName(field);
-                if(value==null)continue;
-                String cname=config+"."+value;
-                try {
-                    configs.put(cname, field.get(o));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
+        reloadProfiles();
+        String cate = null;
+        String gname = null;
+        String cname = null;
+        for (Object o : components) {
+            Class target = o.getClass();
+            Category category = (Category) target.getAnnotation(Category.class);
+            SModule module = (SModule) target.getAnnotation(SModule.class);
+            Config config = (Config) target.getAnnotation(Config.class);
+            if (config != null || module != null) {
+                cate = COMMON;
+                if (config != null) {
+                    gname = config.name();
+                }
+                if (module != null) {
+                    cate = module.category();
+                    gname = module.name();
                 }
 
+                for (Field field : target.getDeclaredFields()) {
+                    field.setAccessible(true);
+                    Value value = (Value) field.getAnnotation(Value.class);
+                    if (value != null) {
+                        cname = value.name();
+
+                        try {
+                            putConfig(cate, gname, cname, field.get(o));
+                            configObjs.add(field.get(o));
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
             }
         }
-        bindConfigFromFile();
-        writeConfig();
+        bindConfigFromProfile();
+        writeToProfile();
+        saveProfiles();
         for (Run run : callbacks) {
             run.run();
         }
     }
 
+    private void bindConfigFromProfile() {
+        JSONObject jo = current.getConfig();
+        if (jo == null) return;
+        for (String cate : jo.keySet()) {
 
-    public String getValueName(Field field){
-        Value value=field.getAnnotation(Value.class);
-        String name=null;
-        if(value!=null){
-            name=value.name();
-        }
-        return name;
-    }
-    public static final String EXTRA="extra";
+            for (String gname : jo.getJSONObject(cate).keySet()) {
+                if (jo.getJSONObject(cate).getJSONObject(gname) != null) {
+                    for (String cname : jo.getJSONObject(cate).getJSONObject(gname).keySet()) {
 
-    private void bindConfigFromFile(){
-        JSONObject jo=null;
-        try {
-            jo=JSON.parseObject(new String(store.load(uuid)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        for (String key: jo.keySet()) {
-            if (key == EXTRA) continue;
-            Object current = configs.get(key);
-            if (current == null) {
-
-                logger.warn("Removed setting: key: " + key);
-                continue;
-            }
-
-
-            logger.info("Loaded setting: " + key);
-            try {
-                Object o = jo.getJSONObject(key).toJavaObject(current.getClass());
-                ReflectUtils.copyData(current, o);
-                if (current instanceof ConfigInit) {
-                    ((ConfigInit) current).init();
+                        Object config = this.configs.get(cate).get(gname).get(cname);
+                        if (config == null) continue;
+                        Object object = jo.getJSONObject(cate).getJSONObject(gname).getObject(cname, config.getClass());
+                        ReflectUtils.copyData(config, object);
+                        if (config instanceof ConfigInit) {
+                            ConfigInit configInit = (ConfigInit) config;
+                            configInit.init();
+                        }
+                    }
                 }
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-                logger.warn("配置文件加载似乎出现了一个问题 ： key " + key);
-            }
 
+            }
         }
+
     }
 
     public void addCallBack(Run run) {
@@ -136,20 +203,29 @@ public class ConfigManager {
 
     }
 
-    public void writeConfig() {
-//        for (ExtraConfig extraConfig: extraConfigs) {
-//           Object o =extraConfig.read();
-//           HashMap hashMap=new HashMap();
-//            hashMap.put(EXTRA+"."+extraConfig.name(),o);
-//            configs.put(EXTRA,hashMap);
-//
-//        }
-        store.write(JSON.toJSONString(configs, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect).getBytes(), uuid);
+    public String getUuid() {
+        return uuid;
     }
 
-    public void switchStore(Store store){
-        uuid=null;
-        this.store=store;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public Profile getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(Profile current) {
+        this.current = current;
+    }
+
+    public void writeToProfile() {
+        this.current.setConfig(JSON.parseObject(JSON.toJSONString(configs)));
+    }
+
+    public void switchStore(Store store) {
+        uuid = null;
+        this.store = store;
 
     }
 

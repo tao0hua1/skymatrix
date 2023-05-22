@@ -41,7 +41,7 @@ public class ClickGui extends Screen {
     public static FontRenderer iconfontRenderer30;
     public static FontRenderer iconfontRenderer28;
     public static FontRenderer iconfontRenderer26;
-    private static ClickGui instance;
+    public static ClickGui instance;
     @Use
     public Notification notification;
     public static FontRenderer iconfontRenderer24;
@@ -62,6 +62,9 @@ public class ClickGui extends Screen {
     public ConfigManager configManager;
     @Value(name = "state")
     public MapValueHolder<String, UiInfo, UiInfo> valueHolder = new MapValueHolder<>(new HashMap(), new UiInfo());
+    public KeyBind keyBind;
+    int k1 = -1;
+    int k2 = -1;
 
     public ClickGui() {
         super(Text.empty());
@@ -129,12 +132,35 @@ public class ClickGui extends Screen {
         }
     }
 
+    int k3 = -1;
+    int shiftign;
+    int mouse1ign;
+    private UI focus;
+
+    public UI getFocus() {
+        return focus;
+    }
+
+    public void setFocus(UI focus) {
+        this.focus = focus;
+    }
+
     @Override
     public void close() {
 
-        configManager.writeConfig();
-        notification.push(new Notice("Config", "config saved successfully", NoticeType.INFO));
+        configManager.writeToProfile();
+        configManager.saveProfiles();
+        notification.push(new Notice("Config", "profile: " + configManager.getCurrent().getName() + " saved successfully", NoticeType.INFO));
         super.close();
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        for (UIModules uiModules : modules.values()) {
+            uiModules.mouseScrolled(mouseX, mouseX, amount);
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override
@@ -146,6 +172,10 @@ public class ClickGui extends Screen {
         for (UIModules uiModules : modules.values()) {
             uiModules.render(matrices, mouseX, mouseY, delta);
         }
+        if (focus != null) {
+            Screen.fillGradient(matrices, 0, 0, this.width * UI.getS(), this.height * UI.getS(), -1072689136, -804253680);
+            focus.render(matrices, mouseX, mouseY, delta);
+        }
 
 
     }
@@ -154,14 +184,71 @@ public class ClickGui extends Screen {
     protected void init() {
 
 
-
+        for (UI ui : modules.values()) {
+            ui.initUI();
+        }
         super.init();
+    }
+
+    private void append(int key, int t) {
+        if (k1 == key) {
+            return;
+        }
+        if (k2 == key) {
+            return;
+        }
+        if (k3 == key) {
+            return;
+        }
+
+
+        if (k1 == -1) {
+            k1 = t == 0 ? key : KeyBindManger.MOUSE + t;
+        } else {
+            if (k2 == -1) {
+                k2 = t == 0 ? key : KeyBindManger.MOUSE + t;
+            } else {
+                if (k3 == -1) {
+                    k3 = t == 0 ? key : KeyBindManger.MOUSE + t;
+                }
+            }
+        }
+
+
+        List<Integer> keys = new ArrayList<>();
+        if (k1 != -1) keys.add(k1);
+        if (k2 != -1) keys.add(k2);
+        if (k3 != -1) keys.add(k3);
+        this.keyBind.setKeys(keys);
+
+    }
+
+    private void resetKeyBind() {
+        this.keyBind = null;
+        k1 = -1;
+        k2 = -1;
+        k3 = -1;
+        ClickGui.instance.setFocus(null);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         mouseY = mouseY * UI.getS();
         mouseX = mouseX * UI.getS();
+
+        if (mouse1ign > 0) {
+            mouse1ign--;
+            return true;
+        }
+        if (keyBind != null) {
+            append(button, 1);
+            return true;
+        }
+
+        if (focus != null) {
+            focus.mouseClicked(mouseX, mouseY, button);
+            return true;
+        }
         List<UIModules> list = new ArrayList<>(modules.values().stream().toList());
         Collections.reverse(list);
         for (UIModules uiModules : list) {
@@ -176,6 +263,20 @@ public class ClickGui extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         mouseY = mouseY * UI.getS();
         mouseX = mouseX * UI.getS();
+
+        if (mouse1ign > 0) {
+            mouse1ign--;
+            return true;
+        }
+        if (keyBind != null) {
+            resetKeyBind();
+            return true;
+        }
+
+        if (focus != null) {
+            focus.mouseReleased(mouseX, mouseY, button);
+            return true;
+        }
         List<UIModules> list = new ArrayList<>(modules.values().stream().toList());
         Collections.reverse(list);
         for (UIModules uiModules : list) {
@@ -190,15 +291,38 @@ public class ClickGui extends Screen {
         mouseX = mouseX * UI.getS();
         List<UIModules> list = new ArrayList<>(modules.values().stream().toList());
         Collections.reverse(list);
+        if (focus != null) {
+            focus.mouseMoved(mouseX, mouseY);
+            return;
+        }
         for (UIModules uiModules : list) {
             uiModules.mouseMoved(mouseX, mouseY);
+
         }
         super.mouseMoved(mouseX, mouseY);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (shiftign == 2) {
 
+            return true;
+        }
+        if (keyBind != null) {
+            if (GLFW.GLFW_KEY_ESCAPE == keyCode) {
+                resetKeyBind();
+                return true;
+            }
+            append(keyCode, 0);
+
+
+            return true;
+        }
+
+        if (focus != null) {
+            focus.keyPressed(keyCode, scanCode, modifiers);
+            return true;
+        }
 
         for (UIModules uiModules : modules.values()) {
             uiModules.keyPressed(keyCode, scanCode, modifiers);
@@ -207,8 +331,27 @@ public class ClickGui extends Screen {
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    public void open() {
+
+
+        client.openGui(ClickGui.class);
+    }
+
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if (shiftign == 2) {
+            shiftign = -1;
+            return true;
+        }
+        if (keyBind != null) {
+            resetKeyBind();
+            return true;
+        }
+
+        if (focus != null) {
+            focus.keyReleased(keyCode, scanCode, modifiers);
+            return true;
+        }
         for (UIModules uiModules : modules.values()) {
             uiModules.keyReleased(keyCode, scanCode, modifiers);
         }
@@ -216,9 +359,10 @@ public class ClickGui extends Screen {
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
 
-    public void open() {
-
-
-        client.openGui(ClickGui.class);
+    public void setupKeyBind(KeyBind keyBind) {
+        shiftign = 2;
+        mouse1ign++;
+        this.keyBind = keyBind;
+        this.keyBind.setKeys(new ArrayList<Integer>());
     }
 }

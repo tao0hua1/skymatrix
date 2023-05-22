@@ -7,37 +7,35 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Component
 public class LocalConfigStore implements Store {
-    private File config= new File(Client.root,"config.json");
-
+    private static final String BASE = "CF_{UUID}.json";
+    private File config = new File(Client.root, "configs/");
 
     @Override
     public void write(byte[] data, String uuid) {
         try {
-            FileUtils.writeByteArrayToFile(config,data,false);
+            FileUtils.writeByteArrayToFile(new File(config, BASE.replace("{UUID}", uuid)), data, false);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-    @Init(level = -10)
-    public void init() {  try {
-        if(!config.exists()){
-                Client.root.mkdirs();
-                config.createNewFile();
 
-            FileUtils.writeStringToFile(config,"{}");
+    @Init(level = -10)
+    public void init() {
+        if (!config.exists()) {
+            config.mkdirs();
         }
-        } catch (IOException e) {
-        throw new RuntimeException(e);
+
     }
-    }
+
 
     @Override
-    public byte[] load(String uuid)  {
+    public byte[] load(String uuid) {
         try {
-            return FileUtils.readFileToByteArray(config);
+            return FileUtils.readFileToByteArray(new File(config, BASE.replace("{UUID}", uuid)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -45,6 +43,17 @@ public class LocalConfigStore implements Store {
 
     @Override
     public String[] loadUUIDs() {
-        return new String[0];
+
+        ArrayList<String> uuids = new ArrayList<>();
+        for (File file : config.listFiles()) {
+            if (file.isFile()) {
+                if (file.getName().startsWith("CF_")) {
+                    uuids.add(file.getName().replace(".json", "").replace("CF_", ""));
+                }
+            }
+        }
+
+
+        return uuids.toArray(new String[]{});
     }
 }

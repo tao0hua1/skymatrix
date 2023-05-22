@@ -121,7 +121,7 @@ public class UIColorSlider extends UI {
     }
 
     @Override
-    void initUI() {
+    public void initUI() {
 
     }
 

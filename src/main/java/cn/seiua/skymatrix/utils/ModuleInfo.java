@@ -2,6 +2,7 @@ package cn.seiua.skymatrix.utils;
 
 import cn.seiua.skymatrix.client.module.ModuleManager;
 import cn.seiua.skymatrix.client.module.Signs;
+import cn.seiua.skymatrix.config.option.KeyBind;
 
 import java.io.Serializable;
 
@@ -15,6 +16,17 @@ public class ModuleInfo implements Serializable {
     private transient Object target;
     private transient Signs sign;
     private Boolean enable;
+
+
+    private KeyBind keyBind;
+
+    public KeyBind getKeyBind() {
+        return keyBind;
+    }
+
+    public void setKeyBind(KeyBind keyBind) {
+        this.keyBind = keyBind;
+    }
 
     public ModuleInfo(String fullName, String name, Class aClass, Object target, Signs sign, String category) {
         this.fullName = fullName;

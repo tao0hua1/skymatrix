@@ -8,9 +8,11 @@ import cn.seiua.skymatrix.config.option.KeyBind;
 import cn.seiua.skymatrix.event.EventTarget;
 import cn.seiua.skymatrix.event.events.KeyboardEvent;
 import cn.seiua.skymatrix.event.events.MouseEvent;
+import cn.seiua.skymatrix.gui.ClickGui;
+import net.minecraft.client.MinecraftClient;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
 @Event(register = true)
-public class KeyBindManger /*implements Runnable*/{
+public class KeyBindManger /*implements Runnable*/ {
 
     @Use
     private ConfigManager configManager;
@@ -27,24 +29,8 @@ public class KeyBindManger /*implements Runnable*/{
     private List<KeyBind> keyBinds0;
     private List<KeyBind> keyBinds1;
     private List<KeyBind> keyBinds2;
-    @Init(level = 999999999)
-    public void handle(){
-        keyBinds0=new ArrayList<>();
-        keyBinds1=new ArrayList<>();
-        keyBinds2=new ArrayList<>();
-        active=new CopyOnWriteArrayList<>();
-        for (Object o:configManager.configs.values()) {
-                if(o instanceof KeyBind){
-                    KeyBind keyBind=(KeyBind) o;
-                    switch (keyBind.getKeys().size()){
-                        case 1:{keyBinds0.add(keyBind);break;}
-                        case 2:{keyBinds1.add(keyBind);break;}
-                        case 3:{keyBinds2.add(keyBind);break;}
-                        default:throw new RuntimeException("NMSL");
-                    }
-            }
-        }
-    }
+
+    public static final int MOUSE = 10000;
 
 
     public static final HashMap<Integer, String> KEY_MAP = new HashMap<Integer, String>() {{
@@ -119,146 +105,189 @@ public class KeyBindManger /*implements Runnable*/{
         put(347, "RIGHT SUPER");
         put(348, "MENU");
     }};
-
-    private CopyOnWriteArrayList<KeyBind>  active;
+    private CopyOnWriteArrayList<KeyBind> active;
 
     // key KeyBind
     // key key KeyBind
     // key KeyBind
 
-    private int key0=-1;
-    private int key1=-1;
-    private int key2=-1;
+    private int key0 = -1;
+    private int key1 = -1;
+    private int key2 = -1;
 
+    public static String getKeyName(int key) {
+        if (key >= MOUSE) {
+            return "M" + (key - MOUSE);
+        }
+        String keyName = GLFW.glfwGetKeyName(key, GLFW.glfwGetKeyScancode(key));
+        if (keyName == null) {
+            keyName = KEY_MAP.get(key);
+        }
+        return keyName;
+    }
+
+    @Init(level = 999999999)
+    public void handle() {
+        keyBinds0 = new ArrayList<>();
+        keyBinds1 = new ArrayList<>();
+        keyBinds2 = new ArrayList<>();
+        active = new CopyOnWriteArrayList<>();
+        for (Object o : configManager.getConfigsByClass(KeyBind.class)) {
+
+            KeyBind keyBind = (KeyBind) o;
+            switch (keyBind.getKeys().size()) {
+                case 1: {
+                    keyBinds0.add(keyBind);
+                    break;
+                }
+                case 2: {
+                    keyBinds1.add(keyBind);
+                    break;
+                }
+                case 3: {
+                    keyBinds2.add(keyBind);
+                    break;
+                }
+                default:
+                    throw new RuntimeException("NMSL");
+            }
+
+        }
+    }
 
     @EventTarget
     public void keyboard(KeyboardEvent e) {
-        if(e.getAction()==2)return;
-        appendKeyboard(e.getKeyCode(),e.getAction());
+        if (MinecraftClient.getInstance().currentScreen != null && MinecraftClient.getInstance().currentScreen.getClass() == ClickGui.class)
+            return;
+        if (e.getAction() == 2) return;
+        appendKeyboard(e.getKeyCode(), e.getAction());
         printKeyNames();
         matchKey();
     }
+
     @EventTarget
     public void mouse(MouseEvent e) {
-
-        appendMouse(e.getButton(),e.getAction());
+        if (MinecraftClient.getInstance().currentScreen != null && MinecraftClient.getInstance().currentScreen.getClass() == ClickGui.class)
+            return;
+        appendMouse(e.getButton(), e.getAction());
         printKeyNames();
         matchKey();
     }
 
-    private void appendMouse(int value,int action){
-        value=value+MOUSE;
-        if(action==1){
-            if(key0==-1){
-                key0=value;
+    private void appendMouse(int value, int action) {
+        value = value + MOUSE;
+        if (action == 1) {
+            if (key0 == -1) {
+                key0 = value;
                 return;
-            }else if(key0==value){
-                return;
-            }
-            if(key1==-1){
-                key1=value;
-                return;
-            }if(key1==value){
+            } else if (key0 == value) {
                 return;
             }
-            if(key2==-1){
-                key2=value;
+            if (key1 == -1) {
+                key1 = value;
                 return;
-            }if(key2==value){
+            }
+            if (key1 == value) {
+                return;
+            }
+            if (key2 == -1) {
+                key2 = value;
+                return;
+            }
+            if (key2 == value) {
                 return;
             }
         }
-        if(action==0){
-            if(key0==value){
-                key0=-1;
-                key1=-1;
-                key2=-1;
+        if (action == 0) {
+            if (key0 == value) {
+                key0 = -1;
+                key1 = -1;
+                key2 = -1;
             }
-            if(key1==value){
+            if (key1 == value) {
 
-                key1=-1;
-                key2=-1;
+                key1 = -1;
+                key2 = -1;
             }
-            if(key2==value){
+            if (key2 == value) {
 
-                key2=-1;
+                key2 = -1;
             }
         }
 
     }
-    private void appendKeyboard(int value,int action){
-        if(action==1){
 
-            if(key0==-1){
-                key0=value;
+    private void appendKeyboard(int value, int action) {
+        if (action == 1) {
+
+            if (key0 == -1) {
+                key0 = value;
                 return;
-            }else if(key0==value){
-                return;
-            }
-            if(key1==-1){
-                key1=value;
-                return;
-            }if(key1==value){
+            } else if (key0 == value) {
                 return;
             }
-            if(key2==-1){
-                key2=value;
+            if (key1 == -1) {
+                key1 = value;
                 return;
-            }if(key2==value){
+            }
+            if (key1 == value) {
+                return;
+            }
+            if (key2 == -1) {
+                key2 = value;
+                return;
+            }
+            if (key2 == value) {
                 return;
             }
         }
-        if(action==0){
-            if(key0==value){
-                key0=-1;
-                key1=-1;
-                key2=-1;
+        if (action == 0) {
+            if (key0 == value) {
+                key0 = -1;
+                key1 = -1;
+                key2 = -1;
             }
-            if(key1==value){
+            if (key1 == value) {
 
-                key1=-1;
-                key2=-1;
+                key1 = -1;
+                key2 = -1;
             }
-            if(key2==value){
+            if (key2 == value) {
 
-                key2=-1;
+                key2 = -1;
             }
         }
     }
 
-    private void printKeyNames(){
-        String key="Keys"+"-> ";
-        if(key0!=-1){
-            String nmsl=key0>=MOUSE?"MOUSE "+(key0-MOUSE):GLFW.glfwGetKeyName(key0, GLFW.glfwGetKeyScancode(key0));
-            key+=(nmsl==null?KEY_MAP.get(key0):nmsl);
+    private void printKeyNames() {
+        String key = "Keys" + "-> ";
+        if (key0 != -1) {
+            String nmsl = key0 >= MOUSE ? "MOUSE " + (key0 - MOUSE) : GLFW.glfwGetKeyName(key0, GLFW.glfwGetKeyScancode(key0));
+            key += (nmsl == null ? KEY_MAP.get(key0) : nmsl);
         }
-        if(key1!=-1){
-            String nmsl=key1>=MOUSE?"MOUSE "+(key1-MOUSE):GLFW.glfwGetKeyName(key1, GLFW.glfwGetKeyScancode(key1));
-            key+="-> "+(nmsl==null?KEY_MAP.get(key1):nmsl);
+        if (key1 != -1) {
+            String nmsl = key1 >= MOUSE ? "MOUSE " + (key1 - MOUSE) : GLFW.glfwGetKeyName(key1, GLFW.glfwGetKeyScancode(key1));
+            key += "-> " + (nmsl == null ? KEY_MAP.get(key1) : nmsl);
         }
-        if(key2!=-1){
-            String nmsl=key2>=MOUSE?"MOUSE "+(key2-MOUSE):GLFW.glfwGetKeyName(key2, GLFW.glfwGetKeyScancode(key2));
-            key+="-> "+(nmsl==null?KEY_MAP.get(key2):nmsl);
+        if (key2 != -1) {
+            String nmsl = key2 >= MOUSE ? "MOUSE " + (key2 - MOUSE) : GLFW.glfwGetKeyName(key2, GLFW.glfwGetKeyScancode(key2));
+            key += "-> " + (nmsl == null ? KEY_MAP.get(key2) : nmsl);
         }
-        if(key0==-1&&key1==-1&&key2==-1)key=key+"clear!";
+        if (key0 == -1 && key1 == -1 && key2 == -1) key = key + "clear!";
         logger.info(key.toUpperCase());
     }
 
-
-    public static final int MOUSE=10000;
-
-
-    public void matchKey(){
-        if(key0!=-1){
-            for (KeyBind keyBind: keyBinds0) {
+    public void matchKey() {
+        if (key0 != -1) {
+            for (KeyBind keyBind : keyBinds0) {
                 matchKey1(keyBind);
             }
-            if(key1!=-1){
-                for (KeyBind keyBind: keyBinds1) {
+            if (key1 != -1) {
+                for (KeyBind keyBind : keyBinds1) {
                     matchKey1(keyBind);
                 }
-                if(key2!=-1){
-                    for (KeyBind keyBind: keyBinds2) {
+                if (key2 != -1) {
+                    for (KeyBind keyBind : keyBinds2) {
                         matchKey1(keyBind);
                     }
                 }
@@ -267,29 +296,31 @@ public class KeyBindManger /*implements Runnable*/{
 
     }
 
-    private void matchKey1(KeyBind keyBind){
-        int keysize=keyBind.getKeys().size();
-        int flag=0;
-        if(keysize>=1&&key0==keyBind.getKeys().get(0)){
+    private void matchKey1(KeyBind keyBind) {
+        int keysize = keyBind.getKeys().size();
+        if (keysize == 0) {
+            return;
+        }
+        int flag = 0;
+        if (keysize >= 1 && key0 == keyBind.getKeys().get(0)) {
             flag++;
         }
-        if(keysize>=2&&key1==keyBind.getKeys().get(1)){
+        if (keysize >= 2 && key1 == keyBind.getKeys().get(1)) {
             flag++;
         }
-        if(keysize>=3&&key2==keyBind.getKeys().get(2)){
+        if (keysize >= 3 && key2 == keyBind.getKeys().get(2)) {
             flag++;
         }
-        if(flag==keysize){
+        if (flag == keysize) {
 //            logger.info("keybind: "+keyBind.getName()+" keys: "+getKeyName(key0)+" "+getKeyName(key1)+" "+getKeyName(key2));
-            key0=-1;
-            key1=-1;
-            key2=-1;
+            key0 = -1;
+            key1 = -1;
+            key2 = -1;
 
             printKeyNames();
             keyBind.getRun().run();
         }
     }
-
 
 
 }

@@ -74,12 +74,10 @@ public class UIToggle extends UI {
         if (optionInfo.getTarget().isValue()) {
 
             ClickGui.iconfontRenderer24.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
-            ClickGui.iconfontRenderer24.setDrawSize(24);
-            ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96, getY(), "\uE90E");
+            ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96 - ClickGui.iconfontRenderer24.getStringWidth("\uE90E") / 2, getY(), "\uE90E");
         } else {
             ClickGui.iconfontRenderer24.setColor(Theme.getInstance().THEME.geColor());
-            ClickGui.iconfontRenderer24.setDrawSize(24);
-            ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96, getY(), "\uE90D");
+            ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96 - ClickGui.iconfontRenderer24.getStringWidth("\uE90E") / 2, getY(), "\uE90D");
         }
         ClickGui.iconfontRenderer24.resetCenteredH();
         ClickGui.iconfontRenderer24.resetCenteredV();
@@ -87,7 +85,7 @@ public class UIToggle extends UI {
     }
 
     @Override
-    void initUI() {
+    public void initUI() {
 
     }
 

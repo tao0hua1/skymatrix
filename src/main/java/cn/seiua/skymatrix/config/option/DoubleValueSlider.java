@@ -6,12 +6,13 @@ import cn.seiua.skymatrix.gui.ui.UI;
 import cn.seiua.skymatrix.gui.ui.UIDoubleSlider;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 public class DoubleValueSlider<V extends Number> implements UIComponent {
 
-    @JSONField(alternateNames = "value")
+    @JSONField(alternateNames = "value", serialzeFeatures = SerializerFeature.DisableCircularReferenceDetect)
     private V value;
-    @JSONField(alternateNames = "valua")
+    @JSONField(alternateNames = "valua", serialzeFeatures = SerializerFeature.DisableCircularReferenceDetect)
     private V valua;
     private transient V min;
     private transient V max;
@@ -67,7 +68,7 @@ public class DoubleValueSlider<V extends Number> implements UIComponent {
 
     @Override
     public String getID() {
-        return "ValueSlider";
+        return "DoubleValueSlider";
     }
 
     @Override

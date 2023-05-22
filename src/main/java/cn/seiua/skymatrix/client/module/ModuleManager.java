@@ -1,7 +1,6 @@
 package cn.seiua.skymatrix.client.module;
 
-import cn.seiua.skymatrix.client.ConfigManager;
-import cn.seiua.skymatrix.client.EventManager;
+import cn.seiua.skymatrix.client.*;
 import cn.seiua.skymatrix.client.component.*;
 import cn.seiua.skymatrix.config.Value;
 import cn.seiua.skymatrix.config.option.MapValueHolder;
@@ -22,20 +21,24 @@ public class ModuleManager {
     public List<Object> components;
     @Use
     public EventManager eventManager;
+
+    @Use
+    public Notification notification;
     @Use
     public ConfigManager configManager;
 
     private static final Logger logger = LoggerFactory.getLogger("ModuleManager");
     @Value(name = "state")
     public MapValueHolder<String, Boolean, Boolean> valueHolder = new MapValueHolder<String, Boolean, Boolean>(new HashMap<>());
+
     private Map<String, ModuleObj> modules;
 
     public static ModuleManager instance;
 
     @Init(level = 999999)
     public void handle() {
-        modules=new HashMap<>();
-        for (Object o: components) {
+        modules = new HashMap<>();
+        for (Object o : components) {
             Class c = o.getClass();
             Annotation annotation = c.getAnnotation(SModule.class);
             if (annotation != null) {
@@ -66,7 +69,8 @@ public class ModuleManager {
         }
         return valueHolder.value.get(moduleName);
     }
-    public void toggle(String moduleName){
+
+    public void toggle(String moduleName) {
         if (valueHolder.value.containsKey(moduleName)) {
 
             if (!valueHolder.value.get(moduleName).booleanValue()) {
@@ -75,18 +79,25 @@ public class ModuleManager {
             } else {
                 eventManager.unregister(this.modules.get(moduleName).getTarget().getClass());
                 valueHolder.value.put(moduleName, false);
+
             }
 
         } else {
             valueHolder.value.put(moduleName, false);
             logger.warn("不存在的Modulename: " + moduleName);
         }
+
+        if (valueHolder.value.get(moduleName)) {
+            notification.push(new Notice("Module", "Enable " + this.modules.get(moduleName).getName(), NoticeType.INFO));
+        } else {
+            notification.push(new Notice("Module", "Disable " + this.modules.get(moduleName).getName(), NoticeType.INFO));
+        }
+
     }
 
     public String getModuleName(SModule module) {
         return module.category() + "." + module.name();
     }
-
 
 
 }

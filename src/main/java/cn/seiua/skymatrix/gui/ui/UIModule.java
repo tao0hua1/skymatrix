@@ -1,5 +1,8 @@
 package cn.seiua.skymatrix.gui.ui;
 
+import cn.seiua.skymatrix.client.KeyBindManger;
+import cn.seiua.skymatrix.config.IHide;
+import cn.seiua.skymatrix.config.option.KeyBind;
 import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.gui.DrawLine;
 import cn.seiua.skymatrix.gui.Theme;
@@ -11,6 +14,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -60,49 +64,7 @@ public class UIModule extends UI {
         return ac;
     }
 
-    @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
-        drawLine.reset(getX() - 125);
-        setWidth(250);
-        setHeight(58);
-        setMid(true);
-        RenderUtils.cent();
-        RenderUtils.setColor(getBoardColoar());
-        RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 250, getY() + 58, 0), matrixStack, 0);
-        RenderUtils.setColor(moduleInfo.getSign().color);
-        RenderUtils.drawRound2D(new Box(getX() + 124, getY(), 0, getX() + 127, getY() + 58, 0), matrixStack, 0);
-        if (isInBox()) {
-            if (Screen.hasShiftDown()) {
-                RenderUtils.setColor(Theme.getInstance().SUBBOARD.geColor());
-                RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 30, getY() + 30, 0), matrixStack, 2);
-
-            }
-        }
-        ClickGui.fontRenderer22.centeredH();
-        ClickGui.fontRenderer22.setColor(Theme.getInstance().THEME.geColor());
-        ClickGui.fontRenderer22.drawString(matrixStack, drawLine.get(25), getY(), upperFirst(moduleInfo.getName()));
-        ClickGui.fontRenderer22.resetCenteredH();
-        ClickGui.fontRenderer22.resetCenteredV();
-        ClickGui.iconfontRenderer24.centeredH();
-        ClickGui.iconfontRenderer24.centeredV();
-        ClickGui.iconfontRenderer24.setColor(Theme.getInstance().THEME.geColor());
-        ClickGui.iconfontRenderer24.setDrawSize(30);
-        ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96, getY(), "\uE90C");
-        ClickGui.iconfontRenderer24.resetCenteredH();
-        ClickGui.iconfontRenderer24.resetCenteredV();
-
-        if (this.isOpen()) {
-            int sty = getY() + 58 / 2;
-            for (UI ui : uis) {
-                ui.update(getX(), sty);
-                ui.render(matrixStack, mouseX, mouseY, delta);
-                sty += ui.getHeight();
-            }
-            uiy = sty + 58 / 2;
-        } else {
-            uiy = 0;
-        }
-    }
+    private int scroll = 0;
 
     public void toggle() {
         moduleInfo.setEnable(!moduleInfo.isEnable());
@@ -131,22 +93,7 @@ public class UIModule extends UI {
         super.mouseMoved(mouseX, mouseY);
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (isInBox()) {
-            if (button == 0) {
-
-            }
-        }
-
-
-        if (this.isOpen()) {
-            for (UI ui : uis) {
-                ui.mouseClicked(mouseX, mouseY, button);
-            }
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
+    private HashMap<UI, IHide> hideMap;
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
@@ -161,10 +108,124 @@ public class UIModule extends UI {
     }
 
     @Override
-    void initUI() {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+        drawLine.reset(getX() - 125);
+        setWidth(250);
+        setHeight(58);
+        setMid(true);
+        RenderUtils.cent();
+        RenderUtils.setColor(getBoardColoar());
+        RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 250, getY() + 58, 0), matrixStack, 0);
+        RenderUtils.setColor(moduleInfo.getSign().color);
+        RenderUtils.drawRound2D(new Box(getX() + 124, getY(), 0, getX() + 127, getY() + 58, 0), matrixStack, 0);
 
+        ClickGui.fontRenderer22.centeredH();
+        ClickGui.fontRenderer22.setColor(Theme.getInstance().THEME.geColor());
+        ClickGui.fontRenderer22.drawString(matrixStack, drawLine.get(25), getY(), upperFirst(moduleInfo.getName()));
+        ClickGui.fontRenderer22.resetCenteredH();
+        ClickGui.fontRenderer22.resetCenteredV();
+        ClickGui.iconfontRenderer24.centeredH();
+        ClickGui.iconfontRenderer24.centeredV();
+        ClickGui.iconfontRenderer24.setColor(Theme.getInstance().THEME.geColor());
+        ClickGui.iconfontRenderer24.setDrawSize(30);
+        ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96, getY(), "\uE90C");
+        ClickGui.iconfontRenderer24.resetCenteredH();
+        ClickGui.iconfontRenderer24.resetCenteredV();
+
+        KeyBind keyBind = this.moduleInfo.getKeyBind();
+        if (Screen.hasShiftDown() || ClickGui.instance.keyBind == keyBind) {
+
+            if (keyBind != null) {
+                String name = "";
+                if (keyBind.getKeys().size() != 0) {
+                    for (int i : keyBind.getKeys()) {
+                        if (name.equals("")) {
+                            name = UI.upperFirst(KeyBindManger.getKeyName(i));
+                            continue;
+                        }
+                        name = name + "+" + UI.upperFirst(KeyBindManger.getKeyName(i));
+                    }
+                } else {
+                    if (ClickGui.instance.keyBind == keyBind) {
+                        name = "press keys";
+                    } else {
+                        name = "none";
+                    }
+
+                }
+
+                if (name != "") {
+                    int w = ClickGui.fontRenderer16.getStringWidth(name);
+                    int st = getX() + 80 - w / 2;
+                    RenderUtils.setColor(Theme.getInstance().SUBBOARD.geColor());
+                    RenderUtils.drawRound2D(new Box(st, getY(), 0, st + w + 20, getY() + 24, 0), matrixStack, 4);
+                    ClickGui.fontRenderer16.centeredH();
+                    ClickGui.fontRenderer16.centeredV();
+                    ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());
+                    ClickGui.fontRenderer16.drawString(matrixStack, st, getY(), name);
+                    ClickGui.fontRenderer16.resetCenteredH();
+                    ClickGui.fontRenderer16.resetCenteredV();
+                }
+            }
+        }
+        if (this.isOpen()) {
+            int sty = getY() + 58 / 2;
+            int i = 0;
+            for (UI ui : uis) {
+                if (i < scroll) {
+                    i++;
+                    continue;
+                }
+                if (hideMap != null && hideMap.get(ui) != null) {
+                    if (!hideMap.get(ui).canRender(null)) continue;
+                }
+                ui.update(getX(), sty);
+                ui.render(matrixStack, mouseX, mouseY, delta);
+                sty += ui.getHeight();
+
+                i++;
+            }
+            uiy = sty + 58 / 2;
+        } else {
+            uiy = 0;
+        }
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (isInBox()) {
+            if (Screen.hasShiftDown() && button == 0) {
+                if (this.moduleInfo.getKeyBind() != null) {
+                    ClickGui.instance.setupKeyBind(this.moduleInfo.getKeyBind());
+                    ClickGui.instance.setFocus(this);
+                }
+                return true;
+            }
+        }
+
+
+        if (this.isOpen()) {
+            int i = 0;
+            for (UI ui : uis) {
+                if (i < scroll) {
+                    i++;
+                    continue;
+                }
+                if (hideMap != null && hideMap.get(ui) != null) {
+                    if (!hideMap.get(ui).canRender(null)) continue;
+                }
+
+                ui.mouseClicked(mouseX, mouseY, button);
+                i++;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public void initUI() {
+
+    }
 
     @Override
     public int getHeight() {
@@ -197,5 +258,37 @@ public class UIModule extends UI {
                 ui.keyPressed(keyCode, scanCode, modifiers);
             }
         }
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        if (isInBox()) {
+            scroll += (-1 * amount);
+            if (scroll <= 0) {
+                scroll = 0;
+            }
+            int cu = 0;
+            for (UI ui : this.getUis()) {
+                if (this.hideMap.get(ui) != null) {
+                    if (!this.hideMap.get(ui).canRender(null)) {
+                        cu++;
+                    }
+                }
+            }
+            if (scroll >= this.uis.size() - cu) {
+                scroll = this.uis.size() - cu;
+
+            }
+        }
+        if (this.isOpen()) {
+            for (UI ui : uis) {
+                ui.mouseScrolled(mouseX, mouseY, amount);
+            }
+        }
+        return super.mouseScrolled(mouseX, mouseY, amount);
+    }
+
+    public void setHideMap(HashMap<UI, IHide> hideMap) {
+        this.hideMap = hideMap;
     }
 }
