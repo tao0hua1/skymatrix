@@ -10,51 +10,55 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.io.Serializable;
 
 
-
-public class ValueSlider <V extends Number> implements Serializable , UIComponent {
+public class ValueSlider implements Serializable, UIComponent {
     @JSONField(alternateNames = "value")
-    private V value;
-    private transient V min;
-    private transient V max;
-    private transient V interval;
+    private Number value;
+    private transient Number min;
+    private transient Number max;
+    private transient Number interval;
 
-    public V getValue() {
+    public ValueSlider(Number value, Number min, Number max, Number interval) {
+        this.value = value;
+        this.min = min;
+        this.max = max;
+        this.interval = interval;
+    }
+
+    public Number getValue() {
         return value;
     }
 
-    public V getMin() {
+    public void setValue(Number value) {
+
+        this.value = value;
+    }
+
+    public Number getMin() {
         return min;
     }
 
-    public void setMin(V min) {
+    public void setMin(Number min) {
         this.min = min;
     }
 
-    public V getMax() {
+    public Number getMax() {
         return max;
     }
 
-    public void setMax(V max) {
+    public void setMax(Number max) {
         this.max = max;
     }
 
-    public V getInterval() {
+    public Number getInterval() {
         return interval;
     }
 
-    public void setInterval(V interval) {
+    public void setInterval(Number interval) {
         this.interval = interval;
     }
 
-    public void setValue(V value) {
-        this.value = value;
-    }
-
-    public ValueSlider(V value, V min, V max, V interval) {
-        this.value = value;
-        this.min = min;
-        this.max = max;
-        this.interval = interval;
+    public String toValueString() {
+        return value.toString();
     }
 
     @Override

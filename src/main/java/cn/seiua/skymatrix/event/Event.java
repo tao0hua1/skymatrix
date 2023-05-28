@@ -1,5 +1,7 @@
 package cn.seiua.skymatrix.event;
 
+import cn.seiua.skymatrix.SkyMatrix;
+
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -8,25 +10,23 @@ import java.lang.reflect.InvocationTargetException;
 public abstract class Event {
 
     /**
-     *
      * Main events you may need:
-     *
+     * <p>
      * Minecraft:
      * - EventKeyboard
      * - EventMiddleClick
      * - EventTick
-     *
+     * <p>
      * EntityPlayerSP:
      * - EventUpdate
      * - EventPreMotionUpdates
      * - EventPostMotionUpdates
-     *
+     * <p>
      * GuiIngame:
      * - EventRender2D
-     *
+     * <p>
      * EntityRenderer:
      * - EventRender3D
-     *
      */
 
     private boolean cancelled;
@@ -59,7 +59,7 @@ public abstract class Event {
     }
 
     private static final void call(final Event event) {
-
+        if (SkyMatrix.mc.world == null) return;
         final ArrayHelper<Data> dataList = EventManager.get(event.getClass());
 
         if (dataList != null) {

@@ -19,15 +19,14 @@ import java.util.Map;
 
 public class FontRenderer {
 
-    public static final int LEFT_TOP=0;
-    public static final int LEFT_DOWN=1;
-    public static final int RIGHT_TOP=2;
-    public static final int RIGHT_DOWN=3;
-
+    public static final int LEFT_TOP = 0;
+    public static final int LEFT_DOWN = 1;
+    public static final int RIGHT_TOP = 2;
+    public static final int RIGHT_DOWN = 3;
     /**
-     * 字符缓存
-    */
-    private Map<String, CharInfo> charsCache;
+     * 文字的起始位置 0为左上角 1为左下角 2为右上角 3为右下角 如过设置了centeredV centeredH次参数将会失效
+     */
+    public int side;
 
     /**
      * 当前字体
@@ -74,10 +73,10 @@ public class FontRenderer {
      */
     private boolean centeredH;
     /**
-     * 文字的起始位置 0为左上角 1为左下角 2为右上角 3为右下角 如过设置了centeredV centeredH次参数将会失效
+     * 字符缓存
      */
-    private int side;
-    private int outlineSize=1;
+    private Map<String, CharInfo> charsCache;
+    private int outlineSize = 1;
     private Color outlineColor;
     private Color shadowColor;
 
@@ -85,9 +84,11 @@ public class FontRenderer {
     public void setOutlineSize(int outlineSize) {
         this.outlineSize = outlineSize;
     }
+
     private int getOutlineSize() {
         return this.outlineSize;
     }
+
     public void resetOutlineSize() {
         this.outlineSize = 1;
     }
@@ -95,97 +96,104 @@ public class FontRenderer {
     public void setOutlineColor(Color outlineColor) {
         this.outlineColor = outlineColor;
     }
+
     public void resetOutlineColor() {
         this.outlineColor = null;
     }
-    private Color getOutlineColor(Color color){
-        if(outlineColor!=null){
-            return outlineColor;
-        }
-        return ColorUtils.darkenColor(color,0.5);
-    }
 
     public FontRenderer(Font font) {
-        this.charsCache=new HashMap<>();
-        this.font=font;
-        String init="1234567890qwertyuiopasdfghjklzxcvbnm";
-        for (char c: init.toCharArray()) {
-            CharInfo charInfo=getCharImg(c);
-            this.height=charInfo.getHeight();
+        this.charsCache = new HashMap<>();
+        this.font = font;
+        String init = "1234567890qwertyuiopasdfghjklzxcvbnm";
+        for (char c : init.toCharArray()) {
+            CharInfo charInfo = getCharImg(c);
+            this.height = charInfo.getHeight();
         }
 
     }
-    private CharInfo getCharImg(char c){
-        if(this.charsCache.containsKey(c+"")){
-            return this.charsCache.get(c+"");
+
+    private Color getOutlineColor(Color color) {
+        if (outlineColor != null) {
+            return outlineColor;
         }
-        BufferedImage bufferedImage=ClientImageGenerator.generateFontImages(c,font);
-        byte[] bytes=toByteArray(bufferedImage);
-        this.charsCache.put(c+"",new CharInfo(bytes,bufferedImage.getHeight(),bufferedImage.getWidth()));
-        return charsCache.get(c+"");
+        return ColorUtils.darkenColor(color, 0.5);
+    }
+
+    private CharInfo getCharImg(char c) {
+        if (this.charsCache.containsKey(c + "")) {
+            return this.charsCache.get(c + "");
+        }
+        BufferedImage bufferedImage = ClientImageGenerator.generateFontImages(c, font);
+        byte[] bytes = toByteArray(bufferedImage);
+        this.charsCache.put(c + "", new CharInfo(bytes, bufferedImage.getHeight(), bufferedImage.getWidth()));
+        return charsCache.get(c + "");
     }
 
     /**
      * 设置字体颜色
+     *
      * @param color 颜色
      */
-    public void setColor(Color color)
-    {
-        this.back=this.color;
-        this.color=color;
+    public void setColor(Color color) {
+        this.back = this.color;
+        this.color = color;
     }
 
     /**
      * 设置字体绘制的大小单位px
+     *
      * @param size 大小单位px
      */
-    public void setDrawSize(float size)
-    {
-        this.drawSize=size;
-        this.rate=height*1.0f/size;
+    public void setDrawSize(float size) {
+        this.drawSize = size;
+        this.rate = height * 1.0f / size;
     }
 
     /**
      * 设置回之前设置的颜色
      */
-    public void setBack(){
-        Color t=back;
-        this.back=color;
-        this.color=t;
+    public void setBack() {
+        Color t = back;
+        this.back = color;
+        this.color = t;
     }
 
     /**
      * 使接下来绘制的文字水平居中
      */
-    public void centeredV(){
-        this.centeredV=true;
+    public void centeredV() {
+        this.centeredV = true;
     }
+
     /**
      * 使接下来绘制的文字垂直
      */
-    public void centeredH(){
-        this.centeredH=true;
+    public void centeredH() {
+        this.centeredH = true;
     }
+
     /**
      * 重置文字水平居中
      */
-    public void resetCenteredV(){
-        this.centeredV=false;
+    public void resetCenteredV() {
+        this.centeredV = false;
     }
+
     /**
      * 重置文字垂直居中
      */
-    public void resetCenteredH(){
-        this.centeredH=false;
+    public void resetCenteredH() {
+        this.centeredH = false;
     }
 
-    public void drawStringWithShadow(MatrixStack matrixStack,int x,int y,String str){
-        this.shadow=true;
-        this.drawString(matrixStack,x,y,str);
-        this.shadow=false;
+    public void drawStringWithShadow(MatrixStack matrixStack, int x, int y, String str) {
+        this.shadow = true;
+        this.drawString(matrixStack, x, y, str);
+        this.shadow = false;
     }
-    public void drawStringWithOutline(MatrixStack matrixStack,int x,int y,String str){
-        this.outline=true;
+
+    public void drawStringWithOutline(MatrixStack matrixStack, int x, int y, String str) {
+        this.outline = true;
         this.drawString(matrixStack, x, y, str);
         this.outline = false;
     }
@@ -254,22 +262,22 @@ public class FontRenderer {
     private int x;
     private int y;
 
-    private void setSide(int x,int y,String str){
-        this.x=x;
-        this.y=y;
-        if(centeredH||centeredV)return;
-        if(side==RIGHT_DOWN){
-            this.y-=getStringHeight();
+    public void setSide(int x, int y, String str) {
+        this.x = x;
+        this.y = y;
+        if (centeredH || centeredV) return;
+        if (side == RIGHT_DOWN) {
+            this.y -= getStringHeight();
         }
-        if(side==RIGHT_TOP){
+        if (side == RIGHT_TOP) {
             //none
         }
-        if(side==LEFT_DOWN){
-            this.x-=getStringWidth(str);
-            this.y-=getStringHeight();
+        if (side == LEFT_DOWN) {
+            this.x -= getStringWidth(str);
+            this.y -= getStringHeight();
         }
-        if(side==LEFT_TOP){
-            this.x-=getStringWidth(str);
+        if (side == LEFT_TOP) {
+            this.x -= getStringWidth(str);
         }
 
     }
@@ -280,9 +288,9 @@ public class FontRenderer {
      * @param str str
      * @return Width
      */
-    public int getStringWidth(@NotNull String str){
-        int retv=0;
-        for (char c: str.toCharArray()) {
+    public int getStringWidth(@NotNull String str) {
+        int retv = 0;
+        for (char c : str.toCharArray()) {
             retv += getCharImg(c).getWidth();
         }
         return retv;
@@ -290,14 +298,14 @@ public class FontRenderer {
 
     /**
      * 以当前设置的绘制大小，获取字符的高度
+     *
      * @return height
      */
-    public int getStringHeight(){
+    public int getStringHeight() {
         return (int) (height);
     }
 
-    private byte[] toByteArray(BufferedImage image)
-    {
+    private byte[] toByteArray(BufferedImage image) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(image, "png", baos);
@@ -308,12 +316,8 @@ public class FontRenderer {
         }
     }
 
-    public void drawStringWithRainBowColor(MatrixStack matrixStack, float x, float y, String str){
+    public void drawStringWithRainBowColor(MatrixStack matrixStack, float x, float y, String str) {
     }
-
-
-
-
 
 
 }

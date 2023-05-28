@@ -18,6 +18,10 @@ public class SingleChoice<V> implements Serializable, UIComponent {
         return value;
     }
 
+    public V selectedValue() {
+        return this.value.get(selected);
+    }
+
     public void setValue(List<V> value) {
         this.value = value;
     }
@@ -32,7 +36,11 @@ public class SingleChoice<V> implements Serializable, UIComponent {
     }
 
     public void setSelected(int selected) {
-        this.selected = selected;
+        if (this.value == null || this.value.size() == 0) {
+            this.selected = 0;
+            return;
+        }
+        this.selected = selected % this.value.size();
     }
 
     @JSONField(alternateNames = "selected")

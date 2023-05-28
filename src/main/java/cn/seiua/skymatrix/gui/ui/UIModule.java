@@ -108,6 +108,14 @@ public class UIModule extends UI {
     }
 
     @Override
+    public void setMouse(double i, double i1) {
+        for (UI ui : uis) {
+            ui.setMouse(i, i1);
+        }
+        super.setMouse(i, i1);
+    }
+
+    @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         drawLine.reset(getX() - 125);
         setWidth(250);
@@ -115,20 +123,20 @@ public class UIModule extends UI {
         setMid(true);
         RenderUtils.cent();
         RenderUtils.setColor(getBoardColoar());
-        RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 250, getY() + 58, 0), matrixStack, 0);
+        RenderUtils.drawRound2D(new Box(getX(), getY(), getZ(), getX() + 250, getY() + 58, getZ()), matrixStack, 0);
         RenderUtils.setColor(moduleInfo.getSign().color);
-        RenderUtils.drawRound2D(new Box(getX() + 124, getY(), 0, getX() + 127, getY() + 58, 0), matrixStack, 0);
+        RenderUtils.drawRound2D(new Box(getX() + 124, getY(), getZ(), getX() + 127, getY() + 58, getZ()), matrixStack, 0);
 
         ClickGui.fontRenderer22.centeredH();
         ClickGui.fontRenderer22.setColor(Theme.getInstance().THEME.geColor());
-        ClickGui.fontRenderer22.drawString(matrixStack, drawLine.get(25), getY(), upperFirst(moduleInfo.getName()));
+        ClickGui.fontRenderer22.drawString(matrixStack, drawLine.get(25), getY(), getZ(), upperFirst(moduleInfo.getName()));
         ClickGui.fontRenderer22.resetCenteredH();
         ClickGui.fontRenderer22.resetCenteredV();
         ClickGui.iconfontRenderer24.centeredH();
         ClickGui.iconfontRenderer24.centeredV();
         ClickGui.iconfontRenderer24.setColor(Theme.getInstance().THEME.geColor());
         ClickGui.iconfontRenderer24.setDrawSize(30);
-        ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96, getY(), "\uE90C");
+        ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96, getY(), getZ(), "\uE90C");
         ClickGui.iconfontRenderer24.resetCenteredH();
         ClickGui.iconfontRenderer24.resetCenteredV();
 
@@ -158,11 +166,11 @@ public class UIModule extends UI {
                     int w = ClickGui.fontRenderer16.getStringWidth(name);
                     int st = getX() + 80 - w / 2;
                     RenderUtils.setColor(Theme.getInstance().SUBBOARD.geColor());
-                    RenderUtils.drawRound2D(new Box(st, getY(), 0, st + w + 20, getY() + 24, 0), matrixStack, 4);
+                    RenderUtils.drawRound2D(new Box(st, getY(), getZ(), st + w + 20, getY() + 24, getZ()), matrixStack, 4);
                     ClickGui.fontRenderer16.centeredH();
                     ClickGui.fontRenderer16.centeredV();
                     ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());
-                    ClickGui.fontRenderer16.drawString(matrixStack, st, getY(), name);
+                    ClickGui.fontRenderer16.drawString(matrixStack, st, getY(), getZ(), name);
                     ClickGui.fontRenderer16.resetCenteredH();
                     ClickGui.fontRenderer16.resetCenteredV();
                 }
@@ -171,6 +179,8 @@ public class UIModule extends UI {
         if (this.isOpen()) {
             int sty = getY() + 58 / 2;
             int i = 0;
+
+
             for (UI ui : uis) {
                 if (i < scroll) {
                     i++;
@@ -185,6 +195,8 @@ public class UIModule extends UI {
 
                 i++;
             }
+
+
             uiy = sty + 58 / 2;
         } else {
             uiy = 0;
@@ -225,6 +237,9 @@ public class UIModule extends UI {
     @Override
     public void initUI() {
 
+        for (UI ui : uis) {
+            ui.initUI();
+        }
     }
 
     @Override

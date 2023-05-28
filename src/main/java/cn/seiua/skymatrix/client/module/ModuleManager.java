@@ -86,11 +86,20 @@ public class ModuleManager {
             valueHolder.value.put(moduleName, false);
             logger.warn("不存在的Modulename: " + moduleName);
         }
+        Object o = this.modules.get(moduleName).getTarget();
+        boolean flag = false;
+        IToggle toggle = null;
+        if (o instanceof IToggle) {
+            toggle = (IToggle) o;
+            flag = true;
+        }
 
         if (valueHolder.value.get(moduleName)) {
             notification.push(new Notice("Module", "Enable " + this.modules.get(moduleName).getName(), NoticeType.INFO));
+            if (flag) toggle.enable();
         } else {
             notification.push(new Notice("Module", "Disable " + this.modules.get(moduleName).getName(), NoticeType.INFO));
+            if (flag) toggle.disable();
         }
 
     }

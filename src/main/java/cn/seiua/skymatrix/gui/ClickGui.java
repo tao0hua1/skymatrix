@@ -1,6 +1,7 @@
 package cn.seiua.skymatrix.gui;
 
 
+import cn.seiua.skymatrix.SkyMatrix;
 import cn.seiua.skymatrix.client.*;
 import cn.seiua.skymatrix.client.component.Component;
 import cn.seiua.skymatrix.client.component.*;
@@ -8,16 +9,21 @@ import cn.seiua.skymatrix.client.module.Sign;
 import cn.seiua.skymatrix.config.Value;
 import cn.seiua.skymatrix.config.option.KeyBind;
 import cn.seiua.skymatrix.config.option.MapValueHolder;
+import cn.seiua.skymatrix.config.option.ValueInput;
 import cn.seiua.skymatrix.font.FontRenderer;
 import cn.seiua.skymatrix.font.FontUtils;
 import cn.seiua.skymatrix.gui.ui.UI;
+import cn.seiua.skymatrix.gui.ui.UIButton;
 import cn.seiua.skymatrix.gui.ui.UIModules;
+import cn.seiua.skymatrix.hud.HudManager;
 import cn.seiua.skymatrix.utils.CateInfo;
 import cn.seiua.skymatrix.utils.ModuleInfo;
+import cn.seiua.skymatrix.utils.RenderUtils;
 import cn.seiua.skymatrix.utils.UiInfo;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Box;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -77,6 +83,57 @@ public class ClickGui extends Screen {
         return instance.valueHolder.value.get(key);
     }
 
+    private List<UI> uiList = new ArrayList<>();
+    @Value(name = "last")
+    private ValueInput last = new ValueInput("NMSL", "");
+
+    int k3 = -1;
+    int shiftign;
+    int mouse1ign;
+    private UI focus;
+
+    public UI getFocus() {
+        return focus;
+    }
+
+    public void setFocus(UI focus) {
+        this.focus = focus;
+    }
+
+    public void tick1() {
+        while (true) {
+            try {
+                Thread.sleep(3);
+                if (SkyMatrix.mc.currentScreen == this) {
+                    for (UIModules ui : modules.values()) {
+                        ui.updateUI();
+                    }
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+
+    @Override
+    public void close() {
+
+        configManager.writeToProfile();
+        configManager.saveProfiles();
+        notification.push(new Notice("Config", "profile: " + configManager.getCurrent().getName() + " saved successfully", NoticeType.INFO));
+        super.close();
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        for (UIModules uiModules : modules.values()) {
+            uiModules.mouseScrolled(mouseX, mouseX, amount);
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, amount);
+    }
+
     @Init
     public void initClickGui() {
         instance = this;
@@ -130,52 +187,23 @@ public class ClickGui extends Screen {
                 u.addModuleInfo(moduleInfo);
             }
         }
+        uiList.add(new UIButton(() -> {
+            client.openGui(HudManager.class);
+        }, "hud", "Open gui to edit hud!"));
+        uiList.add(new UIButton(() -> {
+            client.openGui(HudManager.class);
+        }, "hud", "Open gui to edit hud!"));
+        uiList.add(new UIButton(() -> {
+            client.openGui(HudManager.class);
+        }, "hud", "Open gui to edit hud!"));
+        uiList.add(new UIButton(() -> {
+            client.openGui(HudManager.class);
+        }, "hud", "Open gui to edit hud!"));
+        new Thread(this::tick1).start();
+
     }
 
-    int k3 = -1;
-    int shiftign;
-    int mouse1ign;
-    private UI focus;
-
-    public UI getFocus() {
-        return focus;
-    }
-
-    public void setFocus(UI focus) {
-        this.focus = focus;
-    }
-
-    @Override
-    public void close() {
-
-        configManager.writeToProfile();
-        configManager.saveProfiles();
-        notification.push(new Notice("Config", "profile: " + configManager.getCurrent().getName() + " saved successfully", NoticeType.INFO));
-        super.close();
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        for (UIModules uiModules : modules.values()) {
-            uiModules.mouseScrolled(mouseX, mouseX, amount);
-        }
-
-        return super.mouseScrolled(mouseX, mouseY, amount);
-    }
-
-    @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-
-        mouseY = mouseY * UI.getS();
-        mouseX = mouseX * UI.getS();
-        matrices.scale(1f / UI.getS(), 1f / UI.getS(), 1f / UI.getS());
-        for (UIModules uiModules : modules.values()) {
-            uiModules.render(matrices, mouseX, mouseY, delta);
-        }
-        if (focus != null) {
-            Screen.fillGradient(matrices, 0, 0, this.width * UI.getS(), this.height * UI.getS(), -1072689136, -804253680);
-            focus.render(matrices, mouseX, mouseY, delta);
-        }
+    public void drawMask(MatrixStack matrices) {
 
 
     }
@@ -232,6 +260,54 @@ public class ClickGui extends Screen {
     }
 
     @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+
+        mouseY = mouseY * UI.getS();
+        mouseX = mouseX * UI.getS();
+        int height = this.height * UI.getS();
+        int width = this.width * UI.getS();
+        matrices.scale(1f / UI.getS(), 1f / UI.getS(), 1f / UI.getS());
+
+        int ap = 0;
+        for (UI ui : uiList) {
+            ui.update(36 + ap, height - 36);
+            ui.render(matrices, mouseX, mouseY, delta);
+            ap += ui.getWidth() + 6;
+        }
+        drawMask(matrices);
+        UIModules l = modules.get(this.last.getValue());
+
+        for (UIModules ui : modules.values()) {
+
+            if (!ui.getID().equals(this.last.getValue())) {
+
+
+                int uih = ui.getMaskHeight() + ui.getHeight();
+                RenderUtils.drawMask(matrices, new Box(ui.getX() - ui.getWidth() / 2, ui.getY() - ui.getHeight() / 2, 1, ui.getX() - ui.getWidth() / 2 + 250, ui.getY() - ui.getHeight() / 2 + uih, 1));
+
+                ui.render(matrices, mouseX, mouseY, delta);
+                RenderUtils.clearMask();
+            }
+
+
+        }
+        if (l != null) {
+            int uih = l.getMaskHeight() + l.getHeight();
+            RenderUtils.drawMask(matrices, new Box(l.getX() - l.getWidth() / 2, l.getY() - l.getHeight() / 2, 1, l.getX() - l.getWidth() / 2 + 250, l.getY() - l.getHeight() / 2 + uih, 1));
+
+            l.render(matrices, mouseX, mouseY, delta);
+            RenderUtils.clearMask();
+        }
+
+        if (focus != null) {
+
+            Screen.fillGradient(matrices, 0, 0, width, height, -1072689136, -804253680);
+            focus.render(matrices, mouseX, mouseY, delta);
+        }
+
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         mouseY = mouseY * UI.getS();
         mouseX = mouseX * UI.getS();
@@ -249,13 +325,22 @@ public class ClickGui extends Screen {
             focus.mouseClicked(mouseX, mouseY, button);
             return true;
         }
+        for (UI ui : uiList) {
+
+            ui.mouseClicked(mouseX, mouseY, button);
+
+        }
         List<UIModules> list = new ArrayList<>(modules.values().stream().toList());
         Collections.reverse(list);
+
+
         for (UIModules uiModules : list) {
-            if (!uiModules.mouseClicked(mouseX, mouseY, button)) {
-                return false;
+            if (uiModules.mouseClicked(mouseX, mouseY, button)) {
+                last.setValue(uiModules.getID());
             }
         }
+
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -294,6 +379,11 @@ public class ClickGui extends Screen {
         if (focus != null) {
             focus.mouseMoved(mouseX, mouseY);
             return;
+        }
+        for (UI ui : uiList) {
+
+            ui.mouseMoved(mouseX, mouseY);
+
         }
         for (UIModules uiModules : list) {
             uiModules.mouseMoved(mouseX, mouseY);

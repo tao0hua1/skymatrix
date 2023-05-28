@@ -8,17 +8,20 @@ import cn.seiua.skymatrix.utils.OptionInfo;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
-public class DoubleValueSlider<V extends Number> implements UIComponent {
+import java.util.Random;
 
+public class DoubleValueSlider implements UIComponent {
+
+    private static Random random = new Random();
     @JSONField(alternateNames = "value", serialzeFeatures = SerializerFeature.DisableCircularReferenceDetect)
-    private V value;
+    private Number value;
     @JSONField(alternateNames = "valua", serialzeFeatures = SerializerFeature.DisableCircularReferenceDetect)
-    private V valua;
-    private transient V min;
-    private transient V max;
-    private transient V interval;
+    private Number valua;
+    private transient Number min;
+    private transient Number max;
+    private transient Number interval;
 
-    public DoubleValueSlider(V value, V valua, V min, V max, V interval) {
+    public DoubleValueSlider(Number value, Number valua, Number min, Number max, Number interval) {
         this.value = value;
         this.min = min;
         this.max = max;
@@ -26,43 +29,56 @@ public class DoubleValueSlider<V extends Number> implements UIComponent {
         this.valua = valua;
     }
 
-    public V getValua() {
+    public String toValueString(Number v) {
+
+        return String.format("%.1f", v);
+    }
+
+    public double getRandomValue() {
+
+        double v = Math.min(value.doubleValue(), value.doubleValue()) + (random.nextInt() % ((Math.max(value.doubleValue(), valua.doubleValue()) - Math.min(value.doubleValue(), valua.doubleValue()))));
+        if (value == valua) v = valua.doubleValue();
+
+        return v;
+    }
+
+    public Number getValua() {
         return valua;
     }
 
-    public void setValua(V valua) {
+    public void setValua(Number valua) {
         this.valua = valua;
     }
 
-    public V getValue() {
+    public Number getValue() {
         return value;
     }
 
-    public void setValue(V value) {
+    public void setValue(Number value) {
         this.value = value;
     }
 
-    public V getMin() {
+    public Number getMin() {
         return min;
     }
 
-    public void setMin(V min) {
+    public void setMin(Number min) {
         this.min = min;
     }
 
-    public V getMax() {
+    public Number getMax() {
         return max;
     }
 
-    public void setMax(V max) {
+    public void setMax(Number max) {
         this.max = max;
     }
 
-    public V getInterval() {
+    public Number getInterval() {
         return interval;
     }
 
-    public void setInterval(V interval) {
+    public void setInterval(Number interval) {
         this.interval = interval;
     }
 

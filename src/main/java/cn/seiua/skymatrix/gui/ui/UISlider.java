@@ -88,7 +88,7 @@ public class UISlider extends UI {
         ClickGui.fontRenderer16.drawString(matrixStack, drawLine.get(25), getY() - 10, upperFirst(optionInfo.getName()));
         drawLine.append(ClickGui.fontRenderer16.getStringWidth(upperFirst(optionInfo.getName())));
         ClickGui.fontRenderer16.centeredV();
-        String v = upperFirst(String.format("%.1f", optionInfo.getTarget().getValue()));
+        String v = upperFirst(String.format("%.1f", optionInfo.getTarget().getValue().doubleValue()));
         ClickGui.fontRenderer16.drawString(matrixStack, getX() + 96 - ClickGui.fontRenderer16.getStringWidth(v) / 2, getY() - 10, v);
         ClickGui.fontRenderer16.resetCenteredH();
         ClickGui.fontRenderer16.resetCenteredV();
@@ -160,8 +160,8 @@ public class UISlider extends UI {
             if (value > max) value = max;
             if (value < min) value = min;
             double v = ((value - min) / 200) * w + this.min;
-            v = MathUtils.findClosest(this.min, this.max, this.interval, v);
-            this.optionInfo.getTarget().setValue(v);
+            Number tv = MathUtils.findClosest(this.min, this.max, this.interval, v);
+            this.optionInfo.getTarget().setValue(tv);
         }
         super.mouseMoved(mouseX, mouseY);
     }

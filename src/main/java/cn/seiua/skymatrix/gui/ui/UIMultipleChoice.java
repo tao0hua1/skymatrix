@@ -65,7 +65,7 @@ public class UIMultipleChoice extends UI {
         ClickGui.iconfontRenderer26.centeredV();
         ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME.geColor());
         String type = optionInfo.getTarget().getType();
-        String icon = Objects.equals(type, MultipleChoice.MODE) ? "\uE92E" : Objects.equals(type, MultipleChoice.BLOCK) ? "\uEAE8" : Objects.equals(type, MultipleChoice.ITEM) ? "\uE939" : Objects.equals(type, MultipleChoice.CREATURE) ? "\uE913" : "\uEAAE";
+        String icon = Objects.equals(type, MultipleChoice.MODE) ? "\uE935" : Objects.equals(type, MultipleChoice.BLOCK) ? "\uEAE8" : Objects.equals(type, MultipleChoice.ITEM) ? "\uE939" : Objects.equals(type, MultipleChoice.CREATURE) ? "\uE913" : "\uEAAE";
 
         ClickGui.fontRenderer16.centeredH();
         ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());

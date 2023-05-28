@@ -179,14 +179,18 @@ public class ConfigManager {
             for (String gname : jo.getJSONObject(cate).keySet()) {
                 if (jo.getJSONObject(cate).getJSONObject(gname) != null) {
                     for (String cname : jo.getJSONObject(cate).getJSONObject(gname).keySet()) {
+                        if (this.configs.containsKey(cate)) {
+                            if (this.configs.get(cate).containsKey(gname)) {
 
-                        Object config = this.configs.get(cate).get(gname).get(cname);
-                        if (config == null) continue;
-                        Object object = jo.getJSONObject(cate).getJSONObject(gname).getObject(cname, config.getClass());
-                        ReflectUtils.copyData(config, object);
-                        if (config instanceof ConfigInit) {
-                            ConfigInit configInit = (ConfigInit) config;
-                            configInit.init();
+                                Object config = this.configs.get(cate).get(gname).get(cname);
+                                if (config == null) continue;
+                                Object object = jo.getJSONObject(cate).getJSONObject(gname).getObject(cname, config.getClass());
+                                ReflectUtils.copyData(config, object);
+                                if (config instanceof ConfigInit) {
+                                    ConfigInit configInit = (ConfigInit) config;
+                                    configInit.init();
+                                }
+                            }
                         }
                     }
                 }

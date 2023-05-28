@@ -1,7 +1,10 @@
 package cn.seiua.skymatrix.utils;
 
+import net.minecraft.item.ItemStack;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SkyBlockUtils {
 
@@ -93,6 +96,40 @@ public class SkyBlockUtils {
         map.put("Lava Pigman", true);
 
         return map;
+    }
+
+    public static String getItemUuid(ItemStack itemStack) {
+        return get(itemStack, "uuid");
+    }
+
+    public static String getItemRarity(ItemStack itemStack) {
+        return get(itemStack, "rarity_upgrades");
+    }
+
+    public static String getItemId(ItemStack itemStack) {
+        return get(itemStack, "id");
+    }
+
+    public static String getItemModifier(ItemStack itemStack) {
+
+        return get(itemStack, "modifier");
+    }
+
+    private static String get(ItemStack itemStack, String key) {
+        if (itemStack.getNbt() == null) return "none";
+        if (itemStack.getNbt().getCompound("ExtraAttributes") == null) return "none";
+        if (itemStack.getNbt().getCompound("ExtraAttributes").get(key) == null) return "none";
+        return Objects.requireNonNull(itemStack.getNbt().getCompound("ExtraAttributes").get(key)).asString();
+    }
+
+    public static String getRodType(ItemStack itemStack) {
+        if (itemStack.getNbt() == null) return null;
+        if (itemStack.getNbt().toString().contains("Lava Rod")) {
+            return "LAVA";
+
+        } else {
+            return "WATER";
+        }
     }
 
 

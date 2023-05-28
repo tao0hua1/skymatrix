@@ -12,16 +12,20 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 
 public class SkyMatrix implements ModInitializer, ClientTickEvents.StartTick {
     public static final String MODID = "skymatrix";
     public static final Logger LOGGER = LoggerFactory.getLogger("skymatrix");
+    public static MinecraftClient mc;
 
     public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
 
@@ -49,13 +53,18 @@ public class SkyMatrix implements ModInitializer, ClientTickEvents.StartTick {
         ClientTickEvents.START_CLIENT_TICK.register(this);
 
     }
+
     private boolean flag;
+
     @Override
     public void onStartTick(MinecraftClient client) {
-               if(flag==false){
-                   ComponentHandler.loadAllClasesName();
-                   ComponentHandler.setup();
-                   flag=true;
-               }
+        if (flag == false) {
+            mc = MinecraftClient.getInstance();
+            LOGGER.info("client loaded!");
+            ComponentHandler.loadAllClasesName();
+            System.out.println(new File(FabricLoader.getInstance().getGameDir().toFile(), "mods") + " aabb");
+            ComponentHandler.setup();
+            flag = true;
+        }
     }
 }

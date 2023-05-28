@@ -8,7 +8,6 @@ import cn.seiua.skymatrix.config.option.KeyBind;
 import cn.seiua.skymatrix.event.EventTarget;
 import cn.seiua.skymatrix.event.events.KeyboardEvent;
 import cn.seiua.skymatrix.event.events.MouseEvent;
-import cn.seiua.skymatrix.gui.ClickGui;
 import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -136,6 +135,9 @@ public class KeyBindManger /*implements Runnable*/ {
 
             KeyBind keyBind = (KeyBind) o;
             switch (keyBind.getKeys().size()) {
+                case 0: {
+                    break;
+                }
                 case 1: {
                     keyBinds0.add(keyBind);
                     break;
@@ -157,8 +159,7 @@ public class KeyBindManger /*implements Runnable*/ {
 
     @EventTarget
     public void keyboard(KeyboardEvent e) {
-        if (MinecraftClient.getInstance().currentScreen != null && MinecraftClient.getInstance().currentScreen.getClass() == ClickGui.class)
-            return;
+
         if (e.getAction() == 2) return;
         appendKeyboard(e.getKeyCode(), e.getAction());
         printKeyNames();
@@ -167,8 +168,7 @@ public class KeyBindManger /*implements Runnable*/ {
 
     @EventTarget
     public void mouse(MouseEvent e) {
-        if (MinecraftClient.getInstance().currentScreen != null && MinecraftClient.getInstance().currentScreen.getClass() == ClickGui.class)
-            return;
+
         appendMouse(e.getButton(), e.getAction());
         printKeyNames();
         matchKey();
@@ -278,6 +278,8 @@ public class KeyBindManger /*implements Runnable*/ {
     }
 
     public void matchKey() {
+        if (MinecraftClient.getInstance().currentScreen != null)
+            return;
         if (key0 != -1) {
             for (KeyBind keyBind : keyBinds0) {
                 matchKey1(keyBind);
@@ -302,22 +304,23 @@ public class KeyBindManger /*implements Runnable*/ {
             return;
         }
         int flag = 0;
-        if (keysize >= 1 && key0 == keyBind.getKeys().get(0)) {
+        if (keysize == 1 && key0 == keyBind.getKeys().get(0)) {
             flag++;
         }
-        if (keysize >= 2 && key1 == keyBind.getKeys().get(1)) {
+        if (keysize == 2 && key1 == keyBind.getKeys().get(1)) {
             flag++;
         }
-        if (keysize >= 3 && key2 == keyBind.getKeys().get(2)) {
+        if (keysize == 3 && key2 == keyBind.getKeys().get(2)) {
             flag++;
         }
+
         if (flag == keysize) {
 //            logger.info("keybind: "+keyBind.getName()+" keys: "+getKeyName(key0)+" "+getKeyName(key1)+" "+getKeyName(key2));
             key0 = -1;
             key1 = -1;
             key2 = -1;
 
-            printKeyNames();
+//            printKeyNames();
             keyBind.getRun().run();
         }
     }

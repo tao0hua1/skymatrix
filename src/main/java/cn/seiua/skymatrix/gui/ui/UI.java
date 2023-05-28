@@ -11,6 +11,16 @@ import net.minecraft.util.math.Box;
 public abstract class UI {
     private int x;
     private int y;
+    private int z;
+
+    public int getZ() {
+        return z;
+    }
+
+    public void setZ(int z) {
+        this.z = z;
+    }
+
     private int width;
     private int height;
     private double mouseX;
@@ -39,6 +49,10 @@ public abstract class UI {
 
     public void setInBoxLeft(Run inBoxLeft) {
         this.inBoxLeft = inBoxLeft;
+    }
+
+    public void updateUI() {
+
     }
 
     public void setInBoxRight(Run inBoxRight) {
@@ -140,6 +154,14 @@ public abstract class UI {
         RenderUtils.drawRound2D(new Box(getX(), getY() - getHeight() / 2, 0, getX() + 249, getY() - getHeight() / 2 + 1, 0), matrixStack, 0);
     }
 
+    public int getMaskHeight() {
+        return -1;
+    }
+
+    public int getMaskWidth() {
+        return -1;
+    }
+
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
 
 
@@ -178,4 +200,9 @@ public abstract class UI {
     }
 
 
+    protected void setMouse(double i, double i1) {
+
+        this.mouseX = i;
+        this.mouseY = i;
+    }
 }

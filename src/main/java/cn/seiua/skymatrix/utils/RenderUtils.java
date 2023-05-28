@@ -22,7 +22,9 @@ public class RenderUtils {
         Tessellator tessellator = RenderSystem.renderThreadTesselator();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
         RenderSystem.setShader(GameRenderer::getPositionProgram);
-
+        GlStateManager._enableBlend();
+        GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        setupColor();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
                 VertexFormats.POSITION);
         bufferBuilder
@@ -103,6 +105,8 @@ public class RenderUtils {
                 .vertex(matrix, (float) bb.minX, (float) bb.maxY, (float) bb.minZ)
                 .next();
         tessellator.draw();
+        GlStateManager._disableBlend();
+        resetColor();
     }
 
     public static void setColor(Color col) {
@@ -139,6 +143,25 @@ public class RenderUtils {
 
         return new Box(bb.minX - wdx, bb.minY - wdy, bb.minZ - wdz, bb.minX + wdx, bb.minY + wdy, bb.minZ + wdz);
 
+    }
+
+    public static void clearMask() {
+        RenderSystem.depthMask(true);
+        RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, false);
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        RenderSystem.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
+    public static void drawMask(MatrixStack matrixStack, Box box) {
+        RenderSystem.enableDepthTest();
+        RenderSystem.colorMask(false, false, false, true);
+        RenderUtils.setColor(Color.red);
+        RenderUtils.resetCent();
+        RenderUtils.drawRound2D(box, matrixStack, 10);
+        RenderSystem.colorMask(true, true, true, true);
+        RenderSystem.depthMask(false);
+        RenderSystem.depthFunc(GL11.GL_GREATER);
     }
 
     public static void drawRound2D(Box bb, MatrixStack matrixStack, int r) {
@@ -223,20 +246,30 @@ public class RenderUtils {
         }
     }
 
+//    public static Vec3d getClientLookVec() {
+//        ClientPlayerEntity player = SkyMatrix.mc.player;
+//        float f = 0.017453292F;
+//        float pi = (float) Math.PI;
+//
+//        float f1 = MathHelper.cos(-player.getYaw() * f - pi);
+//        float f2 = MathHelper.sin(-player.getYaw() * f - pi);
+//        float f3 = -MathHelper.cos(-player.getPitch() * f);
+//        float f4 = MathHelper.sin(-player.getPitch() * f);
+//
+//        return new Vec3d(f2 * f3, f4, f1 * f3);
+//    }
+
     public static void drawOutlineBox(Box bb, MatrixStack matrixStack) {
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
         Tessellator tessellator = RenderSystem.renderThreadTesselator();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
         RenderSystem.setShader(GameRenderer::getPositionProgram);
         GL11C.glEnable(GL11C.GL_LINE_SMOOTH);
+        setupColor();
         bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
                 VertexFormats.POSITION);
-        bufferBuilder
-                .vertex(matrix, (float) bb.minX, (float) bb.minY, (float) bb.minZ)
-                .next();
-        bufferBuilder
-                .vertex(matrix, (float) bb.maxX, (float) bb.minY, (float) bb.minZ)
-                .next();
+
+
         bufferBuilder
                 .vertex(matrix, (float) bb.maxX, (float) bb.minY, (float) bb.maxZ)
                 .next();
@@ -309,6 +342,7 @@ public class RenderUtils {
                 .vertex(matrix, (float) bb.minX, (float) bb.maxY, (float) bb.minZ)
                 .next();
         tessellator.draw();
+        resetColor();
     }
 
     public static void drawRound2DOutline(Box box, MatrixStack matrices, int i) {

@@ -93,7 +93,7 @@ public class UIDoubleSlider extends UI {
         double minv = Math.min(optionInfo.getTarget().getValue().doubleValue(), optionInfo.getTarget().getValua().doubleValue());
         double maxv = Math.max(optionInfo.getTarget().getValue().doubleValue(), optionInfo.getTarget().getValua().doubleValue());
 
-        String v = minv + "-" + maxv;
+        String v = optionInfo.getTarget().toValueString(minv) + "-" + optionInfo.getTarget().toValueString(maxv);
         int w = ClickGui.fontRenderer16.getStringWidth(v);
         ClickGui.fontRenderer16.drawString(matrixStack, getX() + 96 - w / 2, getY() - 10, v);
         ClickGui.fontRenderer16.resetCenteredH();
@@ -210,8 +210,8 @@ public class UIDoubleSlider extends UI {
             if (value > max) value = max;
             if (value < min) value = min;
             double v = ((value - min) / 200) * w + this.min;
-            v = MathUtils.findClosest(this.min, this.max, this.interval, v);
-            this.optionInfo.getTarget().setValue(v);
+            Number tv = MathUtils.findClosest(this.min, this.max, this.interval, v);
+            this.optionInfo.getTarget().setValue(tv);
             return;
         }
         if (hd2) {
@@ -221,8 +221,8 @@ public class UIDoubleSlider extends UI {
             if (value > max) value = max;
             if (value < min) value = min;
             double v = ((value - min) / 200) * w + this.min;
-            v = MathUtils.findClosest(this.min, this.max, this.interval, v);
-            this.optionInfo.getTarget().setValua(v);
+            Number tv = MathUtils.findClosest(this.min, this.max, this.interval, v);
+            this.optionInfo.getTarget().setValua(tv);
         }
         super.mouseMoved(mouseX, mouseY);
     }
