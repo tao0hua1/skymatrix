@@ -49,7 +49,7 @@ public class UIModules extends UI {
 
 
                 try {
-
+                    field.setAccessible(true);
                     Object uobj = field.get(o);
                     if (value.name().equals("keyBind")) {
                         moduleInfo.setKeyBind((KeyBind) uobj);
@@ -248,13 +248,14 @@ public class UIModules extends UI {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (isInBox()) {
-            if (button == 1) {
-                setOpen(!isOpen());
-            }
-        }
+
         boolean flag = (isInBox() && button == 0);
         if (isOpen() && isInBoxA(mouseX, mouseY)) {
+            if (isInBox()) {
+                if (button == 1) {
+                    setOpen(!isOpen());
+                }
+            }
             for (UIModule uiModule : uiModules) {
                 boolean b = uiModule.mouseClicked(mouseX, mouseY, button);
                 if (b == false) {

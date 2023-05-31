@@ -87,6 +87,16 @@ public class DoubleValueSlider implements UIComponent {
         return "DoubleValueSlider";
     }
 
+    public Number maxValue() {
+
+
+        return Math.max(this.valua.doubleValue(), (double) this.value.doubleValue());
+    }
+
+    public Number minValue() {
+        return Math.min((double) this.valua.doubleValue(), (double) this.value.doubleValue());
+    }
+
     @Override
     public UI build(String module, String category, String name, Signs sign) {
 

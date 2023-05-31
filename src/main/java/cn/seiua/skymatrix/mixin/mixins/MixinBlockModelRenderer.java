@@ -1,4 +1,4 @@
-package net.wurstclient.mixin;
+package cn.seiua.skymatrix.mixin.mixins;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
@@ -25,6 +25,7 @@ public abstract class MixinBlockModelRenderer {
                                       BlockState state, BlockPos pos, MatrixStack matrices,
                                       VertexConsumer vertexConsumer, boolean cull, Random random, long seed,
                                       int overlay, CallbackInfo ci) {
+
 
     }
 

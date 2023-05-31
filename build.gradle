@@ -63,6 +63,13 @@ jar {
     from("LICENSE") {
         rename { "${it}_${base.archivesName.get()}" }
     }
+    from {
+        configurations.compileClasspath.findAll {
+            it.name.contains("fastjson")
+        }.collect {
+            zipTree(it)
+        }
+    }
     manifest.attributes(
 
             "tweakClass": "cn.seiua.skymatrix.client.MyTweaker",

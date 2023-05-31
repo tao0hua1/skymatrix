@@ -398,15 +398,17 @@ public abstract class MixinClientPlayNetworkHandler {
 //
 //    }
 //
-//    public void onPlayerPositionLook(PlayerPositionLookS2CPacket var1, CallbackInfo callbackInfo){
-//
-//        ServerPacketEvent event=new ServerPacketEvent(var1);
-//        event.call();
-//        if(event.isCancelled())callbackInfo.cancel();
-//
-//
-//    }
-//
+    @Inject(at = @At("HEAD"), method = "onPlayerPositionLook", cancellable = true)
+    public void onPlayerPositionLook(PlayerPositionLookS2CPacket var1, CallbackInfo callbackInfo) {
+
+        ServerPacketEvent event = new ServerPacketEvent(var1);
+        event.call();
+        if (event.isCancelled()) callbackInfo.cancel();
+
+
+    }
+
+    //
 //    public void onParticle(ParticleS2CPacket var1, CallbackInfo callbackInfo){
 //
 //        ServerPacketEvent event=new ServerPacketEvent(var1);

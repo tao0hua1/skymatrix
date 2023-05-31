@@ -153,7 +153,12 @@ public class UIColorSlider extends UI {
                 v = 0.99f;
             }
             System.out.println(min + "   " + v + "   " + max);
-            this.optionInfo.getTarget().seColor(ColorUtils.setHue(Color.red, (float) v));
+            int a = this.optionInfo.getTarget().geColor().getAlpha();
+            Color color = ColorUtils.setHue(this.optionInfo.getTarget().geColor(), (float) v);
+            int r = color.getRed();
+            int g = color.getGreen();
+            int b = color.getBlue();
+            this.optionInfo.getTarget().seColor(new Color(r, g, b, a));
         }
         super.mouseMoved(mouseX, mouseY);
     }

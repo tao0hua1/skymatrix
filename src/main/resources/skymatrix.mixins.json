@@ -4,9 +4,12 @@
   "package": "cn.seiua.skymatrix.mixin.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MixinBlock"
+    "MixinBlock",
+    "MixinBlockOcclusionCache",
+    "MixinSodiumFluidRenderer"
   ],
   "client": [
+    "MixinBlockModelRenderer",
     "MixinCamera",
     "MixinClientChunkManager",
     "MixinClientPlayerInteractionManager",
@@ -15,7 +18,8 @@
     "MixinInGameHud",
     "MixinKeyboard",
     "MixinMinecraftClient",
-    "MixinMouse"
+    "MixinMouse",
+    "MixinTerrainRenderContext"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -148,6 +148,7 @@ public class UISkyblockItemSelect extends UI {
             String id = SkyBlockUtils.getItemId(itemStack);
 
             if (uuid != "none") {
+
                 if (this.optionInfo.getTarget().getFilter().filter(itemStack)) {
                     itemMap.put(uuid, id);
                     if (this.optionInfo.getTarget().getUuid() != "none") {
@@ -185,6 +186,7 @@ public class UISkyblockItemSelect extends UI {
         if (button == 0) {
             if (isInBox()) {
                 if (Screen.hasShiftDown()) {
+                    if (this.optionInfo.getTarget().getSelector() == null) return true;
                     this.optionInfo.getTarget().setAutoSelect(!this.optionInfo.getTarget().isAutoSelect());
                     return true;
                 }

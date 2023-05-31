@@ -13,9 +13,18 @@ public class TickTimer {
         this.callBack = callBack;
     }
 
+    public int getTick() {
+        return tick;
+    }
+
+    public void setTick(int tick) {
+        this.tick = tick;
+    }
+
     public void update() {
         if (tick == 0) {
-            callBack.run();
+            if (callBack != null)
+                callBack.run();
         }
         tick--;
 

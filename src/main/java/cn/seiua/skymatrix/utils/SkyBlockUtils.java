@@ -1,10 +1,16 @@
 package cn.seiua.skymatrix.utils;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static net.minecraft.item.ItemStack.LORE_KEY;
 
 public class SkyBlockUtils {
 
@@ -133,4 +139,21 @@ public class SkyBlockUtils {
     }
 
 
+    public static String getItemType(ItemStack itemStack) {
+        NbtList nbtList = itemStack.getNbt().getCompound("display").getList(LORE_KEY, NbtElement.STRING_TYPE);
+        String target = nbtList.getString(nbtList.size() - 1);
+        MutableText mutableText2 = Text.Serializer.fromJson(target);
+        target = mutableText2.getString();
+        if (target.contains("BOW")) {
+            return "BOW";
+        }
+        if (target.contains("SWORD")) {
+            return "SWORD";
+        }
+        if (target.contains(" AXE")) {
+            return "AXE";
+        }
+
+        return null;
+    }
 }

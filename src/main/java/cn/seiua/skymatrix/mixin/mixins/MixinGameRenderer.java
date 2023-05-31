@@ -20,6 +20,7 @@ public class MixinGameRenderer {
             method = "renderWorld(FJLnet/minecraft/client/util/math/MatrixStack;)V")
     private void onRenderWorld(float partialTicks, long finishTimeNano,
                                MatrixStack matrixStack, CallbackInfo ci) {
+
         WorldRenderEvent event = new WorldRenderEvent(matrixStack, partialTicks);
         event.call();
     }

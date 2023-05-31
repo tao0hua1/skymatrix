@@ -8,6 +8,12 @@ public class UiInfo {
 
     private int y;
 
+    public UiInfo(boolean value, int x, int y) {
+        this.value = value;
+        this.x = x;
+        this.y = y;
+    }
+
     public boolean isValue() {
         return value;
     }

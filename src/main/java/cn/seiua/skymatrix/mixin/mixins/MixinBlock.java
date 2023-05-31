@@ -24,7 +24,8 @@ public abstract class MixinBlock {
                                          BlockPos pos, Direction direction, BlockPos blockPos,
                                          CallbackInfoReturnable<Boolean> cir) {
 
-        new BlockRenderEvent(pos).call();
+        new BlockRenderEvent(pos, state).call();
     }
+
 
 }

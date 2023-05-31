@@ -12,14 +12,12 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 
 public class SkyMatrix implements ModInitializer, ClientTickEvents.StartTick {
@@ -49,6 +47,7 @@ public class SkyMatrix implements ModInitializer, ClientTickEvents.StartTick {
 
     @Override
     public void onInitialize() {
+
         ClientCommandRegistrationCallback.EVENT.register(SkyMatrix::registerCommands);
         ClientTickEvents.START_CLIENT_TICK.register(this);
 
@@ -59,10 +58,10 @@ public class SkyMatrix implements ModInitializer, ClientTickEvents.StartTick {
     @Override
     public void onStartTick(MinecraftClient client) {
         if (flag == false) {
+            GLFW.glfwSetWindowTitle(MinecraftClient.getInstance().getWindow().getHandle(), "Genshin impact");
             mc = MinecraftClient.getInstance();
             LOGGER.info("client loaded!");
             ComponentHandler.loadAllClasesName();
-            System.out.println(new File(FabricLoader.getInstance().getGameDir().toFile(), "mods") + " aabb");
             ComponentHandler.setup();
             flag = true;
         }

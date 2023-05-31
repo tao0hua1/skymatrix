@@ -18,7 +18,8 @@ public class AutoCHPASS {
     public void onPacket(ServerPacketEvent event) {
         if (event.getPacket() instanceof GameMessageS2CPacket) {
             GameMessageS2CPacket eventPacket = (GameMessageS2CPacket) event.getPacket();
-            if (eventPacket.content().getString().contains("You have 10s remaining on your pass.")) {
+
+            if (eventPacket.content().getString().contains("Your pass to the Crystal Hollows will expire in 1 minute")) {
                 SkyMatrix.mc.getNetworkHandler().sendCommand("purchasecrystallhollowspass");
             }
         }

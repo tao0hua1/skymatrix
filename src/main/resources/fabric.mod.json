@@ -2,9 +2,8 @@
   "schemaVersion": 1,
   "id": "skymatrix",
   "version": "${version}",
-
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Skymatrix",
+  "description": "wtf macroer?",
   "authors": [
     "Me!"
   ],
@@ -12,10 +11,8 @@
     "homepage": "https://fabricmc.net/",
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
-
   "license": "CC0-1.0",
   "icon": "assets/skymatrix/icon.png",
-
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -25,7 +22,6 @@
   "mixins": [
     "skymatrix.mixins.json"
   ],
-
   "depends": {
     "fabricloader": ">=0.14.19",
     "fabric-api": "*",
@@ -33,6 +29,6 @@
     "java": ">=17"
   },
   "suggests": {
-    "another-mod": "*"
+    "another-mod": "sodium"
   }
 }

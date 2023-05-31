@@ -1,6 +1,7 @@
 package cn.seiua.skymatrix.mixin.mixins;
 
 import cn.seiua.skymatrix.event.events.ClientChunkEvent;
+import cn.seiua.skymatrix.event.events.ClientChunkUnLoadEvent;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.nbt.NbtCompound;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Consumer;
@@ -26,5 +28,10 @@ public abstract class MixinClientChunkManager {
     private void onChunkLoad(int x, int z, PacketByteBuf packetByteBuf, NbtCompound
             nbtCompound, Consumer<ChunkData.BlockEntityVisitor> consumer, CallbackInfoReturnable<WorldChunk> info) {
         new ClientChunkEvent(this.world, info.getReturnValue()).call();
+    }
+
+    @Inject(method = "unload", at = @At("TAIL"))
+    public void unload(int chunkX, int chunkZ, CallbackInfo ci) {
+        new ClientChunkUnLoadEvent(chunkX, chunkZ).call();
     }
 }

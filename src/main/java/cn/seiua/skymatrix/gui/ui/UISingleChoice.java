@@ -146,7 +146,7 @@ public class UISingleChoice extends UI {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
             if (isInBox()) {
-                this.optionInfo.getTarget().setSelected(this.optionInfo.getTarget().getSelected() + 1);
+                this.optionInfo.getTarget().setSelected((this.optionInfo.getTarget().getSelected() + 1) % this.optionInfo.getTarget().getValue().size());
 
             }
 

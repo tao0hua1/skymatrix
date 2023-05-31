@@ -70,6 +70,14 @@ public class ModuleManager {
         return valueHolder.value.get(moduleName);
     }
 
+    public void disable(Class c) {
+        SModule sModule = (SModule) c.getAnnotation(SModule.class);
+        String name = this.getModuleName(sModule);
+        if (this.isEnable(name)) {
+            this.toggle(name);
+        }
+    }
+
     public void toggle(String moduleName) {
         if (valueHolder.value.containsKey(moduleName)) {
 

@@ -183,8 +183,14 @@ public class ConfigManager {
                             if (this.configs.get(cate).containsKey(gname)) {
 
                                 Object config = this.configs.get(cate).get(gname).get(cname);
-                                if (config == null) continue;
-                                Object object = jo.getJSONObject(cate).getJSONObject(gname).getObject(cname, config.getClass());
+
+                                Object object = null;
+                                try {
+                                    object = jo.getJSONObject(cate).getJSONObject(gname).getObject(cname, config.getClass());
+                                } catch (NullPointerException e) {
+                                    new RuntimeException("也许是一个被删除的设置");
+                                    continue;
+                                }
                                 ReflectUtils.copyData(config, object);
                                 if (config instanceof ConfigInit) {
                                     ConfigInit configInit = (ConfigInit) config;

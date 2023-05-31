@@ -1,15 +1,14 @@
 package cn.seiua.skymatrix.client;
 
-import cn.seiua.skymatrix.client.component.*;
+import cn.seiua.skymatrix.SkyMatrix;
 import cn.seiua.skymatrix.client.component.Component;
 import cn.seiua.skymatrix.client.component.Event;
-
+import cn.seiua.skymatrix.client.component.Init;
+import cn.seiua.skymatrix.client.component.Use;
 import cn.seiua.skymatrix.event.EventTarget;
 import cn.seiua.skymatrix.event.events.ClientTickEvent;
 import net.minecraft.client.MinecraftClient;
-
 import net.minecraft.client.gui.screen.Screen;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +28,7 @@ public final class Client {
     @Use
     private ConnectManager connectManager;
     public int stage;
-    public static File root=new File(MinecraftClient.getInstance().runDirectory,"skymartix");
+    public static File root = new File(MinecraftClient.getInstance().runDirectory, "skymartix");
     private Client instance;
 
 
@@ -42,7 +41,8 @@ public final class Client {
     }
 
     private boolean flag;
-//    @SubscribeEvent
+
+    //    @SubscribeEvent
 //    public void render(RenderGameOverlayEvent e) {
 //        if (flag == false) {
 //            FontUtils.init();
@@ -50,35 +50,36 @@ public final class Client {
 //    }
 //
     @EventTarget
-    public void ClientTickEvent (ClientTickEvent e){
-        if(MinecraftClient.getInstance().world!=null){
+    public void ClientTickEvent(ClientTickEvent e) {
+        SkyMatrix.mc.getWindow().setTitle("Genshin Impact");
+        if (MinecraftClient.getInstance().world != null) {
             updataGuiScreen();
         }
     }
+
     @Use
     public List<Screen> guiScreens;
 
     private Screen targetGui;
-    public void openGui(Class gui){
-        for (Screen guiScreen: guiScreens) {
-            if(guiScreen.getClass()==gui){
-                logger.debug("display guiscreen: "+guiScreen);
-                targetGui=guiScreen;
+
+    public void openGui(Class gui) {
+        for (Screen guiScreen : guiScreens) {
+            if (guiScreen.getClass() == gui) {
+                logger.debug("display guiscreen: " + guiScreen);
+                targetGui = guiScreen;
                 return;
             }
         }
     }
 
-    private void updataGuiScreen(){
+    private void updataGuiScreen() {
 
-        if(targetGui!=null){
+        if (targetGui != null) {
             MinecraftClient.getInstance().setScreen(targetGui);
-            targetGui=null;
+            targetGui = null;
         }
 
     }
-
-
 
 
 }

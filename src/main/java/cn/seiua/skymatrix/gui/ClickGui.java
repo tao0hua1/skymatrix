@@ -59,7 +59,7 @@ public class ClickGui extends Screen {
     @Use
     public Client client;
     @Value(name = "KEYBIND")
-    public KeyBind bind = new KeyBind("KEYBIND", Arrays.asList(GLFW.GLFW_KEY_RIGHT_SHIFT), this::open);
+    public KeyBind bind = new KeyBind("KEYBIND", Arrays.asList(GLFW.GLFW_KEY_RIGHT_CONTROL), this::open);
     @Use
     public List<Object> component;
     private Map<String, UIModules> modules = new HashMap<>();
@@ -67,7 +67,7 @@ public class ClickGui extends Screen {
     @Use
     public ConfigManager configManager;
     @Value(name = "state")
-    public MapValueHolder<String, UiInfo, UiInfo> valueHolder = new MapValueHolder<>(new HashMap(), new UiInfo());
+    public MapValueHolder<String, UiInfo, UiInfo> valueHolder = new MapValueHolder<>(new HashMap(), new UiInfo(true, 100, 100));
     public KeyBind keyBind;
     int k1 = -1;
     int k2 = -1;
@@ -78,7 +78,7 @@ public class ClickGui extends Screen {
 
     public static UiInfo getValue(String key) {
         if (!instance.valueHolder.value.containsKey(key)) {
-            instance.valueHolder.value.put(key, new UiInfo());
+            instance.valueHolder.value.put(key, new UiInfo(true, 100, 100));
         }
         return instance.valueHolder.value.get(key);
     }
@@ -327,7 +327,9 @@ public class ClickGui extends Screen {
         }
         for (UI ui : uiList) {
 
-            ui.mouseClicked(mouseX, mouseY, button);
+
+            break;
+
 
         }
         List<UIModules> list = new ArrayList<>(modules.values().stream().toList());
@@ -337,6 +339,7 @@ public class ClickGui extends Screen {
         for (UIModules uiModules : list) {
             if (uiModules.mouseClicked(mouseX, mouseY, button)) {
                 last.setValue(uiModules.getID());
+                break;
             }
         }
 
