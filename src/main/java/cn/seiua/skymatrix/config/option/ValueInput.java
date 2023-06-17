@@ -1,6 +1,7 @@
 package cn.seiua.skymatrix.config.option;
 
 import cn.seiua.skymatrix.client.module.Signs;
+import cn.seiua.skymatrix.gui.Icons;
 import cn.seiua.skymatrix.gui.UIComponent;
 import cn.seiua.skymatrix.gui.ui.UI;
 import cn.seiua.skymatrix.gui.ui.UIValueInput;
@@ -15,9 +16,13 @@ public class ValueInput implements UIComponent {
     public static String COMMAND = "Cmd";
     public static String BLOCK = "Block";
     public static String ITEM = "Item";
+    public transient String pre = "";
     private transient String type;
 
     public ValueInput(String value, String type) {
+        if (type == Icons.CMD) {
+            pre = "/";
+        }
         this.value = value;
         this.type = type;
     }

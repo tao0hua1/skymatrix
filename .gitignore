@@ -40,3 +40,4 @@ replay_*.log
 *.jfr
 /src/main/java/cn/seiua/skymatrix/client/modules
 /src/main/resources/assets/skymatrix/font/
+/src/main/java/cn/seiua/skymatrix/client/module/modules/

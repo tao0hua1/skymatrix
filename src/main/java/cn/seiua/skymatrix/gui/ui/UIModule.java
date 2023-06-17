@@ -9,6 +9,7 @@ import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.ModuleInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import cn.seiua.skymatrix.utils.UiInfo;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
@@ -19,7 +20,7 @@ import java.util.List;
 
 
 public class UIModule extends UI {
-    private ModuleInfo moduleInfo;
+    public ModuleInfo moduleInfo;
     private List<UI> uis;
     private DrawLine drawLine = new DrawLine(250);
     private float o = 0;
@@ -116,7 +117,9 @@ public class UIModule extends UI {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.updateMouse(mouseX, mouseY);
+        MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
         setWidth(250);
         setHeight(58);
@@ -132,13 +135,15 @@ public class UIModule extends UI {
         ClickGui.fontRenderer22.drawString(matrixStack, drawLine.get(25), getY(), getZ(), upperFirst(moduleInfo.getName()));
         ClickGui.fontRenderer22.resetCenteredH();
         ClickGui.fontRenderer22.resetCenteredV();
-        ClickGui.iconfontRenderer24.centeredH();
-        ClickGui.iconfontRenderer24.centeredV();
-        ClickGui.iconfontRenderer24.setColor(Theme.getInstance().THEME.geColor());
-        ClickGui.iconfontRenderer24.setDrawSize(30);
-        ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96, getY(), getZ(), "\uE90C");
-        ClickGui.iconfontRenderer24.resetCenteredH();
-        ClickGui.iconfontRenderer24.resetCenteredV();
+        if (!this.uis.isEmpty()) {
+            ClickGui.iconfontRenderer24.centeredH();
+            ClickGui.iconfontRenderer24.centeredV();
+            ClickGui.iconfontRenderer24.setColor(Theme.getInstance().THEME.geColor());
+            ClickGui.iconfontRenderer24.setDrawSize(30);
+            ClickGui.iconfontRenderer24.drawString(matrixStack, getX() + 96, getY(), getZ(), "\uE90C");
+            ClickGui.iconfontRenderer24.resetCenteredH();
+            ClickGui.iconfontRenderer24.resetCenteredV();
+        }
 
         KeyBind keyBind = this.moduleInfo.getKeyBind();
         if (Screen.hasShiftDown() || ClickGui.instance.keyBind == keyBind) {
@@ -187,10 +192,10 @@ public class UIModule extends UI {
                     continue;
                 }
                 if (hideMap != null && hideMap.get(ui) != null) {
-                    if (!hideMap.get(ui).canRender(null)) continue;
+                    if (!hideMap.get(ui).canRender(ui.getHideValue())) continue;
                 }
                 ui.update(getX(), sty);
-                ui.render(matrixStack, mouseX, mouseY, delta);
+                ui.render(context, mouseX, mouseY, delta);
                 sty += ui.getHeight();
 
                 i++;
@@ -306,4 +311,6 @@ public class UIModule extends UI {
     public void setHideMap(HashMap<UI, IHide> hideMap) {
         this.hideMap = hideMap;
     }
+
+
 }

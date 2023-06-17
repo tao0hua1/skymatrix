@@ -4,6 +4,7 @@ import cn.seiua.skymatrix.client.Run;
 import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
@@ -27,8 +28,8 @@ public class UIButton extends UI {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
-
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        MatrixStack matrixStack = context.getMatrices();
         RenderUtils.setColor(isInBox() ? Theme.getInstance().THEME_UI_SELECTED.geColor() : Theme.getInstance().BOARD.geColor());
         RenderUtils.cent();
         RenderUtils.drawRound2D(new Box(getX(), getY(), 1, getX() + 52, getY() + 52, 0), matrixStack, 8);
@@ -44,7 +45,6 @@ public class UIButton extends UI {
 
     public void drawHoverBox(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         if (!isInBox()) return;
-
         ClickGui.fontRenderer24.setColor(Color.WHITE);
         ClickGui.fontRenderer24.centeredH();
         ClickGui.fontRenderer24.resetCenteredV();

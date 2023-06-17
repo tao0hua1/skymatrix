@@ -13,6 +13,51 @@ import java.util.Objects;
 import static net.minecraft.item.ItemStack.LORE_KEY;
 
 public class SkyBlockUtils {
+    private final static HashMap<String, String> oreMapper = new HashMap<>();
+
+    static {
+        oreMapper.put("light_blue_wool", "rich_mithril");
+        oreMapper.put("prismarine", "medium_mithril");
+        oreMapper.put("prismarine_bricks", "poor_mithril");
+        oreMapper.put("dark_prismarine", "low_mithril");
+        oreMapper.put("gray_wool", "lack_mithril");
+        oreMapper.put("cyan_terracotta", "shit_mithril");
+    }
+
+    public static String getNameByMapper(String name) {
+        if (oreMapper.containsKey(name)) {
+            return oreMapper.get(name);
+        }
+        return name;
+    }
+
+    public static Map<String, Boolean> getAllOre() {
+        HashMap<String, Boolean> map = new HashMap<>();
+
+        map.put("gold_ore", false);
+        map.put("iron_ore", false);
+        map.put("coal_ore", false);
+        map.put("lapis_ore", false);
+        map.put("redstone_ore", false);
+        map.put("emerald_ore", false);
+        map.put("diamond_ore", false);
+        map.put("nether_quartz_ore", false);
+        map.put("rich_mithril", false);
+        map.put("medium_mithril", false);
+        map.put("poor_mithril", false);
+        map.put("low_mithril", false);
+        map.put("lack_mithril", false);
+        map.put("shit_mithril", false);
+
+        map.put("stone", false);
+        map.put("obsidian", false);
+        map.put("end_stone", false);
+        map.put("sand", false);
+
+
+        return map;
+    }
+
 
     public static Map<String, Boolean> getAllSeaCreatureMap() {
         HashMap<String, Boolean> map = new HashMap<>();
@@ -36,7 +81,7 @@ public class SkyBlockUtils {
         map.put("Sea Guardian", true);
         map.put("Sea Witch", true);
         map.put("Sea Archer", true);
-        map.put("Rider Of The Deep", true);
+        map.put("Rider of the Deep", true);
         map.put("Catfish", true);
         map.put("Carrot King", true);
         map.put("Sea Leech", true);
@@ -140,9 +185,11 @@ public class SkyBlockUtils {
 
 
     public static String getItemType(ItemStack itemStack) {
+        if (itemStack.getNbt() == null) return null;
         NbtList nbtList = itemStack.getNbt().getCompound("display").getList(LORE_KEY, NbtElement.STRING_TYPE);
         String target = nbtList.getString(nbtList.size() - 1);
         MutableText mutableText2 = Text.Serializer.fromJson(target);
+        if (mutableText2 == null) return null;
         target = mutableText2.getString();
         if (target.contains("BOW")) {
             return "BOW";
@@ -153,7 +200,31 @@ public class SkyBlockUtils {
         if (target.contains(" AXE")) {
             return "AXE";
         }
+        if (target.contains("PICKAXE")) {
+            return "PICKAXE";
+        }
+        if (target.contains("DRILL")) {
+            return "DRILL";
+        }
+        if (target.contains("SHOVEL")) {
+            return "SHOVEL";
+        }
 
         return null;
+    }
+
+    public static Map getAllCrop() {
+
+        HashMap<String, Boolean> map = new HashMap<>();
+
+        map.put("melon", false);
+        map.put("pumpkin", false);
+        map.put("sugar_cane", false);
+        map.put("cactus", false);
+        map.put("nether_wart", false); //age 3
+        map.put("carrots", false); //age 7
+        map.put("potatoes", false); //age 6
+        map.put("wheat", false); //age 7
+        return map;
     }
 }

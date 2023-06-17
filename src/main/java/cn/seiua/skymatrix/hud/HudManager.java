@@ -7,7 +7,7 @@ import cn.seiua.skymatrix.client.component.Use;
 import cn.seiua.skymatrix.event.EventTarget;
 import cn.seiua.skymatrix.event.events.HudRenderEvent;
 import cn.seiua.skymatrix.gui.ui.UI;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -47,8 +47,8 @@ public class HudManager extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
@@ -62,12 +62,14 @@ public class HudManager extends Screen {
         for (ClientHud hud : huds) {
             if (!hud.enable) continue;
             int ms = UI.getS();
-            MatrixStack matrixStack = new MatrixStack();
+
+            MatrixStack matrixStack = event.getContext().getMatrices();
+            matrixStack.push();
             matrixStack.scale(1.0f / ms, 1.0f / ms, 1.0f / ms);
             hud.getTarget().draw(matrixStack, hud.x, hud.y);
-            matrixStack.push();
-            matrixStack.scale(3f, 3f, 3f);
-            MinecraftClient.getInstance().getToastManager().draw(matrixStack);
+
+            matrixStack.scale(ms, ms, ms);
+            matrixStack.pop();
         }
     }
 

@@ -1,10 +1,14 @@
 package cn.seiua.skymatrix.utils;
 
+import cn.seiua.skymatrix.SkyMatrix;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL11C;
@@ -202,7 +206,7 @@ public class RenderUtils {
             float lx = 0;
             float ly = 0;
             boolean nmsl = true;
-            for (int i = 0; i <= 360; i++) {
+            for (int i = 0; i <= 360; i += 6) {
                 if (i == 90) {
                     spx = (int) (bb.minX + r);
                     spy = (int) (bb.minY + r);
@@ -383,5 +387,44 @@ public class RenderUtils {
         resetColor();
 
 
+    }
+
+    public static int regionX1;
+    public static int regionZ1;
+    private static MatrixStack matrixStacka;
+
+    public static void translateView(MatrixStack matrixStack) {
+        if (matrixStacka == matrixStack) return;
+        matrixStacka = matrixStack;
+        Vec3d camPos = SkyMatrix.mc.getBlockEntityRenderDispatcher().camera.getPos();
+        BlockPos blockPos = SkyMatrix.mc.getBlockEntityRenderDispatcher().camera.getBlockPos();
+
+        int regionX = (blockPos.getX() >> 9) * 512;
+        int regionZ = (blockPos.getZ() >> 9) * 512;
+
+
+        matrixStack.translate(regionX - camPos.x, -camPos.y,
+                regionZ - camPos.z);
+
+
+        BlockPos camPos1 = SkyMatrix.mc.getBlockEntityRenderDispatcher().camera.getBlockPos();
+        regionX1 = (camPos1.getX() >> 9) * 512;
+        regionZ1 = (camPos1.getZ() >> 9) * 512;
+    }
+
+    public static void translateEntity(MatrixStack matrixStack, LivingEntity entity) {
+        translatePos(matrixStack, entity.getPos());
+    }
+
+    public static void translatePos(MatrixStack matrixStack, Vec3d vec3d) {
+        matrixStack.push();
+        matrixStack.translate(
+                vec3d.getX() - regionX1,
+                vec3d.getY(),
+                vec3d.getZ() - regionZ1);
+    }
+
+    public static void translatePos(MatrixStack matrixStack, BlockPos pos) {
+        translatePos(matrixStack, new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
     }
 }

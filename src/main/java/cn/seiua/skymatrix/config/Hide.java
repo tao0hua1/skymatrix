@@ -11,4 +11,6 @@ public @interface Hide {
 
     String following();
 
+    String value() default "null";
+
 }

@@ -1,25 +1,25 @@
 package cn.seiua.skymatrix.event.events;
 
 import cn.seiua.skymatrix.event.Event;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 
 public class HudRenderEvent extends Event {
 
-    private MatrixStack matrixStack;
+    private DrawContext drawContext;
 
     private float tickDelta;
 
-    public HudRenderEvent(MatrixStack matrixStack, float tickDelta) {
-        this.matrixStack = matrixStack;
+    public HudRenderEvent(DrawContext drawContext, float tickDelta) {
+        this.drawContext = drawContext;
         this.tickDelta = tickDelta;
     }
 
-    public MatrixStack getMatrixStack() {
-        return matrixStack;
+    public DrawContext getContext() {
+        return drawContext;
     }
 
-    public void setMatrixStack(MatrixStack matrixStack) {
-        this.matrixStack = matrixStack;
+    public void setContext(DrawContext drawContext) {
+        this.drawContext = drawContext;
     }
 
     public float getTickDelta() {

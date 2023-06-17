@@ -2,9 +2,11 @@ package cn.seiua.skymatrix.gui.ui;
 
 
 import cn.seiua.skymatrix.client.Run;
+import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
@@ -21,11 +23,26 @@ public abstract class UI {
         this.z = z;
     }
 
+    private String hideValue;
+
+    public String getHideValue() {
+        return hideValue;
+    }
+
+    public void setHideValue(String hideValue) {
+        this.hideValue = hideValue;
+    }
+
     private int width;
     private int height;
-    private double mouseX;
-    private double mouseY;
+    protected double mouseX;
+    protected double mouseY;
     private boolean mid;
+
+    protected void updateMouse(double mouseX, double mouseY) {
+        this.mouseX = mouseX;
+        this.mouseY = mouseY;
+    }
 
     private Run inBoxLeft;
     private Run inBoxRight;
@@ -36,6 +53,10 @@ public abstract class UI {
     public static int getS() {
         int ms = Math.round(MinecraftClient.getInstance().getWindow().getWidth() * 1.0f / MinecraftClient.getInstance().getWindow().getScaledWidth());
         return ms;
+    }
+
+    public static void addRenderDetail(DrawDetial drawDetial) {
+        ClickGui.drawDetial = drawDetial;
     }
 
     public static String upperFirst(String b) {
@@ -87,7 +108,7 @@ public abstract class UI {
         return v / MinecraftClient.getInstance().options.getGuiScale().getValue();
     }
 
-    public abstract void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta);
+    public abstract void render(DrawContext matrixStack, int mouseX, int mouseY, float delta);
 
     public void handleMouseInput(int mouseX, int mouseY) {
 

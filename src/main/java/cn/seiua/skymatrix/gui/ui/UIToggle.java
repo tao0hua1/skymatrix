@@ -6,6 +6,7 @@ import cn.seiua.skymatrix.gui.DrawLine;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
@@ -52,7 +53,9 @@ public class UIToggle extends UI {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.updateMouse(mouseX, mouseY);
+        MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
         setWidth(250);
         setHeight(38);

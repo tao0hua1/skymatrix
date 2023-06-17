@@ -3,6 +3,8 @@ package cn.seiua.skymatrix.client;
 import cn.seiua.skymatrix.client.component.*;
 import cn.seiua.skymatrix.client.module.ModuleManager;
 import cn.seiua.skymatrix.config.*;
+import cn.seiua.skymatrix.event.EventTarget;
+import cn.seiua.skymatrix.event.events.GameExitEvent;
 import cn.seiua.skymatrix.utils.ReflectUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -17,7 +19,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 @Component
-public class ConfigManager {
+public class ConfigManager<T> {
 
     @Use
     public List<Object> components;
@@ -57,6 +59,7 @@ public class ConfigManager {
     }
 
     private List<Run> callbacks = new ArrayList<>();
+    private List<Run> reloadCallbacks = new ArrayList<>();
 
     public String reloadProfiles() {
 
@@ -108,14 +111,19 @@ public class ConfigManager {
                 throw new RuntimeException(e);
             }
             this.store.write(data, profile.getUuid());
+
+            for (Run run : reloadCallbacks) {
+                run.run();
+            }
         }
     }
 
-    public List<Object> getConfigsByClass(Class c) {
-        List<Object> temp = new ArrayList<>();
+
+    public List<T> getConfigsByClass(Class<T> c) {
+        List<T> temp = new ArrayList<>();
         for (Object o : this.configObjs) {
             if (o.getClass() == c) {
-                temp.add(o);
+                temp.add((T) o);
             }
         }
         return temp;
@@ -206,9 +214,26 @@ public class ConfigManager {
 
     }
 
+    public void saveAll() {
+        this.writeToProfile();
+        this.saveProfiles();
+    }
+
+    @EventTarget
+    public void onExit(GameExitEvent e) {
+        saveAll();
+    }
+
     public void addCallBack(Run run) {
         if (run != null) {
             this.callbacks.add(run);
+        }
+
+    }
+
+    public void addReloadCallbacks(Run run) {
+        if (run != null) {
+            this.reloadCallbacks.add(run);
         }
 
     }

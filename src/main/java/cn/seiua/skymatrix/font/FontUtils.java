@@ -26,12 +26,11 @@ public class FontUtils {
                 throw new RuntimeException(e);
             }
 
-        }else {
+        } else {
             throw new NullPointerException("");
         }
 
     }
-
 
 
 }

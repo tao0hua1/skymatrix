@@ -7,6 +7,7 @@ import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.MathUtils;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
@@ -64,7 +65,9 @@ public class UISlider extends UI {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.updateMouse(mouseX, mouseY);
+        MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
         setMid(true);
 
@@ -115,7 +118,7 @@ public class UISlider extends UI {
         } else {
             ClickGui.iconfontRenderer16.centeredH();
             ClickGui.iconfontRenderer16.centeredV();
-            ClickGui.iconfontRenderer16.setColor(Theme.getInstance().THEME.geColor());
+            ClickGui.iconfontRenderer16.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
             ClickGui.iconfontRenderer16.centeredV();
             ClickGui.iconfontRenderer16.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 9, "\uE904");
             ClickGui.iconfontRenderer16.resetCenteredH();

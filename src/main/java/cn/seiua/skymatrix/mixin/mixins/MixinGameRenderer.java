@@ -1,5 +1,6 @@
 package cn.seiua.skymatrix.mixin.mixins;
 
+import cn.seiua.skymatrix.event.events.UpdateTargetedEntityEvent;
 import cn.seiua.skymatrix.event.events.WorldRenderEvent;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -23,6 +24,34 @@ public class MixinGameRenderer {
 
         WorldRenderEvent event = new WorldRenderEvent(matrixStack, partialTicks);
         event.call();
+    }
+
+
+    @Inject(
+            at = @At(value = "INVOKE",
+                    target = "net/minecraft/client/MinecraftClient.getProfiler ()Lnet/minecraft/util/profiler/Profiler;",
+                    opcode = Opcodes.INVOKEVIRTUAL,
+                    ordinal = 0),
+            method = "updateTargetedEntity")
+    public void updateTargetedEntity(float tickDelta, CallbackInfo ci) {
+        new UpdateTargetedEntityEvent.Pre().call();
+    }
+
+    @Inject(
+            at = @At(value = "INVOKE",
+                    target = "net/minecraft/entity/Entity.getRotationVec (F)Lnet/minecraft/util/math/Vec3d;",
+                    opcode = Opcodes.INVOKEVIRTUAL,
+                    ordinal = 0),
+            method = "updateTargetedEntity")
+    public void updateTargetedEntityPost(float tickDelta, CallbackInfo ci) {
+        new UpdateTargetedEntityEvent.Post().call();
+    }
+
+    @Inject(
+            at = @At(value = "TAIL"),
+            method = "updateTargetedEntity")
+    public void updateTargetedEntityOver(float tickDelta, CallbackInfo ci) {
+        new UpdateTargetedEntityEvent.Over().call();
     }
 
 }

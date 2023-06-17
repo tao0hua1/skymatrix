@@ -2,7 +2,7 @@ package cn.seiua.skymatrix.config.option;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
-public class ValueHolder <T>{
+public class ValueHolder<T> {
     @JSONField(alternateNames = "value")
     public T value;
 

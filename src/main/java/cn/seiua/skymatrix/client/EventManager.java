@@ -19,28 +19,30 @@ public class EventManager {
     @Use
     public List<Object> components;
 
-    private Map<Class,Object> events;
+    private Map<Class, Object> events;
 
     @Init
     public void handle() {
-        events=new HashMap<>();
-        for (Object o: components) {
-            Class c=o.getClass();
-            Annotation annotation=c.getAnnotation(Event.class);
-            if(annotation!=null){
-                events.put(c,o);
-                if(((Event)annotation).register()){
+        events = new HashMap<>();
+        for (Object o : components) {
+            Class c = o.getClass();
+            Annotation annotation = c.getAnnotation(Event.class);
+            if (annotation != null) {
+                events.put(c, o);
+                if (((Event) annotation).register()) {
                     register(c);
                 }
-                logger.info("Event loaded: "+c.getName());
+                logger.info("Event loaded: " + c.getName());
             }
         }
     }
-    public void register(Class c){
+
+    public void register(Class c) {
 
         cn.seiua.skymatrix.event.EventManager.register(events.get(c));
     }
-    public void unregister(Class c){
+
+    public void unregister(Class c) {
 
         cn.seiua.skymatrix.event.EventManager.unregister(events.get(c));
     }

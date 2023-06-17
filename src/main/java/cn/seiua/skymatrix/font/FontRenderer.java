@@ -4,9 +4,11 @@ import cn.seiua.skymatrix.utils.ColorUtils;
 import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
@@ -14,7 +16,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FontRenderer {
@@ -213,9 +217,23 @@ public class FontRenderer {
         x = this.x;
         y = this.y;
         String text = str;
-        if (centeredV) x -= getStringWidth(str) / 2;
 
+        if (centeredV) x -= getStringWidth(str) / 2;
+        if (this.colors != null) {
+            if (index <= this.colors.size() - 1) {
+                this.setColor(this.colors.get(index));
+                index++;
+            }
+
+        }
         for (char c : text.toCharArray()) {
+            if (c == '§') {
+                if (index <= this.colors.size() - 1) {
+                    this.setColor(this.colors.get(index));
+                    index++;
+                }
+                continue;
+            }
             CharInfo charInfo = getCharImg(c);
             if (outline) {
                 setColor(getOutlineColor(this.color));
@@ -233,7 +251,8 @@ public class FontRenderer {
             drawChar(matrixStack, x, y, z, charInfo);
             x += charInfo.getWidth();
         }
-
+        this.colors = null;
+        this.index = 0;
     }
 
     private void drawChar(MatrixStack matrixStack, int x, int y, int z, CharInfo charInfo) {
@@ -250,13 +269,34 @@ public class FontRenderer {
         RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_MIN_FILTER, GlConst.GL_LINEAR);
         RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_MAG_FILTER, GlConst.GL_LINEAR);
 
-        DrawableHelper.drawTexture(matrixStack, x, y, z, 0, 0, (charInfo.getWidth()), (charInfo.getHeight()), (charInfo.getWidth()), (charInfo.getHeight()));
+        drawTexture(charInfo.getIdentifier(), x, y, z, 0, 0, (charInfo.getWidth()), (charInfo.getHeight()), (charInfo.getWidth()), (charInfo.getHeight()), matrixStack);
         GlStateManager._disableBlend();
         RenderSystem.setShaderColor(1, 1, 1, 1);
         if (underline) {
-            DrawableHelper.fill(matrixStack, x, y + getStringHeight() / 2, z, (int) (x + charInfo.getWidth()), (int) y + getStringHeight() / 2 + 1, this.color.getRGB());
+//            DrawableHelper.fill(matrixStack, x, y + getStringHeight() / 2, z, (int) (x + charInfo.getWidth()), (int) y + getStringHeight() / 2 + 1, this.color.getRGB());
         }
 
+    }
+
+    private void drawTexture(Identifier texture, int x, int y, int z, float u, float v, int width, int height, int textureWidth, int textureHeight, MatrixStack matrixStack) {
+        this.drawTexture(texture, x, x + width, y, y + height, z, width, height, u, v, textureWidth, textureHeight, matrixStack);
+    }
+
+    private void drawTexture(Identifier texture, int x1, int x2, int y1, int y2, int z, int regionWidth, int regionHeight, float u, float v, int textureWidth, int textureHeight, MatrixStack matrixStack) {
+        this.drawTexturedQuad(texture, x1, x2, y1, y2, z, (u + 0.0F) / (float) textureWidth, (u + (float) regionWidth) / (float) textureWidth, (v + 0.0F) / (float) textureHeight, (v + (float) regionHeight) / (float) textureHeight, matrixStack);
+    }
+
+    private void drawTexturedQuad(Identifier texture, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, MatrixStack matrixStack) {
+        RenderSystem.setShaderTexture(0, texture);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, (float) z).texture(u1, v1).next();
+        bufferBuilder.vertex(matrix4f, (float) x1, (float) y2, (float) z).texture(u1, v2).next();
+        bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, (float) z).texture(u2, v2).next();
+        bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, (float) z).texture(u2, v1).next();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
     }
 
     private int x;
@@ -291,6 +331,7 @@ public class FontRenderer {
     public int getStringWidth(@NotNull String str) {
         int retv = 0;
         for (char c : str.toCharArray()) {
+            if (c == '§') continue;
             retv += getCharImg(c).getWidth();
         }
         return retv;
@@ -319,5 +360,11 @@ public class FontRenderer {
     public void drawStringWithRainBowColor(MatrixStack matrixStack, float x, float y, String str) {
     }
 
+    private ArrayList<Color> colors;
+    private int index;
 
+    public void setColors(Color... color) {
+        index = 0;
+        colors = new ArrayList<>(List.of(color));
+    }
 }

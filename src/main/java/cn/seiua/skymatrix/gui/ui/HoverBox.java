@@ -1,10 +1,10 @@
 package cn.seiua.skymatrix.gui.ui;
 
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 
 public class HoverBox extends UI {
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext matrixStack, int mouseX, int mouseY, float delta) {
 
     }
 

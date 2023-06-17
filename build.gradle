@@ -13,7 +13,9 @@ repositories {
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html
     // for more information about repositories.
 }
-
+loom {
+    accessWidenerPath = file("src/main/resources/skymatrix.accesswidener")
+}
 dependencies {
 
     implementation 'com.alibaba:fastjson:2.0.28'
@@ -75,6 +77,12 @@ jar {
             "tweakClass": "cn.seiua.skymatrix.client.MyTweaker",
             "TweakOrder": 0,
     )
+}
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "utf-8"
+}
+tasks.withType(Javadoc).configureEach {
+    options.encoding = "utf-8"
 }
 
 // configure the maven publication

@@ -12,6 +12,7 @@ import cn.seiua.skymatrix.config.option.ToggleSwitch;
 import cn.seiua.skymatrix.config.option.ValueSlider;
 import cn.seiua.skymatrix.event.EventTarget;
 import cn.seiua.skymatrix.event.events.ViewClipEvent;
+import cn.seiua.skymatrix.gui.Icons;
 import cn.seiua.skymatrix.utils.ReflectUtils;
 
 import java.util.Arrays;
@@ -25,7 +26,7 @@ public class Camera {
     public KeyBind keyBind = new KeyBind(Arrays.asList(), ReflectUtils.getModuleName(this));
     @Value(name = "selected")
     @Sign(sign = Signs.FREE)
-    public MultipleChoice selected = new MultipleChoice(Map.of("noclip", false), MultipleChoice.MODE);
+    public MultipleChoice selected = new MultipleChoice(Map.of("noclip", false), Icons.MODE);
 
     @Value(name = "modify clip")
     @Sign(sign = Signs.BETA)

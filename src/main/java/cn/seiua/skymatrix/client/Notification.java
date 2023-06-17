@@ -51,7 +51,7 @@ public class Notification {
     public void onRender(HudRenderEvent event) {
         int ms = UI.getS();
         if (ms == 0 || !enable.isValue()) return;
-        MatrixStack matrixStack = new MatrixStack();
+        MatrixStack matrixStack = event.getContext().getMatrices();
         List<Notice> noticeList = new ArrayList<>();
         matrixStack.scale(1.0f / ms, 1.0f / ms, 1.0f / ms);
         noticeList.addAll(notices);
@@ -65,8 +65,8 @@ public class Notification {
             startY -= 130;
         }
         matrixStack.push();
-        matrixStack.scale(3f, 3f, 3f);
-        MinecraftClient.getInstance().getToastManager().draw(matrixStack);
+        matrixStack.scale(ms, ms, ms);
+
     }
 
     public void drawNotice(MatrixStack matrixStack, Notice notice, int starY, int startX) {
@@ -90,6 +90,7 @@ public class Notification {
         int titleY = starY + 28;
         ClickGui.fontRenderer24.setColor(Color.white);
         ClickGui.fontRenderer24.centeredH();
+        ClickGui.fontRenderer24.resetCenteredV();
         ClickGui.fontRenderer24.drawString(matrixStack, titleX, titleY, notice.getTitle());
         ClickGui.fontRenderer24.resetCenteredH();
         ClickGui.fontRenderer24.resetCenteredV();

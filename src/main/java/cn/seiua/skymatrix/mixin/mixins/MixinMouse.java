@@ -17,15 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinMouse {
     @Inject(at = @At("HEAD"), method = "onMouseButton")
     private void onOnKey(long window, int button, int action, int mods, CallbackInfo ci) {
-//        if (action == GLFW.GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null) {
         new MouseEvent(window, button, action, mods).call();
-//        }
     }
 
     @Inject(at = @At("HEAD"), method = "onMouseScroll")
     private void onOnKey(long window, double horizontal, double vertical, CallbackInfo ci) {
-//        if (action == GLFW.GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null) {
-//        new KeyboardEvent(keyCode,scanCode,action).call();
-//        }
     }
 }

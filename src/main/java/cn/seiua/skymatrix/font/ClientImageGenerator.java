@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 public class ClientImageGenerator {
 
     private static int IMGSIZE = 2048;
+
     public static BufferedImage generateFontImages(char c, Font font) {
         String charr = c + "";
         BufferedImage bufferedImage = new BufferedImage(IMGSIZE, IMGSIZE, 2);
@@ -25,9 +26,8 @@ public class ClientImageGenerator {
         graphics.setColor(new Color(255, 255, 255, 255));
         graphics.drawString(charr, positionX, positionY + fontMetrics.getAscent());
 
-        return bufferedImage.getSubimage(0, 0, (int)dimensions.getWidth(), (int)dimensions.getHeight());
+        return bufferedImage.getSubimage(0, 0, (int) dimensions.getWidth(), (int) dimensions.getHeight());
     }
-
 
 
 }

@@ -9,40 +9,37 @@ import cn.seiua.skymatrix.utils.OptionInfo;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
 public class MultipleChoice implements ConfigInit, Serializable, UIComponent {
-    public static String MODE = "Mode";
-    public static String BLOCK = "Block";
-    public static String ITEM = "Item";
-    public static String CREATURE = "Creature";
+
     @JSONField(alternateNames = "value")
     public Map<Object, Boolean> value;
 
-    private String type;
+    private String icon;
 
     public MultipleChoice(Map value) {
 
-        this.value = new HashMap<>();
+        this.value = new LinkedHashMap<>();
         this.value.putAll(value);
-        type = "Creature";
+
     }
 
-    public MultipleChoice(Map value, String type) {
+    public MultipleChoice(Map value, String icon) {
 
-        this.value = new HashMap<>();
+        this.value = new LinkedHashMap<>();
         this.value.putAll(value);
-        this.type = type;
+        this.icon = icon;
     }
 
-    public String getType() {
-        return type;
+    public String getIcon() {
+        return icon;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public Map<Object, Boolean> getValue() {

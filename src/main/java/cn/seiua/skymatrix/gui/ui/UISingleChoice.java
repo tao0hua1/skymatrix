@@ -4,9 +4,11 @@ import cn.seiua.skymatrix.config.option.SingleChoice;
 import cn.seiua.skymatrix.config.option.ValueInput;
 import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.gui.DrawLine;
+import cn.seiua.skymatrix.gui.Icons;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
@@ -51,13 +53,15 @@ public class UISingleChoice extends UI {
 
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.updateMouse(mouseX, mouseY);
+        MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
 
         RenderUtils.cent();
         RenderUtils.setColor(getBoardColoar());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 250, getY() + getHeight(), 0), matrixStack, 0);
-        RenderUtils.setColor(isInBox() ? Theme.getInstance().THEME_UI_SELECTED.geColor() : Theme.getInstance().THEME.geColor());
+        RenderUtils.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 200, getY() + 42, 0), matrixStack, 7);
         RenderUtils.setColor(getBoardColoar());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 196, getY() + 38, 0), matrixStack, 7);
@@ -67,9 +71,9 @@ public class UISingleChoice extends UI {
 
         ClickGui.iconfontRenderer26.centeredH();
         ClickGui.iconfontRenderer26.centeredV();
-        ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME.geColor());
-        String type = optionInfo.getTarget().getType();
-        String icon = Objects.equals(type, SingleChoice.MODE) ? "\uE92E" : Objects.equals(type, SingleChoice.BLOCK) ? "\uEAE8" : Objects.equals(type, SingleChoice.ITEM) ? "\uE939" : Objects.equals(type, SingleChoice.CREATURE) ? "\uE9CE" : "\uEAAE";
+        ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
+
+        String icon = Icons.MODE;
         ClickGui.iconfontRenderer26.drawString(matrixStack, getX() - 77, getY(), icon);
 
 

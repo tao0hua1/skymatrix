@@ -3,6 +3,7 @@ package cn.seiua.skymatrix.utils;
 
 import cn.seiua.skymatrix.SkyMatrix;
 import cn.seiua.skymatrix.client.Rotation;
+import cn.seiua.skymatrix.client.RotationFaker;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
@@ -22,18 +23,22 @@ public enum RotationUtils {
     }
 
     public static Vec3d getClientLookVec() {
-        ClientPlayerEntity player = SkyMatrix.mc.player;
         float f = 0.017453292F;
         float pi = (float) Math.PI;
 
-        float f1 = MathHelper.cos(-player.getYaw() * f - pi);
-        float f2 = MathHelper.sin(-player.getYaw() * f - pi);
-        float f3 = -MathHelper.cos(-player.getPitch() * f);
-        float f4 = MathHelper.sin(-player.getPitch() * f);
+        float f1 = MathHelper.cos(-RotationFaker.instance.getServerYaw() * f - pi);
+        float f2 = MathHelper.sin(-RotationFaker.instance.getServerYaw() * f - pi);
+        float f3 = -MathHelper.cos(-RotationFaker.instance.getServerPitch() * f);
+        float f4 = MathHelper.sin(-RotationFaker.instance.getServerPitch() * f);
 
         return new Vec3d(f2 * f3, f4, f1 * f3);
     }
 
+    public static Rotation toRotation(Vec3d vec3d) {
+        float yaw = (float) Math.toDegrees(Math.atan2(vec3d.x, vec3d.z)) * -1;
+        float pitch = (float) Math.toDegrees(Math.atan2(vec3d.y, Math.sqrt(Math.pow(vec3d.x, 2) + Math.pow(vec3d.z, 2)))) * -1;
+        return new Rotation(yaw, pitch);
+    }
 
     public static Rotation getNeededRotations(Vec3d vec) {
         Vec3d eyesPos = getEyesPos();
@@ -53,9 +58,8 @@ public enum RotationUtils {
     public static double getAngleToLookVec(Vec3d vec) {
         Rotation needed = getNeededRotations(vec);
 
-        ClientPlayerEntity player = SkyMatrix.mc.player;
-        float currentYaw = MathHelper.wrapDegrees(player.getYaw());
-        float currentPitch = MathHelper.wrapDegrees(player.getPitch());
+        float currentYaw = MathHelper.wrapDegrees(RotationFaker.instance.getServerYaw());
+        float currentPitch = MathHelper.wrapDegrees(RotationFaker.instance.getServerPitch());
 
         float diffYaw = MathHelper.wrapDegrees(currentYaw - needed.yaw);
         float diffPitch = MathHelper.wrapDegrees(currentPitch - needed.pitch);
@@ -72,7 +76,7 @@ public enum RotationUtils {
 
     public static float getHorizontalAngleToLookVec(Vec3d vec) {
         Rotation needed = getNeededRotations(vec);
-        return MathHelper.wrapDegrees(SkyMatrix.mc.player.getYaw())
+        return MathHelper.wrapDegrees(RotationFaker.instance.getServerYaw())
                 - needed.yaw;
     }
 

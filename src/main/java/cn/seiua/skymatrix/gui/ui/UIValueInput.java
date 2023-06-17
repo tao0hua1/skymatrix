@@ -6,6 +6,7 @@ import cn.seiua.skymatrix.gui.DrawLine;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 import org.lwjgl.glfw.GLFW;
@@ -48,15 +49,16 @@ public class UIValueInput extends UI {
         super.update(x, y + getHeight() / 2);
     }
 
-
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.updateMouse(mouseX, mouseY);
+        MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
 
         RenderUtils.cent();
         RenderUtils.setColor(getBoardColoar());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 250, getY() + getHeight(), 0), matrixStack, 0);
-        RenderUtils.setColor(isInBox() ? Theme.getInstance().THEME_UI_SELECTED.geColor() : Theme.getInstance().THEME.geColor());
+        RenderUtils.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 200, getY() + 42, 0), matrixStack, 7);
         RenderUtils.setColor(getBoardColoar());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 196, getY() + 38, 0), matrixStack, 7);
@@ -66,15 +68,15 @@ public class UIValueInput extends UI {
 
         ClickGui.iconfontRenderer26.centeredH();
         ClickGui.iconfontRenderer26.centeredV();
-        ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME.geColor());
-        String type = optionInfo.getTarget().getType();
-        String icon = type == ValueInput.COMMAND ? "\uEA4E" : type == ValueInput.BLOCK ? "\uEAE8" : type == ValueInput.ITEM ? "\uE939" : "\uEAAE";
+        ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
+
+        String icon = optionInfo.getTarget().getType();
         ClickGui.iconfontRenderer26.drawString(matrixStack, getX() - 77, getY(), icon);
 
 
         ClickGui.fontRenderer16.centeredH();
         ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());
-        String v = (ValueInput.COMMAND == optionInfo.getTarget().getType() ? "/" : "") + optionInfo.getTarget().getValue();
+        String v = optionInfo.getTarget().pre + optionInfo.getTarget().getValue();
         int w = ClickGui.fontRenderer16.getStringWidth(v);
         ClickGui.fontRenderer16.drawString(matrixStack, drawLine.get(65), getY(), v);
         drawLine.append(w);

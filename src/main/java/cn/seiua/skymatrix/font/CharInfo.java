@@ -1,15 +1,12 @@
 package cn.seiua.skymatrix.font;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.texture.DynamicTexture;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class CharInfo {
@@ -24,6 +21,14 @@ public class CharInfo {
         this.texture = texture;
         this.height = height;
         this.width = width;
+    }
+
+    public Identifier getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(Identifier identifier) {
+        this.identifier = identifier;
     }
 
     public byte[] getTexture() {
@@ -51,18 +56,18 @@ public class CharInfo {
     }
 
 
-    public int getGlid(){
-        TextureManager textureManager=MinecraftClient.getInstance().getTextureManager();
-        if(identifier!=null){
+    public int getGlid() {
+        TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+        if (identifier != null) {
             return textureManager.getTexture(identifier).getGlId();
         }
-        DynamicTexture dynamicTexture= null;
+        DynamicTexture dynamicTexture = null;
         try {
             dynamicTexture = new NativeImageBackedTexture(NativeImage.read(texture));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        identifier= textureManager.registerDynamicTexture("textf", (NativeImageBackedTexture) dynamicTexture);
+        identifier = textureManager.registerDynamicTexture("textf", (NativeImageBackedTexture) dynamicTexture);
         return textureManager.getTexture(identifier).getGlId();
     }
 }

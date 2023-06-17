@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class ConnectManager implements Serializable {
 
     @Value(name = "toggle")
-    public ToggleSwitch toggle=new ToggleSwitch(false);
+    public ToggleSwitch toggle = new ToggleSwitch(false);
 
 
     @Init

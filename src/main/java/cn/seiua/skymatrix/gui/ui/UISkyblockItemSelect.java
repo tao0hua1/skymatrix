@@ -9,6 +9,7 @@ import cn.seiua.skymatrix.utils.ColorUtils;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import cn.seiua.skymatrix.utils.SkyBlockUtils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -57,13 +58,15 @@ public class UISkyblockItemSelect extends UI {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.updateMouse(mouseX, mouseY);
+        MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
 
         RenderUtils.cent();
         RenderUtils.setColor(getBoardColoar());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 250, getY() + getHeight(), 0), matrixStack, 0);
-        RenderUtils.setColor(isInBox() ? Theme.getInstance().THEME_UI_SELECTED.geColor() : Theme.getInstance().THEME.geColor());
+        RenderUtils.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 200, getY() + 42, 0), matrixStack, 7);
         RenderUtils.setColor(getBoardColoar());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 196, getY() + 38, 0), matrixStack, 7);

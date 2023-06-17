@@ -14,6 +14,7 @@ public class OptionInfo<T> implements Serializable {
     private String module;
     private String category;
     private transient Signs sign;
+
     public OptionInfo(T target, String fullName, String name, String module, String category, Signs sign) {
         this.target = target;
         this.fullName = fullName;

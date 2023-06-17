@@ -5,19 +5,18 @@ import cn.seiua.skymatrix.config.Hide;
 import cn.seiua.skymatrix.config.IHide;
 import cn.seiua.skymatrix.config.Value;
 import cn.seiua.skymatrix.config.option.KeyBind;
-import cn.seiua.skymatrix.gui.ClickGui;
-import cn.seiua.skymatrix.gui.DrawLine;
-import cn.seiua.skymatrix.gui.Theme;
-import cn.seiua.skymatrix.gui.UIComponent;
+import cn.seiua.skymatrix.gui.*;
 import cn.seiua.skymatrix.utils.CateInfo;
 import cn.seiua.skymatrix.utils.ModuleInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import cn.seiua.skymatrix.utils.UiInfo;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,6 +44,7 @@ public class UIModules extends UI {
         for (Field field : c.getDeclaredFields()) {
             Value value = (Value) field.getAnnotation(Value.class);
             Sign sign = (Sign) field.getAnnotation(Sign.class);
+            if (field.getAnnotation(Ignore.class) != null) continue;
             if (value != null) {
 
 
@@ -66,6 +66,7 @@ public class UIModules extends UI {
                         if (ui != null) {
                             if (hide != null) {
                                 hideMap.put(ui, temp1.get(hide.following()));
+                                ui.setHideValue(hide.value());
                             }
                             temp.add(ui);
                         }
@@ -92,12 +93,18 @@ public class UIModules extends UI {
 
     @Override
     public void initUI() {
-        UiInfo uiInfo = ClickGui.getValue(cateInfo.getFullName() + ".state");
+        UiInfo uiInfo = ClickGui.getValue("category." + cateInfo.getFullName() + ".state");
         setX(uiInfo.getX());
         setY(uiInfo.getY());
         for (UI ui : uiModules) {
             ui.initUI();
         }
+        Collections.sort(this.uiModules,
+                (o1, o2) -> {
+                    int a = o1.moduleInfo.getName().toCharArray()[0] - o2.moduleInfo.getName().toCharArray()[0];
+                    System.out.println(a);
+                    return a;
+                });
     }
 
     public String getID() {
@@ -105,7 +112,9 @@ public class UIModules extends UI {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.updateMouse(mouseX, mouseY);
+        MatrixStack matrixStack = context.getMatrices();
 
         drawLine.reset(getX() - 125);
         setWidth(250);
@@ -128,7 +137,7 @@ public class UIModules extends UI {
             for (UIModule uiModule : uiModules) {
                 uiModule.update(getX(), sty);
                 uiModule.setZ(getZ());
-                uiModule.render(matrixStack, mouseX, mouseY, delta);
+                uiModule.render(context, mouseX, mouseY, delta);
                 sty += uiModule.getHeight();
             }
             height = sty;
@@ -148,6 +157,7 @@ public class UIModules extends UI {
 
         }
         ClickGui.fontRenderer24.centeredH();
+        ClickGui.fontRenderer24.resetCenteredV();
         ClickGui.fontRenderer24.setColor(Theme.getInstance().THEME.geColor());
         ClickGui.fontRenderer24.setDrawSize(32);
         ClickGui.fontRenderer24.drawString(matrixStack, drawLine.get(25), getY(), upperFirst(cateInfo.getName()));
@@ -157,12 +167,12 @@ public class UIModules extends UI {
     }
 
     public boolean isOpen() {
-        UiInfo uiInfo = ClickGui.getValue(cateInfo.getFullName() + ".state");
+        UiInfo uiInfo = ClickGui.getValue("category" + "." + cateInfo.getFullName() + ".state");
         return uiInfo.isValue();
     }
 
     private void setOpen(boolean b) {
-        ClickGui.getValue(cateInfo.getFullName() + ".state").setValue(b);
+        ClickGui.getValue("category" + "." + cateInfo.getFullName() + ".state").setValue(b);
     }
 
     @Override
@@ -206,7 +216,9 @@ public class UIModules extends UI {
         if (tv >= 20) {
             if (rs > 0) {
                 f--;
+                f--;
             } else {
+                f++;
                 f++;
             }
         }
@@ -221,6 +233,7 @@ public class UIModules extends UI {
                 }
             } else {
                 f++;
+                f++;
             }
         }
         t = f;
@@ -229,7 +242,7 @@ public class UIModules extends UI {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        if (isInBox()) {
+        if (isInBoxA(mouseX, mouseY)) {
             if (amount > 0) {
                 rs = -100;
             } else {
@@ -241,21 +254,27 @@ public class UIModules extends UI {
 
     public boolean isInBoxA(double mx, double my) {
 
-        double ty = getY() + getHeight() / 2;
+        double ty = getY() + (double) getHeight() / 2;
         double ty1 = ty + getMaskHeight();
-        return (my <= ty1 && my >= ty);
+
+
+        double tx = getX() - (double) getWidth() / 2;
+        double tx1 = getX() + (double) getWidth() / 2;
+
+        return (my <= ty1 && my >= ty) && (mx <= tx1 && mx >= tx);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
 
         boolean flag = (isInBox() && button == 0);
-        if (isOpen() && isInBoxA(mouseX, mouseY)) {
-            if (isInBox()) {
-                if (button == 1) {
-                    setOpen(!isOpen());
-                }
+        if (isInBox()) {
+            if (button == 1) {
+                setOpen(!isOpen());
             }
+        }
+        if (isInBoxA(mouseX, mouseY)) {
+
             for (UIModule uiModule : uiModules) {
                 boolean b = uiModule.mouseClicked(mouseX, mouseY, button);
                 if (b == false) {
@@ -269,8 +288,8 @@ public class UIModules extends UI {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        ClickGui.getValue(cateInfo.getFullName() + ".state").setX(getX());
-        ClickGui.getValue(cateInfo.getFullName() + ".state").setY(getY());
+        ClickGui.getValue("category." + cateInfo.getFullName() + ".state").setX(getX());
+        ClickGui.getValue("category." + cateInfo.getFullName() + ".state").setY(getY());
         for (UIModule uiModule : uiModules) {
             uiModule.mouseReleased(mouseX, mouseY, button);
         }
@@ -295,4 +314,6 @@ public class UIModules extends UI {
             uiModule.keyPressed(keyCode, scanCode, modifiers);
         }
     }
+
+
 }

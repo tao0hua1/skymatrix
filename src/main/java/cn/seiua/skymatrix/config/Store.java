@@ -6,8 +6,10 @@ import java.io.IOException;
 
 public interface Store extends Library {
 
-     void write(byte[] data,String uuid);
-     byte[] load(String uuid) throws IOException;
-     String[] loadUUIDs();
+    void write(byte[] data, String uuid);
+
+    byte[] load(String uuid) throws IOException;
+
+    String[] loadUUIDs();
 
 }

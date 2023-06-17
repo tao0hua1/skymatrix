@@ -7,6 +7,7 @@ import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.MathUtils;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
@@ -65,10 +66,21 @@ public class UIDoubleSlider extends UI {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.updateMouse(mouseX, mouseY);
+        MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
         setMid(true);
 
+        double t1 = getTarget();
+        double t2 = getTarget2();
+        double d1 = getTarget() + getX();
+        double d2 = getTarget2() + getX();
+        double dd = Math.abs(t1 - t2);
+
+        double minv = Math.min(optionInfo.getTarget().getValue().doubleValue(), optionInfo.getTarget().getValua().doubleValue());
+        double maxv = Math.max(optionInfo.getTarget().getValue().doubleValue(), optionInfo.getTarget().getValua().doubleValue());
+        double fv = getX() - 100 + (((minv - this.min) / w) * 200);
 
         RenderUtils.cent();
         RenderUtils.setColor(getBoardColoar());
@@ -79,7 +91,9 @@ public class UIDoubleSlider extends UI {
         RenderUtils.cent();
         RenderUtils.setColor(Theme.getInstance().THEME.geColor());
         RenderUtils.drawRound2D(new Box(getX(), getY() + 10, 0, getX() + 200, getY() + 12, 0), matrixStack, 1);
+        RenderUtils.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
         RenderUtils.resetCent();
+        RenderUtils.drawRound2D(new Box(fv, getY() + 9, 0, fv + dd, getY() + 11, 0), matrixStack, 1);
 
 
         drawLine(matrixStack);
@@ -90,8 +104,6 @@ public class UIDoubleSlider extends UI {
         drawLine.append(ClickGui.fontRenderer16.getStringWidth(upperFirst(optionInfo.getName())));
         ClickGui.fontRenderer16.centeredV();
 
-        double minv = Math.min(optionInfo.getTarget().getValue().doubleValue(), optionInfo.getTarget().getValua().doubleValue());
-        double maxv = Math.max(optionInfo.getTarget().getValue().doubleValue(), optionInfo.getTarget().getValua().doubleValue());
 
         String v = optionInfo.getTarget().toValueString(minv) + "-" + optionInfo.getTarget().toValueString(maxv);
         int w = ClickGui.fontRenderer16.getStringWidth(v);
@@ -110,7 +122,7 @@ public class UIDoubleSlider extends UI {
         ClickGui.iconfontRenderer28.centeredV();
         ClickGui.iconfontRenderer28.setColor(getBoardColoar());
         ClickGui.iconfontRenderer28.centeredV();
-        ClickGui.iconfontRenderer28.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 8, v1max ? "\uE900" : "\uE901");
+        ClickGui.iconfontRenderer28.drawString(matrixStack, (int) (getX() - uw / 2 + t1), getY() + 8, v1max ? "\uE900" : "\uE901");
         ClickGui.iconfontRenderer28.resetCenteredH();
         ClickGui.iconfontRenderer28.resetCenteredV();
 
@@ -118,7 +130,7 @@ public class UIDoubleSlider extends UI {
         ClickGui.iconfontRenderer28.centeredV();
         ClickGui.iconfontRenderer28.setColor(getBoardColoar());
         ClickGui.iconfontRenderer28.centeredV();
-        ClickGui.iconfontRenderer28.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget2()), getY() + 8, v1max ? "\uE901" : "\uE900");
+        ClickGui.iconfontRenderer28.drawString(matrixStack, (int) (getX() - uw / 2 + t2), getY() + 8, v1max ? "\uE901" : "\uE900");
         ClickGui.iconfontRenderer28.resetCenteredH();
         ClickGui.iconfontRenderer28.resetCenteredV();
         if (isInButton(mouseX, mouseY) || hd) {
@@ -126,15 +138,15 @@ public class UIDoubleSlider extends UI {
             ClickGui.iconfontRenderer22.centeredV();
             ClickGui.iconfontRenderer22.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
             ClickGui.iconfontRenderer22.centeredV();
-            ClickGui.iconfontRenderer22.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 9, v1max ? "\uE900" : "\uE901");
+            ClickGui.iconfontRenderer22.drawString(matrixStack, (int) (getX() - uw / 2 + t1), getY() + 9, v1max ? "\uE900" : "\uE901");
             ClickGui.iconfontRenderer22.resetCenteredH();
             ClickGui.iconfontRenderer22.resetCenteredV();
         } else {
             ClickGui.iconfontRenderer18.centeredH();
             ClickGui.iconfontRenderer18.centeredV();
-            ClickGui.iconfontRenderer18.setColor(Theme.getInstance().THEME.geColor());
+            ClickGui.iconfontRenderer18.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
             ClickGui.iconfontRenderer18.centeredV();
-            ClickGui.iconfontRenderer18.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget()), getY() + 9, v1max ? "\uE900" : "\uE901");
+            ClickGui.iconfontRenderer18.drawString(matrixStack, (int) (getX() - uw / 2 + t1), getY() + 9, v1max ? "\uE900" : "\uE901");
             ClickGui.iconfontRenderer18.resetCenteredH();
             ClickGui.iconfontRenderer18.resetCenteredV();
         }
@@ -143,15 +155,15 @@ public class UIDoubleSlider extends UI {
             ClickGui.iconfontRenderer22.centeredV();
             ClickGui.iconfontRenderer22.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
             ClickGui.iconfontRenderer22.centeredV();
-            ClickGui.iconfontRenderer22.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget2()), getY() + 9, v1max ? "\uE901" : "\uE900");
+            ClickGui.iconfontRenderer22.drawString(matrixStack, (int) (getX() - uw / 2 + t2), getY() + 9, v1max ? "\uE901" : "\uE900");
             ClickGui.iconfontRenderer22.resetCenteredH();
             ClickGui.iconfontRenderer22.resetCenteredV();
         } else {
             ClickGui.iconfontRenderer18.centeredH();
             ClickGui.iconfontRenderer18.centeredV();
-            ClickGui.iconfontRenderer18.setColor(Theme.getInstance().THEME.geColor());
+            ClickGui.iconfontRenderer18.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
             ClickGui.iconfontRenderer18.centeredV();
-            ClickGui.iconfontRenderer18.drawString(matrixStack, (int) (getX() - uw / 2 + getTarget2()), getY() + 9, v1max ? "\uE901" : "\uE900");
+            ClickGui.iconfontRenderer18.drawString(matrixStack, (int) (getX() - uw / 2 + t2), getY() + 9, v1max ? "\uE901" : "\uE900");
             ClickGui.iconfontRenderer18.resetCenteredH();
             ClickGui.iconfontRenderer18.resetCenteredV();
         }

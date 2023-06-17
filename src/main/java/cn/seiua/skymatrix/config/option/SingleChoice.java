@@ -1,6 +1,7 @@
 package cn.seiua.skymatrix.config.option;
 
 import cn.seiua.skymatrix.client.module.Signs;
+import cn.seiua.skymatrix.config.IHide;
 import cn.seiua.skymatrix.gui.UIComponent;
 import cn.seiua.skymatrix.gui.ui.UI;
 import cn.seiua.skymatrix.gui.ui.UISingleChoice;
@@ -10,7 +11,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.io.Serializable;
 import java.util.List;
 
-public class SingleChoice<V> implements Serializable, UIComponent {
+public class SingleChoice<V> implements Serializable, UIComponent, IHide {
 
     private transient List<V> value;
 
@@ -72,5 +73,11 @@ public class SingleChoice<V> implements Serializable, UIComponent {
         OptionInfo<SingleChoice> optionInfo = new OptionInfo<>(this, category + "." + name, name, module, category, sign);
         UISingleChoice uiToggle = new UISingleChoice(optionInfo);
         return uiToggle;
+    }
+
+    @Override
+    public boolean canRender(String v) {
+
+        return this.selectedValue().equals(v);
     }
 }

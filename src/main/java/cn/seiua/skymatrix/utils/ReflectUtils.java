@@ -1,6 +1,7 @@
 package cn.seiua.skymatrix.utils;
 
 import cn.seiua.skymatrix.client.component.SModule;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
@@ -67,6 +68,7 @@ public class ReflectUtils {
         try {
             if (o.getClass() == oo.getClass()) {
                 for (Field f : o.getClass().getDeclaredFields()) {
+                    if (f.getAnnotation(JSONField.class) == null) continue;
                     f.setAccessible(true);
                     Object obj = f.get(oo);
                     Object obj1 = f.get(o);

@@ -1,6 +1,6 @@
 package cn.seiua.skymatrix.event;
 
-import cn.seiua.skymatrix.SkyMatrix;
+import net.minecraft.client.MinecraftClient;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -59,7 +59,7 @@ public abstract class Event {
     }
 
     private static final void call(final Event event) {
-        if (SkyMatrix.mc.world == null) return;
+        if (MinecraftClient.getInstance().player == null) return;
         final ArrayHelper<Data> dataList = EventManager.get(event.getClass());
 
         if (dataList != null) {

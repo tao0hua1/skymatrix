@@ -3,7 +3,6 @@ package cn.seiua.skymatrix.client.module;
 import com.alibaba.fastjson.annotation.JSONField;
 
 
-
 public class ModuleObj {
     public ModuleObj(Object target, boolean enable, String name, String category) {
         this.target = target;

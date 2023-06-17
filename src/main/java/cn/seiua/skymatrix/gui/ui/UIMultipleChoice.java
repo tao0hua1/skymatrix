@@ -6,11 +6,11 @@ import cn.seiua.skymatrix.gui.DrawLine;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
 import java.awt.*;
-import java.util.Objects;
 
 public class UIMultipleChoice extends UI {
     private DrawLine drawLine = new DrawLine(250);
@@ -36,9 +36,9 @@ public class UIMultipleChoice extends UI {
         if (o > 1) o = 1;
         if (o < 0) o = 0;
         Color color = Theme.getInstance().SUBBOARD.geColor();
-//        float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
-//        Color ac = Color.getHSBColor(hsb[0], hsb[1], Math.max(hsb[2], 0.35f * o));
-        return color;
+        float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+        Color ac = Color.getHSBColor(hsb[0], hsb[1], Math.max(hsb[2], 0.35f * o));
+        return ac;
     }
 
     public void update(int x, int y) {
@@ -50,23 +50,23 @@ public class UIMultipleChoice extends UI {
 
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.updateMouse(mouseX, mouseY);
+        MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
         int t = -1 * (getHeight() / 2) + 52 / 2;
 
         RenderUtils.cent();
-        RenderUtils.setColor(getBoardColoar());
+        RenderUtils.setColor(Theme.getInstance().SUBBOARD.geColor());
         RenderUtils.drawRound2D(new Box(getX(), getY(), 0, getX() + 250, getY() + getHeight(), 0), matrixStack, 0);
-        RenderUtils.setColor(optionInfo.getSign().color);
-        RenderUtils.drawRound2D(new Box(getX() + 124, getY(), 0, getX() + 127, getY() + getHeight(), 0), matrixStack, 0);
 
 
         ClickGui.iconfontRenderer26.centeredH();
         ClickGui.iconfontRenderer26.centeredV();
-        ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME.geColor());
-        String type = optionInfo.getTarget().getType();
-        String icon = Objects.equals(type, MultipleChoice.MODE) ? "\uE935" : Objects.equals(type, MultipleChoice.BLOCK) ? "\uEAE8" : Objects.equals(type, MultipleChoice.ITEM) ? "\uE939" : Objects.equals(type, MultipleChoice.CREATURE) ? "\uE913" : "\uEAAE";
+        ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
 
+        String icon = this.optionInfo.getTarget().getIcon();
+        if (icon == null) icon = "1";
         ClickGui.fontRenderer16.centeredH();
         ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());
 
@@ -75,18 +75,27 @@ public class UIMultipleChoice extends UI {
         int c = getHoverIndex(mouseX, mouseY);
         for (Object key : this.optionInfo.getTarget().getValue().keySet()) {
             boolean b = this.optionInfo.getTarget().getValue().get(key);
+            if (c == j) {
+                RenderUtils.setColor(getBoardColoar());
+
+                RenderUtils.drawRound2D(new Box(getX(), getY() + t, 0, getX() + getWidth(), getY() + t + 42, 0), matrixStack, 0);
+            }
+
+
             RenderUtils.setColor(c == j || b ? Theme.getInstance().THEME_UI_SELECTED.geColor() : Theme.getInstance().THEME.geColor());
             RenderUtils.drawRound2D(new Box(getX(), getY() + t, 0, getX() + 200, getY() + t + 42, 0), matrixStack, 7);
-            RenderUtils.setColor(c == j || b ? Theme.getInstance().HOVERANDSELECTED.geColor() : getBoardColoar());
+            RenderUtils.setColor(Theme.getInstance().HOVERANDSELECTED.geColor());
             RenderUtils.drawRound2D(new Box(getX(), getY() + t, 0, getX() + 196, getY() + t + 38, 0), matrixStack, 7);
             ClickGui.iconfontRenderer26.drawString(matrixStack, getX() - 77, getY() + t, icon);
-            ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME.geColor());
+            ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
             ClickGui.fontRenderer16.drawString(matrixStack, drawLine.get(65), getY() + t, key.toString());
             ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());
             drawLine.reset(getX() - 125);
             t += 52;
             j++;
         }
+        RenderUtils.setColor(optionInfo.getSign().color);
+        RenderUtils.drawRound2D(new Box(getX() + 124, getY(), 0, getX() + 127, getY() + getHeight(), 0), matrixStack, 0);
         RenderUtils.resetCent();
         ClickGui.fontRenderer16.resetCenteredH();
         ClickGui.fontRenderer16.resetCenteredV();

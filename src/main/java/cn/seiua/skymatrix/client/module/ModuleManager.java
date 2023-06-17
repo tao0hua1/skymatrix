@@ -55,7 +55,9 @@ public class ModuleManager {
     public void registerEvents() {
         for (Object key : valueHolder.value.keySet()) {
             if (valueHolder.value.get(key)) {
-                eventManager.register(modules.get(key).getTarget().getClass());
+                if (modules.containsKey(key)) {
+                    eventManager.register(modules.get(key).getTarget().getClass());
+                }
             }
         }
     }
@@ -79,21 +81,6 @@ public class ModuleManager {
     }
 
     public void toggle(String moduleName) {
-        if (valueHolder.value.containsKey(moduleName)) {
-
-            if (!valueHolder.value.get(moduleName).booleanValue()) {
-                eventManager.register(this.modules.get(moduleName).getTarget().getClass());
-                valueHolder.value.put(moduleName, true);
-            } else {
-                eventManager.unregister(this.modules.get(moduleName).getTarget().getClass());
-                valueHolder.value.put(moduleName, false);
-
-            }
-
-        } else {
-            valueHolder.value.put(moduleName, false);
-            logger.warn("不存在的Modulename: " + moduleName);
-        }
         Object o = this.modules.get(moduleName).getTarget();
         boolean flag = false;
         IToggle toggle = null;
@@ -101,14 +88,23 @@ public class ModuleManager {
             toggle = (IToggle) o;
             flag = true;
         }
-
-        if (valueHolder.value.get(moduleName)) {
-            notification.push(new Notice("Module", "Enable " + this.modules.get(moduleName).getName(), NoticeType.INFO));
-            if (flag) toggle.enable();
-        } else {
-            notification.push(new Notice("Module", "Disable " + this.modules.get(moduleName).getName(), NoticeType.INFO));
-            if (flag) toggle.disable();
+        if (!valueHolder.value.containsKey(moduleName)) {
+            valueHolder.value.put(moduleName, false);
+            logger.warn("不存在的Modulename: " + moduleName);
         }
+        if (!valueHolder.value.get(moduleName)) {
+            if (flag) toggle.enable();
+            notification.push(new Notice("Module", "Enable " + this.modules.get(moduleName).getName(), NoticeType.INFO));
+            eventManager.register(this.modules.get(moduleName).getTarget().getClass());
+            valueHolder.value.put(moduleName, true);
+
+        } else {
+            if (flag) toggle.disable();
+            notification.push(new Notice("Module", "Disable " + this.modules.get(moduleName).getName(), NoticeType.INFO));
+            eventManager.unregister(this.modules.get(moduleName).getTarget().getClass());
+            valueHolder.value.put(moduleName, false);
+        }
+
 
     }
 

@@ -1,14 +1,13 @@
 package cn.seiua.skymatrix.client;
 
 import cn.seiua.skymatrix.SkyMatrix;
-import cn.seiua.skymatrix.client.component.Component;
-import cn.seiua.skymatrix.client.component.Event;
-import cn.seiua.skymatrix.client.component.Init;
-import cn.seiua.skymatrix.client.component.Use;
+import cn.seiua.skymatrix.client.component.*;
+import cn.seiua.skymatrix.client.config.Setting;
 import cn.seiua.skymatrix.event.EventTarget;
 import cn.seiua.skymatrix.event.events.ClientTickEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,6 +16,7 @@ import java.util.List;
 
 @Component
 @Event(register = true)
+@Category(name = "client")
 public final class Client {
 
 
@@ -27,6 +27,8 @@ public final class Client {
     private EventManager eventManager;
     @Use
     private ConnectManager connectManager;
+    @Use
+    private Setting setting;
     public int stage;
     public static File root = new File(MinecraftClient.getInstance().runDirectory, "skymartix");
     private Client instance;
@@ -42,16 +44,12 @@ public final class Client {
 
     private boolean flag;
 
-    //    @SubscribeEvent
-//    public void render(RenderGameOverlayEvent e) {
-//        if (flag == false) {
-//            FontUtils.init();
-//        }
-//    }
-//
     @EventTarget
     public void ClientTickEvent(ClientTickEvent e) {
-        SkyMatrix.mc.getWindow().setTitle("Genshin Impact");
+        if (setting.title.getValue() != "") {
+            SkyMatrix.mc.getWindow().setTitle(setting.title.getValue());
+        }
+
         if (MinecraftClient.getInstance().world != null) {
             updataGuiScreen();
         }
@@ -79,6 +77,16 @@ public final class Client {
             targetGui = null;
         }
 
+    }
+
+    public static void sendMessage(Text message) {
+        assert SkyMatrix.mc.player != null;
+        SkyMatrix.mc.player.sendMessage(Text.of("§8[§9S§9k§9y§9M§9a§9t§9r§9i§9x§8]").copy().append(message));
+    }
+
+    public static void sendDebugMessage(Text message) {
+        if (!Setting.getInstance().debug.isValue()) return;
+        sendMessage(Text.of("§3[§bDebug§3]§7: §r").copy().append(message));
     }
 
 

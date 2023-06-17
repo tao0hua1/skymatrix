@@ -12,6 +12,7 @@ public class WorldRenderEvent extends Event {
     public WorldRenderEvent(MatrixStack matrixStack, float tickDelta) {
         this.matrixStack = matrixStack;
         this.tickDelta = tickDelta;
+
     }
 
     public MatrixStack getMatrixStack() {

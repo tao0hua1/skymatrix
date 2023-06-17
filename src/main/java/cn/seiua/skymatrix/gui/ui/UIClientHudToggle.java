@@ -6,6 +6,7 @@ import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.hud.ClientHud;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
@@ -49,9 +50,10 @@ public class UIClientHudToggle extends UI {
 
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
-
+        super.updateMouse(mouseX, mouseY);
         RenderUtils.cent();
         RenderUtils.setColor(getBoardColoar());
         RenderUtils.drawRound2D(new Box(getX(), getY(), -1, getX() + 250, getY() + getHeight(), -1), matrixStack, 0);

@@ -1,6 +1,7 @@
 package cn.seiua.skymatrix.mixin.mixins;
 
 import cn.seiua.skymatrix.event.events.ClientTickEvent;
+import cn.seiua.skymatrix.event.events.GameExitEvent;
 import cn.seiua.skymatrix.event.events.WorldChangeEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
@@ -18,12 +19,17 @@ public abstract class MixinMinecraftClient {
 
     }
 
+    @Inject(at = @At("HEAD"), method = "close")
+    public void close(CallbackInfo ci) {
+        new GameExitEvent().call();
+    }
+
     @Inject(at = @At("HEAD"), method = "joinWorld")
     public void joinWorld(ClientWorld world, CallbackInfo ci) {
         new WorldChangeEvent(world).call();
     }
 
-    @Inject(at = @At("RETURN"), method = "tick")
+    @Inject(at = @At("HEAD"), method = "tick")
     private void onEndTick(CallbackInfo info) {
         new ClientTickEvent().call();
     }

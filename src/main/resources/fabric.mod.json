@@ -5,13 +5,14 @@
   "name": "Skymatrix",
   "description": "wtf macroer?",
   "authors": [
-    "Me!"
+    "Seiuna",
+    "Yuuiyu"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/seiuna/skymatrix",
+    "sources": "https://github.com/seiuna/skymatrix"
   },
-  "license": "CC0-1.0",
+  "license": "AGPL-3.0 license",
   "icon": "assets/skymatrix/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -25,8 +26,9 @@
   "depends": {
     "fabricloader": ">=0.14.19",
     "fabric-api": "*",
-    "minecraft": "~1.19.4",
-    "java": ">=17"
+    "minecraft": "~1.20",
+    "java": ">=17",
+    "sodium": "*"
   },
   "suggests": {
     "another-mod": "sodium"

@@ -4,6 +4,7 @@ import cn.seiua.skymatrix.client.module.Signs;
 import cn.seiua.skymatrix.gui.UIComponent;
 import cn.seiua.skymatrix.gui.ui.UI;
 import cn.seiua.skymatrix.gui.ui.UIColorSlider;
+import cn.seiua.skymatrix.utils.ColorUtils;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import com.alibaba.fastjson.annotation.JSONField;
 
@@ -20,10 +21,27 @@ public class ColorHolder implements Serializable, UIComponent {
     @JSONField(alternateNames = "alpha")
     public Integer a;
 
+    @JSONField(alternateNames = "rainbow")
+    public boolean rainbow;
 
     @JSONField(alternateNames = "value")
     public transient Color value;
 
+    public boolean isRainbow() {
+        return rainbow;
+    }
+
+    public void setRainbow(boolean rainbow) {
+        this.rainbow = rainbow;
+    }
+
+    public Color getValue() {
+        return value;
+    }
+
+    public void setValue(Color value) {
+        this.value = value;
+    }
 
     public ColorHolder(Color value) {
         seColor(value);
@@ -62,7 +80,15 @@ public class ColorHolder implements Serializable, UIComponent {
     }
 
     public Color geColor() {
-        return new Color(r, g, b, a);
+        Color color = new Color(r, g, b);
+        if (rainbow) {
+            float v = (System.currentTimeMillis() % 4000);
+
+            color = ColorUtils.setHue(color, v / 4000);
+        } else {
+            return color;
+        }
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), a);
     }
 
     public void seColor(Color value) {

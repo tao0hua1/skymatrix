@@ -12,6 +12,7 @@ import cn.seiua.skymatrix.config.option.MapValueHolder;
 import cn.seiua.skymatrix.config.option.ValueInput;
 import cn.seiua.skymatrix.font.FontRenderer;
 import cn.seiua.skymatrix.font.FontUtils;
+import cn.seiua.skymatrix.gui.ui.DrawDetial;
 import cn.seiua.skymatrix.gui.ui.UI;
 import cn.seiua.skymatrix.gui.ui.UIButton;
 import cn.seiua.skymatrix.gui.ui.UIModules;
@@ -20,6 +21,7 @@ import cn.seiua.skymatrix.utils.CateInfo;
 import cn.seiua.skymatrix.utils.ModuleInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import cn.seiua.skymatrix.utils.UiInfo;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -36,6 +38,7 @@ public class ClickGui extends Screen {
 
     public static FontRenderer fontRenderer18;
     public static FontRenderer fontRenderer16;
+    public static FontRenderer fontRenderer8;
 
     public static FontRenderer fontRenderer24;
     public static FontRenderer fontRenderer22;
@@ -72,20 +75,32 @@ public class ClickGui extends Screen {
     int k1 = -1;
     int k2 = -1;
 
+    public static DrawDetial drawDetial;
+
     public ClickGui() {
         super(Text.empty());
     }
 
+    static int count = 0;
+
     public static UiInfo getValue(String key) {
         if (!instance.valueHolder.value.containsKey(key)) {
-            instance.valueHolder.value.put(key, new UiInfo(true, 100, 100));
+            if (key.contains("category")) {
+                instance.valueHolder.value.put(key, new UiInfo(true, 300 + count * 230, 300));
+                count++;
+            } else {
+                instance.valueHolder.value.put(key, new UiInfo(false, 300, 300));
+            }
+
+
         }
         return instance.valueHolder.value.get(key);
     }
 
     private List<UI> uiList = new ArrayList<>();
     @Value(name = "last")
-    private ValueInput last = new ValueInput("NMSL", "");
+    @Ignore
+    private ValueInput last = new ValueInput("1", "");
 
     int k3 = -1;
     int shiftign;
@@ -122,13 +137,16 @@ public class ClickGui extends Screen {
         configManager.writeToProfile();
         configManager.saveProfiles();
         notification.push(new Notice("Config", "profile: " + configManager.getCurrent().getName() + " saved successfully", NoticeType.INFO));
+
         super.close();
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        mouseY = mouseY * UI.getS();
+        mouseX = mouseX * UI.getS();
         for (UIModules uiModules : modules.values()) {
-            uiModules.mouseScrolled(mouseX, mouseX, amount);
+            uiModules.mouseScrolled(mouseX, mouseY, amount);
         }
 
         return super.mouseScrolled(mouseX, mouseY, amount);
@@ -146,6 +164,7 @@ public class ClickGui extends Screen {
         fontRenderer20 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 20);
         fontRenderer18 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 18);
         fontRenderer16 = FontUtils.getFontRenderer("fzb.ttf", Font.PLAIN, 16);
+        fontRenderer8 = FontUtils.getFontRenderer("fzb.ttf", Font.BOLD, 12);
         iconfontRenderer30 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 30);
         iconfontRenderer28 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 28);
         iconfontRenderer26 = FontUtils.getFontRenderer("icomoon.ttf", Font.PLAIN, 26);
@@ -231,13 +250,13 @@ public class ClickGui extends Screen {
 
 
         if (k1 == -1) {
-            k1 = t == 0 ? key : KeyBindManger.MOUSE + t;
+            k1 = t == 0 ? key : KeyBindManger.MOUSE + key;
         } else {
             if (k2 == -1) {
-                k2 = t == 0 ? key : KeyBindManger.MOUSE + t;
+                k2 = t == 0 ? key : KeyBindManger.MOUSE + key;
             } else {
                 if (k3 == -1) {
-                    k3 = t == 0 ? key : KeyBindManger.MOUSE + t;
+                    k3 = t == 0 ? key : KeyBindManger.MOUSE + key;
                 }
             }
         }
@@ -260,21 +279,21 @@ public class ClickGui extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
         mouseY = mouseY * UI.getS();
         mouseX = mouseX * UI.getS();
         int height = this.height * UI.getS();
         int width = this.width * UI.getS();
-        matrices.scale(1f / UI.getS(), 1f / UI.getS(), 1f / UI.getS());
-
+        context.getMatrices().scale(1f / UI.getS(), 1f / UI.getS(), 1f / UI.getS());
+        drawMask(context.getMatrices());
         int ap = 0;
         for (UI ui : uiList) {
             ui.update(36 + ap, height - 36);
-            ui.render(matrices, mouseX, mouseY, delta);
+            ui.render(context, mouseX, mouseY, delta);
             ap += ui.getWidth() + 6;
         }
-        drawMask(matrices);
+
         UIModules l = modules.get(this.last.getValue());
 
         for (UIModules ui : modules.values()) {
@@ -283,9 +302,9 @@ public class ClickGui extends Screen {
 
 
                 int uih = ui.getMaskHeight() + ui.getHeight();
-                RenderUtils.drawMask(matrices, new Box(ui.getX() - ui.getWidth() / 2, ui.getY() - ui.getHeight() / 2, 1, ui.getX() - ui.getWidth() / 2 + 250, ui.getY() - ui.getHeight() / 2 + uih, 1));
+                RenderUtils.drawMask(context.getMatrices(), new Box(ui.getX() - ui.getWidth() / 2, ui.getY() - ui.getHeight() / 2, 1, ui.getX() - ui.getWidth() / 2 + 250, ui.getY() - ui.getHeight() / 2 + uih, 1));
 
-                ui.render(matrices, mouseX, mouseY, delta);
+                ui.render(context, mouseX, mouseY, delta);
                 RenderUtils.clearMask();
             }
 
@@ -293,16 +312,22 @@ public class ClickGui extends Screen {
         }
         if (l != null) {
             int uih = l.getMaskHeight() + l.getHeight();
-            RenderUtils.drawMask(matrices, new Box(l.getX() - l.getWidth() / 2, l.getY() - l.getHeight() / 2, 1, l.getX() - l.getWidth() / 2 + 250, l.getY() - l.getHeight() / 2 + uih, 1));
+            RenderUtils.drawMask(context.getMatrices(), new Box(l.getX() - l.getWidth() / 2, l.getY() - l.getHeight() / 2, 1, l.getX() - l.getWidth() / 2 + 250, l.getY() - l.getHeight() / 2 + uih, 1));
 
-            l.render(matrices, mouseX, mouseY, delta);
+            l.render(context, mouseX, mouseY, delta);
             RenderUtils.clearMask();
         }
 
         if (focus != null) {
+            context.fillGradient(0, 0, width, height, -1072689136, -804253680);
+            focus.render(context, mouseX, mouseY, delta);
+        } else {
 
-            Screen.fillGradient(matrices, 0, 0, width, height, -1072689136, -804253680);
-            focus.render(matrices, mouseX, mouseY, delta);
+            if (drawDetial != null) {
+                drawDetial.run(context, mouseX, mouseY, delta);
+                drawDetial = null;
+            }
+
         }
 
     }
