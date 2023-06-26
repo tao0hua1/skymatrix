@@ -4,10 +4,5 @@ import cn.seiua.skymatrix.client.module.Signs;
 import cn.seiua.skymatrix.gui.ui.UI;
 
 public interface UIComponent {
-
-    String getID();
-
     UI build(String module, String category, String name, Signs sign);
-
-
 }

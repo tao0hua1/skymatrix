@@ -61,10 +61,6 @@ public class ValueSlider implements Serializable, UIComponent {
         return value.toString();
     }
 
-    @Override
-    public String getID() {
-        return "ValueSlider";
-    }
 
     @Override
     public UI build(String module, String category, String name, Signs sign) {

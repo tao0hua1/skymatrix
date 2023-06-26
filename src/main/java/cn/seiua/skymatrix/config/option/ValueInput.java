@@ -43,10 +43,6 @@ public class ValueInput implements UIComponent {
         this.value = value;
     }
 
-    @Override
-    public String getID() {
-        return null;
-    }
 
     @Override
     public UI build(String module, String category, String name, Signs sign) {

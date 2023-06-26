@@ -229,7 +229,7 @@ public class UIModule extends UI {
                     continue;
                 }
                 if (hideMap != null && hideMap.get(ui) != null) {
-                    if (!hideMap.get(ui).canRender(null)) continue;
+                    if (!hideMap.get(ui).canRender(ui.getHideValue())) continue;
                 }
 
                 ui.mouseClicked(mouseX, mouseY, button);

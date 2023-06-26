@@ -28,10 +28,6 @@ public class ToggleSwitch implements Serializable, UIComponent, IHide {
         this.value = value;
     }
 
-    @Override
-    public String getID() {
-        return "ToggleSwitch";
-    }
 
     @Override
     public UI build(String module, String category, String name, Signs sign) {

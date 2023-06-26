@@ -67,10 +67,6 @@ public class SkyblockItemSelect implements Serializable, UIComponent {
         this.autoSelect = autoSelect;
     }
 
-    @Override
-    public String getID() {
-        return null;
-    }
 
     public int slot() {
         int i = 0;

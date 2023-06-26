@@ -76,6 +76,7 @@ public class SkyBlockUtils {
         HashMap<String, Boolean> map = new HashMap<>();
         // water
         map.put("Squid", true);
+        map.put("Agarimoo", true);
         map.put("Sea Walker", true);
         map.put("Night Squid", true);
         map.put("Sea Guardian", true);
@@ -208,6 +209,9 @@ public class SkyBlockUtils {
         }
         if (target.contains("SHOVEL")) {
             return "SHOVEL";
+        }
+        if (target.contains("WAND")) {
+            return "WAND";
         }
 
         return null;

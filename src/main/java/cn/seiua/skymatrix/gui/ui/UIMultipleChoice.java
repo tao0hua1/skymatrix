@@ -82,14 +82,15 @@ public class UIMultipleChoice extends UI {
             }
 
 
-            RenderUtils.setColor(c == j || b ? Theme.getInstance().THEME_UI_SELECTED.geColor() : Theme.getInstance().THEME.geColor());
+            RenderUtils.setColor(b ? Theme.getInstance().THEME_UI_SELECTED.geColor() : Theme.getInstance().THEME.geColor());
             RenderUtils.drawRound2D(new Box(getX(), getY() + t, 0, getX() + 200, getY() + t + 42, 0), matrixStack, 7);
             RenderUtils.setColor(Theme.getInstance().HOVERANDSELECTED.geColor());
             RenderUtils.drawRound2D(new Box(getX(), getY() + t, 0, getX() + 196, getY() + t + 38, 0), matrixStack, 7);
-            ClickGui.iconfontRenderer26.drawString(matrixStack, getX() - 77, getY() + t, icon);
             ClickGui.iconfontRenderer26.setColor(Theme.getInstance().THEME_UI_SELECTED.geColor());
+            ClickGui.iconfontRenderer26.drawString(matrixStack, getX() - 77, getY() + t, icon);
+            ClickGui.fontRenderer16.setColor(b ? Theme.getInstance().THEME_UI_SELECTED.geColor() : Theme.getInstance().THEME.geColor());
             ClickGui.fontRenderer16.drawString(matrixStack, drawLine.get(65), getY() + t, key.toString());
-            ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());
+
             drawLine.reset(getX() - 125);
             t += 52;
             j++;

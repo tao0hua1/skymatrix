@@ -63,10 +63,6 @@ public class SingleChoice<V> implements Serializable, UIComponent, IHide {
         this.type = type;
     }
 
-    @Override
-    public String getID() {
-        return "SingleChoice";
-    }
 
     @Override
     public UI build(String module, String category, String name, Signs sign) {

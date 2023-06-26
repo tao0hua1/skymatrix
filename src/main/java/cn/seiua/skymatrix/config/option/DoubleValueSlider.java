@@ -82,10 +82,6 @@ public class DoubleValueSlider implements UIComponent {
         this.interval = interval;
     }
 
-    @Override
-    public String getID() {
-        return "DoubleValueSlider";
-    }
 
     public Number maxValue() {
 

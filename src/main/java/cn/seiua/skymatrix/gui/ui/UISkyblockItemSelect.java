@@ -84,7 +84,7 @@ public class UISkyblockItemSelect extends UI {
 
             if (this.itemMap.get(this.optionInfo.getTarget().getUuid()) != null) {
                 v = this.itemMap.get(this.optionInfo.getTarget().getUuid());
-                v = v.replace("_", " ").toLowerCase();
+                v = upperFirst(v.replace("_", " ").toLowerCase());
             } else {
                 v = "NOFOUND";
             }
