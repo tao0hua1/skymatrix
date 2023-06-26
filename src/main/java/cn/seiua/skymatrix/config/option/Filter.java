@@ -19,16 +19,14 @@ public interface Filter {
 
     static boolean weaponFilter(ItemStack itemStack) {
         String id = SkyBlockUtils.getItemId(itemStack);
-
         if (!Objects.equals(id, "none")) {
             String type = SkyBlockUtils.getItemType(itemStack);
             if (type != null) {
-                if (type.equals("BOW") || type.equals("SWORD") || type.equals("AXE")) {
+                if (type.equals("BOW") || type.equals("SWORD") || type.equals("AXE") || type.equals("WAND")) {
                     return true;
                 }
             }
         }
-
         return false;
     }
 }
