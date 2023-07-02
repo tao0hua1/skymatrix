@@ -33,7 +33,7 @@ public class CycleTickTimer implements TickTimer {
                 callBack.run();
                 tick = targetTick;
                 currentTimes++;
-                if (currentTimes > times) {
+                if (times != -1 && currentTimes > times) {
                     tick = 1;
                 }
             }
