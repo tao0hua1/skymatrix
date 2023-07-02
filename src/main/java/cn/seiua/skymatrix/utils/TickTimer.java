@@ -2,31 +2,23 @@ package cn.seiua.skymatrix.utils;
 
 import cn.seiua.skymatrix.client.Run;
 
-public class TickTimer {
+public interface TickTimer {
+    void update();
 
-    private int tick;
+    void reset();
 
-    private Run callBack;
-
-    public TickTimer(int tick, Run callBack) {
-        this.tick = tick;
-        this.callBack = callBack;
+    static OneTickTimer build(int tick, Run callback) {
+        return new OneTickTimer(tick, callback);
     }
 
-    public int getTick() {
-        return tick;
+    /**
+     * @param tick
+     * @param callback
+     * @param times    -1 表示无线
+     * @return
+     */
+    static CycleTickTimer build(int tick, Run callback, int times) {
+        return new CycleTickTimer(tick, callback, times);
     }
 
-    public void setTick(int tick) {
-        this.tick = tick;
-    }
-
-    public void update() {
-        if (tick == 0) {
-            if (callBack != null)
-                callBack.run();
-        }
-        tick--;
-
-    }
 }
