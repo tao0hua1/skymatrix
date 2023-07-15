@@ -111,11 +111,15 @@ public class UIModules extends UI {
         return cateInfo.getName();
     }
 
+    public static int flag;
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.updateMouse(mouseX, mouseY);
         MatrixStack matrixStack = context.getMatrices();
-
+        if (this.isInBox()) {
+            flag++;
+        }
         drawLine.reset(getX() - 125);
         setWidth(250);
         setHeight(58);

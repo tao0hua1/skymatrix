@@ -16,6 +16,11 @@ public class Message {
         Client.sendDebugMessage(Text.of("§3[§a" + name + "§3]§7: §r").copy().append(text));
     }
 
+    public void sendWarningMessage(Text text) {
+
+        sendMessage(Text.of("§9[§ewarning§9]§7: §r").copy().append(text));
+    }
+
     public void sendMessage(Text text) {
         Client.sendMessage(Text.of("§3[§a" + name + "§3]§7: §r").copy().append(text));
     }

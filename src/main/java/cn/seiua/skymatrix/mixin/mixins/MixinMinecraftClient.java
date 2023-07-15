@@ -16,7 +16,7 @@ public abstract class MixinMinecraftClient {
 
     @Inject(at = @At("HEAD"), method = "run")
     public void run(CallbackInfo ci) {
-
+        System.setProperty("java.awt.headless", "false");
     }
 
     @Inject(at = @At("HEAD"), method = "close")

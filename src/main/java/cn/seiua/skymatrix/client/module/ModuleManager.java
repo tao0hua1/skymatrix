@@ -21,7 +21,6 @@ public class ModuleManager {
     public List<Object> components;
     @Use
     public EventManager eventManager;
-
     @Use
     public Notification notification;
     @Use
@@ -72,6 +71,10 @@ public class ModuleManager {
         return valueHolder.value.get(moduleName);
     }
 
+    public void disable(Object c) {
+        disable(c.getClass());
+    }
+
     public void disable(Class c) {
         SModule sModule = (SModule) c.getAnnotation(SModule.class);
         String name = this.getModuleName(sModule);
@@ -97,6 +100,7 @@ public class ModuleManager {
             notification.push(new Notice("Module", "Enable " + this.modules.get(moduleName).getName(), NoticeType.INFO));
             eventManager.register(this.modules.get(moduleName).getTarget().getClass());
             valueHolder.value.put(moduleName, true);
+
 
         } else {
             if (flag) toggle.disable();

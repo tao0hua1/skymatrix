@@ -2,6 +2,7 @@ package cn.seiua.skymatrix.client;
 
 import cn.seiua.skymatrix.client.component.*;
 import cn.seiua.skymatrix.client.module.ModuleManager;
+import cn.seiua.skymatrix.client.waypoint.WaypointGroupEntity;
 import cn.seiua.skymatrix.config.*;
 import cn.seiua.skymatrix.event.EventTarget;
 import cn.seiua.skymatrix.event.events.GameExitEvent;
@@ -9,6 +10,8 @@ import cn.seiua.skymatrix.utils.ReflectUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jna.Native;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +26,7 @@ public class ConfigManager<T> {
 
     @Use
     public List<Object> components;
-
+    private static ObjectMapper objectMapper = new ObjectMapper();
     public static final String VERSION = "1.0";
     @Use
     public List<ExtraConfig> extraConfigs;
@@ -189,9 +192,7 @@ public class ConfigManager<T> {
                     for (String cname : jo.getJSONObject(cate).getJSONObject(gname).keySet()) {
                         if (this.configs.containsKey(cate)) {
                             if (this.configs.get(cate).containsKey(gname)) {
-
                                 Object config = this.configs.get(cate).get(gname).get(cname);
-
                                 Object object = null;
                                 try {
                                     object = jo.getJSONObject(cate).getJSONObject(gname).getObject(cname, config.getClass());
@@ -264,4 +265,30 @@ public class ConfigManager<T> {
 
     }
 
+    public HashMap<String, WaypointGroupEntity> loadWaypoints() {
+        HashMap<String, WaypointGroupEntity> waypointGroupEntityHashMap = new HashMap<>();
+        for (String name : this.store.extraFiles()) {
+            if (name.startsWith(Store.WAYPOINT)) {
+                String wap = new String(store.loadExtraFile(name));
+                try {
+                    WaypointGroupEntity waypointGroupEntity = objectMapper.readValue(wap, WaypointGroupEntity.class);
+                    waypointGroupEntityHashMap.put(waypointGroupEntity.name, waypointGroupEntity);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return waypointGroupEntityHashMap;
+    }
+
+    public void saveWaypoints(HashMap<String, WaypointGroupEntity> wgep) {
+        for (WaypointGroupEntity we : wgep.values()) {
+            try {
+                this.store.saveExtraFile(Store.WAYPOINT + we.name, objectMapper.writeValueAsString(we).getBytes());
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
 }

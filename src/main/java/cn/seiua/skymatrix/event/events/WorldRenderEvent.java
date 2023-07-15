@@ -1,6 +1,7 @@
 package cn.seiua.skymatrix.event.events;
 
 import cn.seiua.skymatrix.event.Event;
+import cn.seiua.skymatrix.utils.ColorUtils;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class WorldRenderEvent extends Event {
@@ -10,6 +11,7 @@ public class WorldRenderEvent extends Event {
     private float tickDelta;
 
     public WorldRenderEvent(MatrixStack matrixStack, float tickDelta) {
+        ColorUtils.stepWorld = 0;
         this.matrixStack = matrixStack;
         this.tickDelta = tickDelta;
 

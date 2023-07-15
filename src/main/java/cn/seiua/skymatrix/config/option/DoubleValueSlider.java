@@ -8,6 +8,7 @@ import cn.seiua.skymatrix.utils.OptionInfo;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
+import java.util.Objects;
 import java.util.Random;
 
 public class DoubleValueSlider implements UIComponent {
@@ -37,9 +38,11 @@ public class DoubleValueSlider implements UIComponent {
     public double getRandomValue() {
 
         double v = Math.min(value.doubleValue(), value.doubleValue()) + (random.nextInt() % ((Math.max(value.doubleValue(), valua.doubleValue()) - Math.min(value.doubleValue(), valua.doubleValue()))));
-        if (value == valua) v = valua.doubleValue();
-
-        return v;
+        if (Objects.equals(value, valua)) v = valua.doubleValue();
+        if (Double.isNaN(v)) {
+            return this.value.doubleValue();
+        }
+        return Math.min(v, this.maxValue().doubleValue());
     }
 
     public Number getValua() {

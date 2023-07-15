@@ -208,11 +208,11 @@ public class FontRenderer {
         this.underline = false;
     }
 
-    public void drawString(MatrixStack matrixStack, int x, int y, String str) {
+    public void drawString(MatrixStack matrixStack, float x, float y, String str) {
         drawString(matrixStack, x, y, 0, str);
     }
 
-    public void drawString(MatrixStack matrixStack, int x, int y, int z, String str) {
+    public void drawString(MatrixStack matrixStack, float x, float y, float z, String str) {
         setSide(x, y, str);
         x = this.x;
         y = this.y;
@@ -228,10 +228,13 @@ public class FontRenderer {
         }
         for (char c : text.toCharArray()) {
             if (c == '§') {
-                if (index <= this.colors.size() - 1) {
-                    this.setColor(this.colors.get(index));
-                    index++;
+                if (this.colors != null) {
+                    if (index <= this.colors.size() - 1) {
+                        this.setColor(this.colors.get(index));
+                        index++;
+                    }
                 }
+
                 continue;
             }
             CharInfo charInfo = getCharImg(c);
@@ -255,7 +258,7 @@ public class FontRenderer {
         this.index = 0;
     }
 
-    private void drawChar(MatrixStack matrixStack, int x, int y, int z, CharInfo charInfo) {
+    private void drawChar(MatrixStack matrixStack, float x, float y, float z, CharInfo charInfo) {
         float tx = x;
         float ty = y;
         if (centeredH) y -= getStringHeight() / 2;
@@ -278,15 +281,15 @@ public class FontRenderer {
 
     }
 
-    private void drawTexture(Identifier texture, int x, int y, int z, float u, float v, int width, int height, int textureWidth, int textureHeight, MatrixStack matrixStack) {
+    private void drawTexture(Identifier texture, float x, float y, float z, float u, float v, float width, float height, float textureWidth, float textureHeight, MatrixStack matrixStack) {
         this.drawTexture(texture, x, x + width, y, y + height, z, width, height, u, v, textureWidth, textureHeight, matrixStack);
     }
 
-    private void drawTexture(Identifier texture, int x1, int x2, int y1, int y2, int z, int regionWidth, int regionHeight, float u, float v, int textureWidth, int textureHeight, MatrixStack matrixStack) {
+    private void drawTexture(Identifier texture, float x1, float x2, float y1, float y2, float z, float regionWidth, float regionHeight, float u, float v, float textureWidth, float textureHeight, MatrixStack matrixStack) {
         this.drawTexturedQuad(texture, x1, x2, y1, y2, z, (u + 0.0F) / (float) textureWidth, (u + (float) regionWidth) / (float) textureWidth, (v + 0.0F) / (float) textureHeight, (v + (float) regionHeight) / (float) textureHeight, matrixStack);
     }
 
-    private void drawTexturedQuad(Identifier texture, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, MatrixStack matrixStack) {
+    private void drawTexturedQuad(Identifier texture, float x1, float x2, float y1, float y2, float z, float u1, float u2, float v1, float v2, MatrixStack matrixStack) {
         RenderSystem.setShaderTexture(0, texture);
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
@@ -299,10 +302,10 @@ public class FontRenderer {
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
     }
 
-    private int x;
-    private int y;
+    private float x;
+    private float y;
 
-    public void setSide(int x, int y, String str) {
+    public void setSide(float x, float y, String str) {
         this.x = x;
         this.y = y;
         if (centeredH || centeredV) return;

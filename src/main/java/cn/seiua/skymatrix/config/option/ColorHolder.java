@@ -80,7 +80,7 @@ public class ColorHolder implements Serializable, UIComponent {
     }
 
     public Color geColor() {
-        Color color = new Color(r, g, b);
+        Color color = new Color(r, g, b, a);
         if (rainbow) {
             float v = (System.currentTimeMillis() % 4000);
 
@@ -97,6 +97,8 @@ public class ColorHolder implements Serializable, UIComponent {
         g = value.getGreen();
         b = value.getBlue();
         a = value.getAlpha();
+        this.value = new Color(r, g, b, a);
+
     }
 
 

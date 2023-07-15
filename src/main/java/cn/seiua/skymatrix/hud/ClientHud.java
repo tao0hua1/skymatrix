@@ -5,13 +5,17 @@ import cn.seiua.skymatrix.gui.UIComponent;
 import cn.seiua.skymatrix.gui.ui.UI;
 import cn.seiua.skymatrix.gui.ui.UIClientHudToggle;
 import cn.seiua.skymatrix.utils.OptionInfo;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
 
 public class ClientHud implements Serializable, UIComponent {
 
-    public int x;
-    public int y;
+    @JSONField
+    public float x;
+    @JSONField
+    public float y;
+    @JSONField
     public boolean enable;
 
     public transient Hud target;
@@ -23,19 +27,19 @@ public class ClientHud implements Serializable, UIComponent {
         this.target = target;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 
@@ -53,11 +57,6 @@ public class ClientHud implements Serializable, UIComponent {
 
     public void setTarget(Hud target) {
         this.target = target;
-    }
-
-    @Override
-    public String getID() {
-        return null;
     }
 
     @Override

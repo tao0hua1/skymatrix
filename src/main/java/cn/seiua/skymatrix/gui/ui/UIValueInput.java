@@ -49,9 +49,14 @@ public class UIValueInput extends UI {
         super.update(x, y + getHeight() / 2);
     }
 
+    public static int flag;
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.updateMouse(mouseX, mouseY);
+        if (ClickGui.instance.getFocus() == this && isInBox() && !isInButton(mouseX, mouseY)) {
+            flag++;
+        }
         MatrixStack matrixStack = context.getMatrices();
         drawLine.reset(getX() - 125);
 

@@ -51,6 +51,14 @@ public class UIButton extends UI {
         ClickGui.fontRenderer24.drawString(matrixStack, 20, getY() - getHeight(), desc);
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!isInBox()) return false;
+        if (button == 0) {
+            this.target.run();
+        }
+        return true;
+    }
 
     @Override
     public void initUI() {

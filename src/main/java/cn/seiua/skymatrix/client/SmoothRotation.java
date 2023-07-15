@@ -41,7 +41,7 @@ public class SmoothRotation {
         }
     }
 
-    public void smoothLook(Rotation rotation, float ticks, Run callback, boolean client) {
+    public void smoothLook(Rotation rotation, float ticks, Run callback, boolean client, boolean disPitch, boolean disYaw) {
         if (this.ticks == 0) {
             look(rotation);
             if (callback != null)
@@ -50,20 +50,21 @@ public class SmoothRotation {
             return;
         }
 
-        this.task = new RotatioTask(callback, client);
+        this.task = new RotatioTask(callback, client, disPitch, disYaw);
 
         pitchDifference = wrapAngleTo180(rotation.getPitch() - rotationFaker.getServerPitch());
         yawDifference = wrapAngleTo180(rotation.getYaw() - rotationFaker.getServerYaw());
 
         this.ticks = (int) (ticks * 20);
         tickCounter = 0;
+    }
 
+    public void smoothLook(Rotation rotation, float ticks, Run callback, boolean client) {
+        smoothLook(rotation, ticks, callback, client, false, false);
     }
 
     public void look(Rotation rotation) {
 
-//        SkyMatrix.mc.player.setPitch(rotationFaker.getServerPitch());
-//        SkyMatrix.mc.player.setYaw(rotationFaker.getServerYaw());
     }
 
     public void reset() {
@@ -85,21 +86,32 @@ public class SmoothRotation {
                 rotationFaker.faceVectorClient(new Rotation(rotationFaker.getServerYaw() + yawDifference / ticks, rotationFaker.getServerPitch() + pitchDifference / ticks));
 
             } else
+
                 rotationFaker.faceVectorPacket(new Rotation(rotationFaker.getServerYaw() + yawDifference / ticks, rotationFaker.getServerPitch() + pitchDifference / ticks));
             tickCounter++;
         } else if (task.getCallback() != null) {
             running = false;
             task.getCallback().run();
             if (!this.task.client) {
+//                 if (!task.isDisPitch()) {
                 rotationFaker.setServerPitch(SkyMatrix.mc.player.getPitch());
+//                 }
+//                 if (!task.isDisYaw()) {
                 rotationFaker.setServerYaw(SkyMatrix.mc.player.getYaw());
+                //                }
             }
             task = null;
 
         } else {
             if (!this.task.client) {
+
+//                 if (!task.isDisPitch()) {
                 rotationFaker.setServerPitch(SkyMatrix.mc.player.getPitch());
+//                 }
+//                if (!task.isDisYaw()) {
                 rotationFaker.setServerYaw(SkyMatrix.mc.player.getYaw());
+//                }
+
             }
             task = null;
             running = false;
@@ -132,10 +144,30 @@ public class SmoothRotation {
         private Run callback = null;
 
         private boolean client;
+        private boolean disPitch;
+        private boolean disYaw;
 
-        public RotatioTask(Run callback, boolean client) {
+        public RotatioTask(Run callback, boolean client, boolean disPitch, boolean disYaw) {
             this.callback = callback;
             this.client = client;
+            this.disPitch = disPitch;
+            this.disYaw = disYaw;
+        }
+
+        public boolean isDisPitch() {
+            return disPitch;
+        }
+
+        public void setDisPitch(boolean disPitch) {
+            this.disPitch = disPitch;
+        }
+
+        public boolean isDisYaw() {
+            return disYaw;
+        }
+
+        public void setDisYaw(boolean disYaw) {
+            this.disYaw = disYaw;
         }
 
         public Run getCallback() {

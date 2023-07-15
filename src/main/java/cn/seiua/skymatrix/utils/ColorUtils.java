@@ -4,6 +4,14 @@ import java.awt.*;
 
 public class ColorUtils {
 
+
+    public static int stepWorld;
+
+    public static Color rainbowColorWorld() {
+
+        return setHue(Color.red, (stepWorld++ * 0.05f));
+    }
+
     public static Color darkenColor(Color color, double factor) {
         int red = (int) (color.getRed() * (1 - factor));
         int green = (int) (color.getGreen() * (1 - factor));
@@ -22,6 +30,7 @@ public class ColorUtils {
     }
 
     public static Color setHue(Color color, float hue) {
+
         float[] hsv = new float[3];
         Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsv);
         hsv[0] = hue;

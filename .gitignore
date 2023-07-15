@@ -38,6 +38,4 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
-/src/main/java/cn/seiua/skymatrix/client/modules
-/src/main/resources/assets/skymatrix/font/
-/src/main/java/cn/seiua/skymatrix/client/module/modules/
+

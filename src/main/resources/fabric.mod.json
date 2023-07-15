@@ -4,6 +4,7 @@
   "version": "${version}",
   "name": "Skymatrix",
   "description": "wtf macroer?",
+  "accessWidener": "skymatrix.accesswidener",
   "authors": [
     "Seiuna",
     "Yuuiyu"

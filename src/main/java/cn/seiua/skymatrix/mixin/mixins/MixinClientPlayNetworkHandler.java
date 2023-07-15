@@ -408,16 +408,17 @@ public abstract class MixinClientPlayNetworkHandler {
 
     }
 
+    @Inject(at = @At("HEAD"), method = "onParticle", cancellable = true)
+    public void onParticle(ParticleS2CPacket var1, CallbackInfo callbackInfo) {
+
+        ServerPacketEvent event = new ServerPacketEvent(var1);
+        event.call();
+        if (event.isCancelled()) callbackInfo.cancel();
+
+
+    }
+
     //
-//    public void onParticle(ParticleS2CPacket var1, CallbackInfo callbackInfo){
-//
-//        ServerPacketEvent event=new ServerPacketEvent(var1);
-//        event.call();
-//        if(event.isCancelled())callbackInfo.cancel();
-//
-//
-//    }
-//
 //    public void onPing(PlayPingS2CPacket var1, CallbackInfo callbackInfo){
 //
 //        ServerPacketEvent event=new ServerPacketEvent(var1);
@@ -490,15 +491,14 @@ public abstract class MixinClientPlayNetworkHandler {
 //
 //    }
 //
-//    public void onUpdateSelectedSlot(UpdateSelectedSlotS2CPacket var1, CallbackInfo callbackInfo){
-//
-//        ServerPacketEvent event=new ServerPacketEvent(var1);
-//        event.call();
-//        if(event.isCancelled())callbackInfo.cancel();
-//
-//
-//    }
-//
+    @Inject(at = @At("HEAD"), method = "onUpdateSelectedSlot", cancellable = true)
+    public void onUpdateSelectedSlot(UpdateSelectedSlotS2CPacket var1, CallbackInfo callbackInfo) {
+        ServerPacketEvent event = new ServerPacketEvent(var1);
+        event.call();
+        if (event.isCancelled()) callbackInfo.cancel();
+    }
+
+    //
 //    public void onScoreboardDisplay(ScoreboardDisplayS2CPacket var1, CallbackInfo callbackInfo){
 //
 //        ServerPacketEvent event=new ServerPacketEvent(var1);

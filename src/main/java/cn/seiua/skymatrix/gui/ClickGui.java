@@ -6,16 +6,14 @@ import cn.seiua.skymatrix.client.*;
 import cn.seiua.skymatrix.client.component.Component;
 import cn.seiua.skymatrix.client.component.*;
 import cn.seiua.skymatrix.client.module.Sign;
+import cn.seiua.skymatrix.client.waypoint.Waypoint;
 import cn.seiua.skymatrix.config.Value;
 import cn.seiua.skymatrix.config.option.KeyBind;
 import cn.seiua.skymatrix.config.option.MapValueHolder;
 import cn.seiua.skymatrix.config.option.ValueInput;
 import cn.seiua.skymatrix.font.FontRenderer;
 import cn.seiua.skymatrix.font.FontUtils;
-import cn.seiua.skymatrix.gui.ui.DrawDetial;
-import cn.seiua.skymatrix.gui.ui.UI;
-import cn.seiua.skymatrix.gui.ui.UIButton;
-import cn.seiua.skymatrix.gui.ui.UIModules;
+import cn.seiua.skymatrix.gui.ui.*;
 import cn.seiua.skymatrix.hud.HudManager;
 import cn.seiua.skymatrix.utils.CateInfo;
 import cn.seiua.skymatrix.utils.ModuleInfo;
@@ -210,8 +208,8 @@ public class ClickGui extends Screen {
             client.openGui(HudManager.class);
         }, "hud", "Open gui to edit hud!"));
         uiList.add(new UIButton(() -> {
-            client.openGui(HudManager.class);
-        }, "hud", "Open gui to edit hud!"));
+            client.openGui(Waypoint.class);
+        }, "waypoint", "Open gui to edit Waypoint!"));
         uiList.add(new UIButton(() -> {
             client.openGui(HudManager.class);
         }, "hud", "Open gui to edit hud!"));
@@ -281,10 +279,11 @@ public class ClickGui extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
-        mouseY = mouseY * UI.getS();
-        mouseX = mouseX * UI.getS();
-        int height = this.height * UI.getS();
-        int width = this.width * UI.getS();
+        int ms = UI.getS();
+        mouseY = mouseY * ms;
+        mouseX = mouseX * ms;
+        int height = this.height * ms;
+        int width = this.width * ms;
         context.getMatrices().scale(1f / UI.getS(), 1f / UI.getS(), 1f / UI.getS());
         drawMask(context.getMatrices());
         int ap = 0;
@@ -313,7 +312,6 @@ public class ClickGui extends Screen {
         if (l != null) {
             int uih = l.getMaskHeight() + l.getHeight();
             RenderUtils.drawMask(context.getMatrices(), new Box(l.getX() - l.getWidth() / 2, l.getY() - l.getHeight() / 2, 1, l.getX() - l.getWidth() / 2 + 250, l.getY() - l.getHeight() / 2 + uih, 1));
-
             l.render(context, mouseX, mouseY, delta);
             RenderUtils.clearMask();
         }
@@ -328,6 +326,21 @@ public class ClickGui extends Screen {
                 drawDetial = null;
             }
 
+        }
+        if (focus != null) {
+            if (UIModules.flag > 0) {
+                long id = GLFW.glfwCreateStandardCursor(GLFW.GLFW_RESIZE_ALL_CURSOR);
+                GLFW.glfwSetCursor(SkyMatrix.mc.getWindow().getHandle(), id);
+            }
+            if (UIValueInput.flag > 0) {
+                long id = GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR);
+                GLFW.glfwSetCursor(SkyMatrix.mc.getWindow().getHandle(), id);
+            }
+            if (UIValueInput.flag + UIModules.flag <= 0) {
+                GLFW.glfwSetCursor(SkyMatrix.mc.getWindow().getHandle(), 0);
+            }
+            UIModules.flag = 0;
+            UIValueInput.flag = 0;
         }
 
     }
@@ -359,7 +372,9 @@ public class ClickGui extends Screen {
         }
         List<UIModules> list = new ArrayList<>(modules.values().stream().toList());
         Collections.reverse(list);
-
+        for (UI ui : uiList) {
+            ui.mouseClicked(mouseX, mouseY, button);
+        }
 
         for (UIModules uiModules : list) {
             if (uiModules.mouseClicked(mouseX, mouseY, button)) {

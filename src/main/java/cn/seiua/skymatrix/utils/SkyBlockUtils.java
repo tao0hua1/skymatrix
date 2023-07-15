@@ -213,6 +213,9 @@ public class SkyBlockUtils {
         if (target.contains("WAND")) {
             return "WAND";
         }
+        if (target.contains("SHEARS")) {
+            return "SHEARS";
+        }
 
         return null;
     }
@@ -220,7 +223,6 @@ public class SkyBlockUtils {
     public static Map getAllCrop() {
 
         HashMap<String, Boolean> map = new HashMap<>();
-
         map.put("melon", false);
         map.put("pumpkin", false);
         map.put("sugar_cane", false);
@@ -229,6 +231,8 @@ public class SkyBlockUtils {
         map.put("carrots", false); //age 7
         map.put("potatoes", false); //age 6
         map.put("wheat", false); //age 7
+        map.put("brown_mushroom", false); //age 7
+        map.put("red_mushroom", false); //age 7
         return map;
     }
 }

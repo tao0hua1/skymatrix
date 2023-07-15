@@ -26,6 +26,7 @@ public class ComponentHandler {
     private static HashSet<Object> objects = new HashSet<>();
     private static HashMap<Object, MethodA> init = new HashMap<>();
     private static HashMap<Field, Object> use = new HashMap<>();
+    private static HashMap<Method, Object> usem = new HashMap<>();
     private static List<String> clazzs = new ArrayList<>();
 
     public static void loadAllClasesName() {

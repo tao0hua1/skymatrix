@@ -13,12 +13,16 @@ repositories {
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html
     // for more information about repositories.
 }
+
 loom {
     accessWidenerPath = file("src/main/resources/skymatrix.accesswidener")
 }
 dependencies {
-
+    implementation files("libs/baritone-api-1.10.1.jar")
     implementation 'com.alibaba:fastjson:2.0.28'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.0.0-alpha.11'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.2'
 
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -62,12 +66,17 @@ java {
 }
 
 jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
     from("LICENSE") {
         rename { "${it}_${base.archivesName.get()}" }
     }
     from {
         configurations.compileClasspath.findAll {
-            it.name.contains("fastjson")
+            it.name.contains("fastjson") ||
+                    it.name.contains("jackson") ||
+                    it.name.contains("kotlin-stdlib") ||
+                    it.name.contains("okio") ||
+                    it.name.contains("okhttp")
         }.collect {
             zipTree(it)
         }

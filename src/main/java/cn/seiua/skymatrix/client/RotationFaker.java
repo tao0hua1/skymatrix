@@ -180,12 +180,17 @@ public final class RotationFaker {
     public void faceVectorPacket(Rotation rotation) {
         Rotation needed = rotation;
 
+        if (!smoothRotation.task.isDisPitch()) {
+            preServerPitch = serverPitch;
+            serverPitch = needed.getPitch();
+        }
+        if (!smoothRotation.task.isDisYaw()) {
+            preServerYaw = serverYaw;
+            serverYaw = needed.getYaw();
+        }
         fakeRotation = true;
-        preServerPitch = serverPitch;
-        preServerYaw = serverYaw;
-        serverYaw = needed.getYaw();
 
-        serverPitch = needed.getPitch();
+
     }
 
     public void faceVectorClient(Rotation rotation) {
