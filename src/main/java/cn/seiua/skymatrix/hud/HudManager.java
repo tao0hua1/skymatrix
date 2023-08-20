@@ -88,11 +88,11 @@ public class HudManager extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        int ms = UI.getS();
-        mouseY = mouseY * ms;
-        mouseX = mouseX * ms;
-        int height = this.height * ms;
-        int width = this.width * ms;
+        float ms = UI.getS();
+        mouseY = (int) (mouseY * ms);
+        mouseX = (int) (mouseX * ms);
+        int height = (int) (this.height * ms);
+        int width = (int) (this.width * ms);
         MatrixStack matrixStack = context.getMatrices();
         matrixStack.push();
         matrixStack.scale(1.0f / ms, 1.0f / ms, 1.0f / ms);
@@ -149,7 +149,7 @@ public class HudManager extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int ms = UI.getS();
+        float ms = UI.getS();
         mouseY = mouseY * ms;
         mouseX = mouseX * ms;
         if (focus != null) {
@@ -169,7 +169,7 @@ public class HudManager extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        int ms = UI.getS();
+        float ms = UI.getS();
         mouseY = mouseY * ms;
         mouseX = mouseX * ms;
         drag = false;
@@ -189,10 +189,11 @@ public class HudManager extends Screen {
     @EventTarget
     public void onRender(HudRenderEvent event) {
         if (SkyMatrix.mc.currentScreen == this) return;
+        if (SkyMatrix.mc.options.playerListKey.isPressed()) return;
         for (ClientHud hud : huds) {
             if (hud == null) continue;
             if (!hud.enable) continue;
-            int ms = UI.getS();
+            float ms = UI.getS();
 
             MatrixStack matrixStack = event.getContext().getMatrices();
             matrixStack.push();

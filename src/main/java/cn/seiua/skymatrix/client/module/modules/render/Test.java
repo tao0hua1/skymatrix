@@ -10,10 +10,7 @@ import cn.seiua.skymatrix.client.component.Use;
 import cn.seiua.skymatrix.client.module.Sign;
 import cn.seiua.skymatrix.client.module.Signs;
 import cn.seiua.skymatrix.config.Value;
-import cn.seiua.skymatrix.config.option.ColorHolder;
-import cn.seiua.skymatrix.config.option.DoubleValueSlider;
-import cn.seiua.skymatrix.config.option.KeyBind;
-import cn.seiua.skymatrix.config.option.SingleChoice;
+import cn.seiua.skymatrix.config.option.*;
 import cn.seiua.skymatrix.event.EventTarget;
 import cn.seiua.skymatrix.event.events.ClientTickEvent;
 import cn.seiua.skymatrix.event.events.FluidRenderEvent;
@@ -31,6 +28,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 @Event
 @Sign(sign = Signs.FREE)
@@ -43,12 +41,23 @@ public class Test implements IToggle {
 
     @Value(name = "keyBind")
     public KeyBind keyBind = new KeyBind(Arrays.asList(), ReflectUtils.getModuleName(this));
-    @Value(name = "你好")
+    @Value(name = "color")
     private ColorHolder colorHolder = new ColorHolder(new Color(255, 184, 0, 84));
-    @Value(name = "------")
+    @Value(name = "Double Slider")
     private DoubleValueSlider range = new DoubleValueSlider(6, 50, 0, 120, 0.5);
-    @Value(name = "你好你好")
+    @Value(name = "Single Choice")
     private SingleChoice<String> mode = new SingleChoice(List.of("worm", "custom"), Icons.MODE);
+    @Value(name = "Multiple Choice")
+    private MultipleChoice a = new MultipleChoice(Map.of("test", false, "test2", true), Icons.MODE);
+    @Value(name = "Value Input")
+    ValueInput valueInput = new ValueInput("test", Icons.CMD);
+    @Value(name = "switch")
+    ToggleSwitch aSwitch = new ToggleSwitch(false);
+    @Value(name = "Item")
+    SkyblockItemSelect skyblockItemSelect = new SkyblockItemSelect(null, false, Selector::bestRodSelector, Filter::rodFilter);
+    @Value(name = "Waypoint")
+    WaypointSelect waypoint = new WaypointSelect(null, "FF");
+
 
     @Use
     private ConfigManager configManager;

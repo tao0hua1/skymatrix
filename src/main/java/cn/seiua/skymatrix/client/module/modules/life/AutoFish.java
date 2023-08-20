@@ -66,7 +66,7 @@ public class AutoFish implements IToggle, Hud {
     public KeyBind keyBind = new KeyBind(Arrays.asList(GLFW.GLFW_KEY_X), ReflectUtils.getModuleName(this));
     @Value(name = "hud")
     public ClientHud clientHud = new ClientHud(30, 30, true, this);
-    @Value(name = "Auto disable LavaESP")
+    @Value(name = "auto disable LavaESP")
     private ToggleSwitch autoDiableESP = new ToggleSwitch(false);
     @Value(name = "rethrow")
     @Sign(sign = Signs.PRO)
@@ -111,14 +111,14 @@ public class AutoFish implements IToggle, Hud {
     @Hide(following = "random tick")
     @Sign(sign = Signs.FREE)
     public DoubleValueSlider randomThrowTick = new DoubleValueSlider(6, 1, 0, 20, 1);
-    @Value(name = "auto-sell")
+    @Value(name = "auto sell")
     @Sign(sign = Signs.PRO)
     public ToggleSwitch autoSell = new ToggleSwitch(false);
-    @Value(name = "Adjust position")
+    @Value(name = "adjust position")
     @Sign(sign = Signs.FREE)
     public ToggleSwitch adjust = new ToggleSwitch(false);
     @Value(name = "position")
-    @Hide(following = "Adjust position")
+    @Hide(following = "adjust position")
     @Sign(sign = Signs.FREE)
     public SingleChoice<String> position = new SingleChoice(List.of("right", "left", "forward", "backward"), SingleChoice.MODE);
     @Value(name = "antiAFK")
@@ -761,6 +761,7 @@ public class AutoFish implements IToggle, Hud {
     private RateStacker antiAFKRate = new RateStacker(10);
 
     private void throwRod() {
+
         SkyMatrix.mc.player.swingHand(SkyMatrix.mc.player.getActiveHand());
         SkyMatrix.mc.interactionManager.interactItem(SkyMatrix.mc.player, SkyMatrix.mc.player.getActiveHand());
         this.rts = Status.CHECKING;
@@ -769,20 +770,25 @@ public class AutoFish implements IToggle, Hud {
             this.afks = Status.THROWN;
         }
 
-        Random random1 = new Random();
-        int rv1 = Math.abs(random1.nextInt()) % 16 - 8;
-        int rv2 = Math.abs(random1.nextInt()) % 16 - 8;
 
-        if (this.t31) {
-            this.t31 = false;
-            smoothRotation.smoothLook(new Rotation((float) (SkyMatrix.mc.player.getYaw() + x), (float) (SkyMatrix.mc.player.getPitch() + y)), 6, null, true);
+        if (antiAfk.isValue()) {
+            Random random1 = new Random();
+            int rv1 = Math.abs(random1.nextInt()) % 16 - 8;
+            int rv2 = Math.abs(random1.nextInt()) % 16 - 8;
+            if (this.t31) {
+                this.t31 = false;
+                smoothRotation.smoothLook(new Rotation((float) (SkyMatrix.mc.player.getYaw() + x), (float) (SkyMatrix.mc.player.getPitch() + y)), 6, null, true);
+            } else {
+                this.x = rv1 * -1;
+                this.y = rv2 * -1;
+                this.t31 = true;
+                smoothRotation.smoothLook(new Rotation(SkyMatrix.mc.player.getYaw() + rv1, SkyMatrix.mc.player.getPitch() + rv2), 6, null, true);
+
+            }
         } else {
-            this.x = rv1 * -1;
-            this.y = rv2 * -1;
             this.t31 = true;
-            smoothRotation.smoothLook(new Rotation(SkyMatrix.mc.player.getYaw() + rv1, SkyMatrix.mc.player.getPitch() + rv2), 6, null, true);
-
         }
+
 
     }
 

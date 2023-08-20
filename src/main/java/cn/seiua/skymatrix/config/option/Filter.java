@@ -29,4 +29,17 @@ public interface Filter {
         }
         return false;
     }
+
+    static boolean aote(ItemStack itemStack) {
+        String id = SkyBlockUtils.getItemId(itemStack);
+        if (!Objects.equals(id, "none")) {
+            String type = SkyBlockUtils.getItemId(itemStack);
+            if (type != null) {
+                if (type.equals("ASPECT_OF_THE_END") || type.equals("ASPECT_OF_THE_VOID")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

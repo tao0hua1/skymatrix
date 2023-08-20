@@ -29,7 +29,8 @@
     "fabric-api": "*",
     "minecraft": "~1.20",
     "java": ">=17",
-    "sodium": "*"
+    "sodium": "*",
+    "baritone": "*"
   },
   "suggests": {
     "another-mod": "sodium"

@@ -5,6 +5,7 @@ import cn.seiua.skymatrix.client.component.*;
 import cn.seiua.skymatrix.client.config.Setting;
 import cn.seiua.skymatrix.event.EventTarget;
 import cn.seiua.skymatrix.event.events.ClientTickEvent;
+import com.google.common.collect.EvictingQueue;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.List;
+import java.util.Queue;
 
 @Component
 @Event(register = true)
@@ -32,7 +34,7 @@ public final class Client {
     public int stage;
     public static File root = new File(MinecraftClient.getInstance().runDirectory, "skymartix");
     private Client instance;
-
+    private static final Queue<Text> priorityQueue = EvictingQueue.create(40);
 
     @Init(level = 999)
     public void start() {
@@ -53,6 +55,11 @@ public final class Client {
         if (MinecraftClient.getInstance().world != null) {
             updataGuiScreen();
         }
+
+        Text text = priorityQueue.poll();
+        if (text != null) {
+
+        }
     }
 
     @Use
@@ -71,23 +78,29 @@ public final class Client {
     }
 
     private void updataGuiScreen() {
-
         if (targetGui != null) {
             MinecraftClient.getInstance().setScreen(targetGui);
             targetGui = null;
         }
-
     }
 
     public static void sendMessage(Text message) {
         assert SkyMatrix.mc.player != null;
         SkyMatrix.mc.player.sendMessage(Text.of("§8[§9S§9k§9y§9M§9a§9t§9r§9i§9x§8]").copy().append(message));
+
     }
 
     public static void sendDebugMessage(Text message) {
         if (!Setting.getInstance().debug.isValue()) return;
-        sendMessage(Text.of("§3[§bDebug§3]§7: §r").copy().append(message));
+
+        SkyMatrix.mc.player.sendMessage(Text.of("§3[§bDebug§3]§7: §r").copy().append(message));
+
     }
 
+    public static void sendSimpleMessage(Text message) {
+        assert SkyMatrix.mc.player != null;
+
+        SkyMatrix.mc.player.sendMessage(Text.of("§c[").copy().append(message).append(Text.of("§c]")));
+    }
 
 }

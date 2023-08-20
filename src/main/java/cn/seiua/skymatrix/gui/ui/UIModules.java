@@ -30,17 +30,29 @@ public class UIModules extends UI {
     int rs = 0;
     long t = 0;
 
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        for (UIModule u : uiModules) {
+            u.charTyped(chr, modifiers);
+        }
+        return true;
+    }
+
     public void addModuleInfo(ModuleInfo moduleInfo) {
+
         modules.add(moduleInfo);
         UIModule uiModule = new UIModule(moduleInfo);
+
         uiModules.add(uiModule);
         String category = moduleInfo.getCategory();
         String name = moduleInfo.getName();
         Object o = moduleInfo.getTarget();
         Class c = moduleInfo.getaClass();
         List<UI> temp = new ArrayList<>();
-        HashMap<UI, IHide> hideMap = new HashMap<>();
+        HashMap<UI, List<HideB>> hideMap = new HashMap<>();
         HashMap<String, IHide> temp1 = new HashMap<>();
+        HashMap<String, UI> temp2 = new HashMap<>();
+
         for (Field field : c.getDeclaredFields()) {
             Value value = (Value) field.getAnnotation(Value.class);
             Sign sign = (Sign) field.getAnnotation(Sign.class);
@@ -61,12 +73,16 @@ public class UIModules extends UI {
                             temp1.put(value.name(), (IHide) uobj);
                         }
                         Hide hide = field.getAnnotation(Hide.class);
-
                         UI ui = uiComponent.build(name, category, value.name(), sign == null ? null : sign.sign());
+                        temp2.put(value.name(), ui);
                         if (ui != null) {
                             if (hide != null) {
-                                hideMap.put(ui, temp1.get(hide.following()));
-                                ui.setHideValue(hide.value());
+                                ArrayList<HideB> t = new ArrayList<>();
+                                for (String a : hide.following().split("&")) {
+                                    t.add(new HideB(hide.value(), temp1.get(a.trim())));
+                                }
+                                hideMap.put(ui, t);
+
                             }
                             temp.add(ui);
                         }
@@ -102,7 +118,7 @@ public class UIModules extends UI {
         Collections.sort(this.uiModules,
                 (o1, o2) -> {
                     int a = o1.moduleInfo.getName().toCharArray()[0] - o2.moduleInfo.getName().toCharArray()[0];
-                    System.out.println(a);
+//                    System.out.println(a);
                     return a;
                 });
     }
@@ -127,16 +143,6 @@ public class UIModules extends UI {
 
         int sty = (int) (getY() + t + 58);
         if (isOpen()) {
-//            RenderSystem.enableDepthTest();
-//            RenderSystem.colorMask(false, false, false, true);
-//            RenderUtils.setColor(Color.red);
-//            RenderUtils.cent();
-//            RenderUtils.drawSolidBox(new Box(getX(), getY(), 0, getX() + 250, getY() + 200, -1), matrixStack);
-//
-//            RenderSystem.colorMask(true, true, true, true);
-//            RenderSystem.depthMask(false);
-//            RenderSystem.depthFunc(GL11.GL_GREATER);
-//            RenderSystem.enableBlend();
 
             for (UIModule uiModule : uiModules) {
                 uiModule.update(getX(), sty);
@@ -145,11 +151,7 @@ public class UIModules extends UI {
                 sty += uiModule.getHeight();
             }
             height = sty;
-//            RenderSystem.depthMask(true);
-//            RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, true);
-//            RenderSystem.enableDepthTest();
-//            RenderSystem.depthFunc(GL11.GL_LEQUAL);
-//            RenderSystem.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
+
         }
 
         RenderUtils.cent();

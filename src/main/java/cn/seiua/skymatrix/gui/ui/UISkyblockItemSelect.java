@@ -11,9 +11,11 @@ import cn.seiua.skymatrix.utils.RenderUtils;
 import cn.seiua.skymatrix.utils.SkyBlockUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.LinkedHashMap;
@@ -186,6 +188,12 @@ public class UISkyblockItemSelect extends UI {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (isInBox()) {
+            if (InputUtil.isKeyPressed(SkyMatrix.mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) && button == 1) {
+                this.optionInfo.openDoc();
+                return super.mouseClicked(mouseX, mouseY, button);
+            }
+        }
         if (button == 0) {
             if (isInBox()) {
                 if (Screen.hasShiftDown()) {

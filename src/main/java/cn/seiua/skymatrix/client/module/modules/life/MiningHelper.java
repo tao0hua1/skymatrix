@@ -54,6 +54,12 @@ public class MiningHelper implements IToggle {
     private BlockPos target;
 
     public boolean isTarget(BlockPos bp) {
+        String name1 = (SkyMatrix.mc.world.getBlockState(bp).getBlock().getName()).getString();
+
+        if (name1.contains("Grass") || name1.contains("Stone") || name1.contains("Leaves") || name1.contains("Wood") || name1.contains("Poppy") || name1.contains("Dandelion") || name1.contains("Azure") || name1.contains("Bluet")) {
+            if (name1.equals("Grass Block")) return false;
+            return true;
+        }
 
         String name = BlockUtils.getName(bp).replace("minecraft:", "");
         name = SkyBlockUtils.getNameByMapper(name);
@@ -72,12 +78,16 @@ public class MiningHelper implements IToggle {
 
     @EventTarget
     public void onTick(ClientTickEvent e) {
+        if (SkyMatrix.mc.crosshairTarget.getType().equals(HitResult.Type.BLOCK)) {
+
+
+        }
         if (SkyMatrix.mc.currentScreen == null && SkyMatrix.mc.options.attackKey.isPressed()) {
             ItemStack is = SkyMatrix.mc.player.getInventory().getMainHandStack();
             String type = SkyBlockUtils.getItemType(is);
-            String name = is.getItem().getName().getString();
+            String name = is.getItem().toString().toLowerCase();
             if (name.contains("Air")) return;
-            if ((name.contains("Pickaxe") || name.contains("Axe") || name.contains("Shovel")) || ((type != null) && (type.equals("AXE") || type.equals("DRILL") || type.equals("PICKAXE") || type.equals("SHOVEL")))) {
+            if ((name.contains("pickaxe") || name.contains("hoe") || name.contains("Axe") || name.contains("shovel")) || ((type != null) && (type.equals("AXE") || type.equals("DRILL") || type.equals("PICKAXE") || type.equals("SHOVEL") || type.equals("HOE")))) {
 
 
                 blockPos = new ArrayList<>();
@@ -126,7 +136,7 @@ public class MiningHelper implements IToggle {
                 }
                 if (flag != 0) {
                     Vec3d vec3d1 = targetVec.multiply(targetVec.length());
-                    smoothRotation.smoothLook(RotationUtils.toRotation(vec3d1), 2, null, false);
+                    smoothRotation.smoothLook(RotationUtils.toRotation(vec3d1), 1.4f, null, false);
                     black.put(String.valueOf(Objects.hash(this.target.getX(), this.target.getY(), this.target.getZ())), 20);
                 } else {
 

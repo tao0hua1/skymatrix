@@ -224,7 +224,8 @@ public class SkyBlockUtils {
 
         HashMap<String, Boolean> map = new HashMap<>();
         map.put("melon", false);
-        map.put("pumpkin", false);
+        map.put("cocoa", false);
+        map.put("carved_pumpkin", false);
         map.put("sugar_cane", false);
         map.put("cactus", false);
         map.put("nether_wart", false); //age 3
@@ -233,6 +234,21 @@ public class SkyBlockUtils {
         map.put("wheat", false); //age 7
         map.put("brown_mushroom", false); //age 7
         map.put("red_mushroom", false); //age 7
+        return map;
+    }
+
+    public static Map getAllWood() {
+        HashMap<String, Boolean> map = new HashMap<>();
+        map.put("oak_log", false);
+        map.put("oak_wood", false);
+        map.put("birch_log", false);
+        map.put("birch_wood", false);
+        map.put("jungle_log", false);
+        map.put("jungle_wood", false);
+        map.put("dark_oak_log", false);
+        map.put("dark_oak_wood", false);
+        map.put("acacia_log", false);
+        map.put("acacia_wood", false);
         return map;
     }
 }

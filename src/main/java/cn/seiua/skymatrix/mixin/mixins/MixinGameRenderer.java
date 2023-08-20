@@ -1,5 +1,6 @@
 package cn.seiua.skymatrix.mixin.mixins;
 
+import cn.seiua.skymatrix.event.events.ClientSettingEvent;
 import cn.seiua.skymatrix.event.events.UpdateTargetedEntityEvent;
 import cn.seiua.skymatrix.event.events.WorldRenderEvent;
 import net.minecraft.client.render.GameRenderer;
@@ -52,6 +53,18 @@ public class MixinGameRenderer {
             method = "updateTargetedEntity")
     public void updateTargetedEntityOver(float tickDelta, CallbackInfo ci) {
         new UpdateTargetedEntityEvent.Over().call();
+    }
+
+    @Inject(
+            at = @At(value = "INVOKE",
+                    target = "net/minecraft/client/MinecraftClient.openPauseMenu (Z)V",
+                    opcode = Opcodes.INVOKEVIRTUAL,
+                    ordinal = 0),
+            method = "render", cancellable = true)
+    public void render(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+        ClientSettingEvent e = new ClientSettingEvent("lostFocus");
+        e.call();
+        if (e.isCancelled()) ci.cancel();
     }
 
 }

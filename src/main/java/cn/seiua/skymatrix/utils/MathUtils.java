@@ -1,7 +1,11 @@
 package cn.seiua.skymatrix.utils;
 
+import cn.seiua.skymatrix.client.waypoint.WaypointEntity;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+
+import java.time.LocalTime;
+import java.util.List;
 
 public class MathUtils {
     public static double calculateAngle(Vec2f v1, Vec2f v2) {
@@ -18,6 +22,29 @@ public class MathUtils {
         double angleInDegrees = Math.toDegrees(angleInRadians);
         if (Double.isNaN(angleInDegrees)) return 0;
         return angleInDegrees;
+    }
+
+    public static Vec3d calculateCenter(List<WaypointEntity> entityList) {
+        if (entityList == null || entityList.isEmpty()) {
+            return null;
+        }
+
+        double totalX = 0;
+        double totalY = 0;
+        double totalZ = 0;
+        int numPoints = entityList.size();
+
+        for (WaypointEntity point : entityList) {
+            totalX += point.getX();
+            totalY += point.getY();
+            totalZ += point.getZ();
+        }
+
+        double centerX = totalX / numPoints;
+        double centerY = totalY / numPoints;
+        double centerZ = totalZ / numPoints;
+
+        return new Vec3d(centerX, centerY, centerZ);
     }
 
     public static double calculateAngle(Vec3d v1, Vec3d v2) {
@@ -58,6 +85,17 @@ public class MathUtils {
         }
 
         return closestValue;
+    }
+
+    public static boolean isTimeInRange(LocalTime startTime, LocalTime endTime) {
+        LocalTime currentTime = LocalTime.now();
+        boolean crossesMidnight = endTime.isBefore(startTime);
+
+        if (crossesMidnight) {
+            return currentTime.isAfter(startTime) || currentTime.isBefore(endTime);
+        } else {
+            return currentTime.isAfter(startTime) && currentTime.isBefore(endTime);
+        }
     }
 
 }

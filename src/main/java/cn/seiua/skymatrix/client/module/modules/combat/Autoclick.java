@@ -83,8 +83,11 @@ public class Autoclick implements IToggle {
             }
             float ff = random.nextFloat();
             if (ff <= r) {
-                if (!SkyMatrix.mc.player.isUsingItem())
+                if (!SkyMatrix.mc.player.isUsingItem()) {
+
                     SkyMatrix.mc.doItemUse();
+                }
+
 
             }
         }

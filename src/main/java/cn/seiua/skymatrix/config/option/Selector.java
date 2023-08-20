@@ -58,4 +58,18 @@ public interface Selector {
 
     String select();
 
+    static String bestAote() {
+        int i = 0;
+        for (ItemStack itemStack : SkyMatrix.mc.player.getInventory().main) {
+            if (i == 9) {
+                break;
+            }
+            if (Filter.aote(itemStack)) {
+                String uuid = SkyBlockUtils.getItemUuid(itemStack);
+                return uuid;
+            }
+            i++;
+        }
+        return null;
+    }
 }

@@ -38,14 +38,14 @@ public class ComponentHandler {
         }
 
         for (String classpathEntry : paths) {
-
+            if (!classpathEntry.contains("skymatrix")) continue;
             File file = new File(classpathEntry);
-            if (!file.toString().contains(".jar")) {
+            if (!file.toString().endsWith(".jar")) {
                 String[] files = file.list();
-                System.out.println(file + "  Directory");
+//                System.out.println(file + "  Directory");
                 traverseDirectory(file, file);
             } else {
-                System.out.println(file + "  jar");
+//                System.out.println(file + "  jar");
                 traverseJar(file);
             }
         }
@@ -124,7 +124,7 @@ public class ComponentHandler {
                         Annotation annotation = f.getAnnotation(Use.class);
                         if (annotation != null) {
                             use.put(f, o);
-                            logger.info("Wrote Loaded " + o.getClass().toString() + "." + f.getName() + "." + f.getName());
+                            logger.info("Wrote Loaded " + o.getClass().toString() + "." + f.getName());
                         }
                     }
                     //加载初始化方法

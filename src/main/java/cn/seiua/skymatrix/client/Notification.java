@@ -49,7 +49,7 @@ public class Notification {
 
     @EventTarget
     public void onRender(HudRenderEvent event) {
-        int ms = UI.getS();
+        float ms = UI.getS();
         if (ms == 0 || !enable.isValue()) return;
         MatrixStack matrixStack = event.getContext().getMatrices();
         List<Notice> noticeList = new ArrayList<>();

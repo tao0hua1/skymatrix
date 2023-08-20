@@ -1,17 +1,21 @@
 package cn.seiua.skymatrix.gui.ui;
 
+import cn.seiua.skymatrix.SkyMatrix;
 import cn.seiua.skymatrix.config.option.ValueInput;
 import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.gui.DrawLine;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class UIValueInput extends UI {
     private DrawLine drawLine = new DrawLine(250);
@@ -51,6 +55,23 @@ public class UIValueInput extends UI {
 
     public static int flag;
 
+    public boolean charTyped(char chr, int modifiers) {
+        if (ClickGui.instance.getFocus() == this) {
+
+
+            if (SharedConstants.isValidChar(chr)) {
+                ValueInput valueInput = this.optionInfo.getTarget();
+                valueInput.setValue(valueInput.getValue() + chr);
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return
+                false;
+    }
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.updateMouse(mouseX, mouseY);
@@ -82,8 +103,18 @@ public class UIValueInput extends UI {
         ClickGui.fontRenderer16.centeredH();
         ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor());
         String v = optionInfo.getTarget().pre + optionInfo.getTarget().getValue();
+        boolean flag = false;
+        if (optionInfo.getTarget().getValue() == null || Objects.equals(optionInfo.getTarget().getValue(), "")) {
+            flag = true;
+            ClickGui.fontRenderer16.setColor(Theme.getInstance().THEME.geColor().darker());
+            v = optionInfo.getTarget().pre + optionInfo.getTarget().getSuggestion();
+        }
+
         int w = ClickGui.fontRenderer16.getStringWidth(v);
         ClickGui.fontRenderer16.drawString(matrixStack, drawLine.get(65), getY(), v);
+        if (flag) {
+            w = ClickGui.fontRenderer16.getStringWidth(optionInfo.getTarget().pre);
+        }
         drawLine.append(w);
 
 
@@ -140,6 +171,12 @@ public class UIValueInput extends UI {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (isInBox()) {
+            if (InputUtil.isKeyPressed(SkyMatrix.mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) && button == 1) {
+                this.optionInfo.openDoc();
+                return super.mouseClicked(mouseX, mouseY, button);
+            }
+        }
         if (button == 0) {
             if (isInButton(mouseX, mouseY)) {
                 if (ClickGui.instance.getFocus() == this) {
@@ -159,25 +196,26 @@ public class UIValueInput extends UI {
         ValueInput valueInput = this.optionInfo.getTarget();
         if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_ESCAPE) {
             ClickGui.instance.setFocus(null);
+
         }
         if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             if (valueInput.getValue().length() != 0) {
                 valueInput.setValue(valueInput.getValue().substring(0, valueInput.getValue().length() - 1));
             }
         }
-
-        String key = GLFW.glfwGetKeyName(keyCode, scanCode);
-        if (GLFW.GLFW_KEY_SPACE == keyCode) {
-            key = " ";
-        }
-
-        if (key != null) {
-            System.out.println(key);
-
-            valueInput.setValue(valueInput.getValue() + key);
-
-        }
-
+//
+//        String key = GLFW.glfwGetKeyName(keyCode, scanCode);
+//        if (GLFW.GLFW_KEY_SPACE == keyCode) {
+//            key = " ";
+//        }
+//
+//        if (key != null) {
+////            System.out.println(key);
+//
+//            valueInput.setValue(valueInput.getValue() + key);
+//
+//        }
+//
 
         super.keyPressed(keyCode, scanCode, modifiers);
     }

@@ -2,6 +2,7 @@ package cn.seiua.skymatrix.mixin.mixins;
 
 import cn.seiua.skymatrix.event.events.ClientTickEvent;
 import cn.seiua.skymatrix.event.events.GameExitEvent;
+import cn.seiua.skymatrix.event.events.OpenScreenEvent;
 import cn.seiua.skymatrix.event.events.WorldChangeEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
@@ -32,6 +33,13 @@ public abstract class MixinMinecraftClient {
     @Inject(at = @At("HEAD"), method = "tick")
     private void onEndTick(CallbackInfo info) {
         new ClientTickEvent().call();
+    }
+
+    @Inject(at = @At("HEAD"), method = "setScreen", cancellable = true)
+    private void setScreen(CallbackInfo info) {
+        OpenScreenEvent e = new OpenScreenEvent();
+        e.call();
+        if (e.isCancelled()) info.cancel();
     }
 
 

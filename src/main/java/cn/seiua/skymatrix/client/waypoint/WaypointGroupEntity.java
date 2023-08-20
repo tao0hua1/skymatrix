@@ -11,6 +11,8 @@ public class WaypointGroupEntity implements Serializable {
     public String name;
     public String world;
     public Map<String, String> data;
+    public boolean remove;
+    public boolean show = true;
 
     public WaypointGroupEntity(ArrayList<WaypointEntity> waypoints, String name, String world) {
         this.waypoints = waypoints;
@@ -24,6 +26,10 @@ public class WaypointGroupEntity implements Serializable {
 
     public String getWorld() {
         return world;
+    }
+
+    public int c() {
+        return world.toCharArray()[0];
     }
 
     public void setWorld(String world) {

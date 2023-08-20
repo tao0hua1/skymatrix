@@ -1,5 +1,6 @@
 accessWidener	v1	named
 accessible	field	net/minecraft/client/gui/screen/ingame/HandledScreen	handler	Lnet/minecraft/screen/ScreenHandler;
+accessible field net/minecraft/client/gui/hud/PlayerListHud ENTRY_ORDERING Ljava/util/Comparator;
 accessible	method	net/minecraft/client/Mouse	onMouseButton (JIII)V
 accessible method net/minecraft/client/MinecraftClient doAttack ()Z
 accessible method net/minecraft/client/MinecraftClient doItemUse ()V

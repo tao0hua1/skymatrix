@@ -1,0 +1,4 @@
+{
+  "client.warning.waypoint.illegal-world": "Can not match the world for the waypoint group!",
+  "client.warning.waypoint.not-found": "The way point group is not found! please rebind!"
+}

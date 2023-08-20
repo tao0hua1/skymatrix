@@ -207,7 +207,7 @@ public class RenderUtils {
             float lx = 0;
             float ly = 0;
             boolean nmsl = true;
-            for (int i = 0; i <= 360; i += 6) {
+            for (int i = 0; i <= 360; i += 3) {
                 if (i == 90) {
                     spx = (int) (bb.minX + r);
                     spy = (int) (bb.minY + r);

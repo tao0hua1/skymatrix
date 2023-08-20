@@ -10,7 +10,6 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,6 @@ public class SkyMatrix implements ModInitializer, ClientTickEvents.StartTick {
     @Override
     public void onStartTick(MinecraftClient client) {
         if (flag == false) {
-            GLFW.glfwSetWindowTitle(MinecraftClient.getInstance().getWindow().getHandle(), "Genshin impact");
             mc = MinecraftClient.getInstance();
             LOGGER.info("client loaded!");
             ComponentHandler.loadAllClasesName();

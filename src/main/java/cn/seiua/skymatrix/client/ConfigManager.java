@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 @Component
+@Event(register = true)
 public class ConfigManager<T> {
 
     @Use
@@ -182,7 +183,7 @@ public class ConfigManager<T> {
         }
     }
 
-    private void bindConfigFromProfile() {
+    public void bindConfigFromProfile() {
         JSONObject jo = current.getConfig();
         if (jo == null) return;
         for (String cate : jo.keySet()) {
@@ -282,6 +283,7 @@ public class ConfigManager<T> {
     }
 
     public void saveWaypoints(HashMap<String, WaypointGroupEntity> wgep) {
+
         for (WaypointGroupEntity we : wgep.values()) {
             try {
                 this.store.saveExtraFile(Store.WAYPOINT + we.name, objectMapper.writeValueAsString(we).getBytes());

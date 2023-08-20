@@ -2,7 +2,11 @@ package cn.seiua.skymatrix.client;
 
 public interface IToggle {
 
-    void disable();
+    default void disable() {
 
-    void enable();
+    }
+
+    default void enable() {
+
+    }
 }

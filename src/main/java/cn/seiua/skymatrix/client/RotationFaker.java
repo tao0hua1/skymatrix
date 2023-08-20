@@ -36,7 +36,7 @@ public final class RotationFaker {
     public void setServerPitch(float serverPitch) {
 
         if (serverPitch > 90) {
-            System.out.println(serverPitch + " set");
+//            System.out.println(serverPitch + " set");
         }
         this.serverPitch = serverPitch;
     }
@@ -133,11 +133,8 @@ public final class RotationFaker {
             if (e.getType().equals("HEAD")) {
 
                 entity.headYaw = getServerYaw();
-//                entity.prevHeadYaw = getServerYaw();
                 prePitch = entity.getPitch();
-//                preYaw = entity.getYaw();
                 entity.prevHeadYaw = preServerYaw;
-                entity.prevPitch = preServerPitch;
                 entity.setPitch(getServerPitch());
                 entity.prevPitch = getServerPitch();
 //                e.getEntity().prevBodyYaw = getServerYaw();

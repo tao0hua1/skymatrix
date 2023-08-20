@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class MixinClientPlayNetworkHandler {
 
+
     @Inject(at = @At("HEAD"), method = "sendPacket", cancellable = true)
     public void onPacket(Packet<?> packet, CallbackInfo callbackInfo) {
         ClientPacketEvent packetEvent = new ClientPacketEvent(packet);
@@ -163,7 +164,7 @@ public abstract class MixinClientPlayNetworkHandler {
 
     @Inject(at = @At("HEAD"), method = "onChatMessage", cancellable = true)
     public void onChatMessage(ChatMessageS2CPacket var1, CallbackInfo callbackInfo) {
-        System.out.println(var1);
+
         ServerPacketEvent event = new ServerPacketEvent(var1);
         event.call();
         if (event.isCancelled()) callbackInfo.cancel();

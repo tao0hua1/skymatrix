@@ -1,5 +1,6 @@
 package cn.seiua.skymatrix.config.option;
 
+import cn.seiua.skymatrix.SkyMatrix;
 import cn.seiua.skymatrix.client.module.Signs;
 import cn.seiua.skymatrix.gui.Icons;
 import cn.seiua.skymatrix.gui.UIComponent;
@@ -18,6 +19,11 @@ public class ValueInput implements UIComponent {
     public static String ITEM = "Item";
     public transient String pre = "";
     private transient String type;
+    private transient String suggestion;
+
+    public void execute() {
+        SkyMatrix.mc.getNetworkHandler().sendCommand(value);
+    }
 
     public ValueInput(String value, String type) {
         if (type == Icons.CMD) {
@@ -25,6 +31,11 @@ public class ValueInput implements UIComponent {
         }
         this.value = value;
         this.type = type;
+    }
+
+    public ValueInput(String value, String type, String suggestion) {
+        this(value, type);
+        this.suggestion = suggestion;
     }
 
     public String getType() {
@@ -43,6 +54,13 @@ public class ValueInput implements UIComponent {
         this.value = value;
     }
 
+    public String getSuggestion() {
+        return suggestion;
+    }
+
+    public void setSuggestion(String suggestion) {
+        this.suggestion = suggestion;
+    }
 
     @Override
     public UI build(String module, String category, String name, Signs sign) {

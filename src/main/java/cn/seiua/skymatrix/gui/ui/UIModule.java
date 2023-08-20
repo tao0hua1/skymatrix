@@ -1,18 +1,22 @@
 package cn.seiua.skymatrix.gui.ui;
 
+import cn.seiua.skymatrix.SkyMatrix;
 import cn.seiua.skymatrix.client.KeyBindManger;
-import cn.seiua.skymatrix.config.IHide;
 import cn.seiua.skymatrix.config.option.KeyBind;
 import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.gui.DrawLine;
+import cn.seiua.skymatrix.gui.HideB;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.ModuleInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import cn.seiua.skymatrix.utils.UiInfo;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -34,6 +38,15 @@ public class UIModule extends UI {
         setInBoxRight(this::toggle1);
     }
 
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+
+        for (UI ui : uis) {
+            ui.charTyped(chr, modifiers);
+        }
+
+        return true;
+    }
 
     public List<UI> getUis() {
         return uis;
@@ -94,7 +107,7 @@ public class UIModule extends UI {
         super.mouseMoved(mouseX, mouseY);
     }
 
-    private HashMap<UI, IHide> hideMap;
+    private HashMap<UI, List<HideB>> hideMap;
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
@@ -132,7 +145,7 @@ public class UIModule extends UI {
 
         ClickGui.fontRenderer22.centeredH();
         ClickGui.fontRenderer22.setColor(Theme.getInstance().THEME.geColor());
-        ClickGui.fontRenderer22.drawString(matrixStack, drawLine.get(25), getY(), getZ(), upperFirst(moduleInfo.getName()));
+        ClickGui.fontRenderer22.drawString(matrixStack, drawLine.get(25), getY(), getZ(), upperFirst(Text.translatable(moduleInfo.getName()).getString()));
         ClickGui.fontRenderer22.resetCenteredH();
         ClickGui.fontRenderer22.resetCenteredV();
         if (!this.uis.isEmpty()) {
@@ -192,7 +205,13 @@ public class UIModule extends UI {
                     continue;
                 }
                 if (hideMap != null && hideMap.get(ui) != null) {
-                    if (!hideMap.get(ui).canRender(ui.getHideValue())) continue;
+                    boolean flag = true;
+                    for (HideB hideB : hideMap.get(ui)) {
+                        flag = flag && hideB.canRender();
+                    }
+                    if (!flag) {
+                        continue;
+                    }
                 }
                 ui.update(getX(), sty);
                 ui.render(context, mouseX, mouseY, delta);
@@ -210,6 +229,12 @@ public class UIModule extends UI {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (isInBox()) {
+            if (InputUtil.isKeyPressed(SkyMatrix.mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) && button == 1) {
+                this.moduleInfo.openDoc();
+                return super.mouseClicked(mouseX, mouseY, button);
+            }
+        }
         if (isInBox()) {
             if (Screen.hasShiftDown() && button == 0) {
                 if (this.moduleInfo.getKeyBind() != null) {
@@ -229,7 +254,13 @@ public class UIModule extends UI {
                     continue;
                 }
                 if (hideMap != null && hideMap.get(ui) != null) {
-                    if (!hideMap.get(ui).canRender(ui.getHideValue())) continue;
+                    boolean flag = true;
+                    for (HideB hideB : hideMap.get(ui)) {
+                        flag = flag && hideB.canRender();
+                    }
+                    if (!flag) {
+                        continue;
+                    }
                 }
 
                 ui.mouseClicked(mouseX, mouseY, button);
@@ -289,8 +320,12 @@ public class UIModule extends UI {
             }
             int cu = 0;
             for (UI ui : this.getUis()) {
-                if (this.hideMap.get(ui) != null) {
-                    if (!this.hideMap.get(ui).canRender(null)) {
+                if (hideMap != null && hideMap.get(ui) != null) {
+                    boolean flag = true;
+                    for (HideB hideB : hideMap.get(ui)) {
+                        flag = flag && hideB.canRender();
+                    }
+                    if (!flag) {
                         cu++;
                     }
                 }
@@ -308,7 +343,8 @@ public class UIModule extends UI {
         return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
-    public void setHideMap(HashMap<UI, IHide> hideMap) {
+    public void setHideMap(HashMap<UI, List<HideB>> hideMap) {
+
         this.hideMap = hideMap;
     }
 

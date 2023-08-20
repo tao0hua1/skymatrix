@@ -76,16 +76,18 @@ public class HttpClient {
 
     public void run() {
         while (true) {
-            Task task = queue.poll();
-            if (task != null) {
-                try {
+            try {
+                Task task = queue.poll();
+                if (task != null) {
+
                     Response response = task.getCall().execute();
                     String data = response.body().string();
                     Object o = this.mapper.readValue(data, task.getType());
                     task.getCallBack().callBack(o, data);
-                } catch (IOException e) {
-                    e.printStackTrace();
+
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

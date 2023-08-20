@@ -3,6 +3,7 @@ package cn.seiua.skymatrix.client.waypoint;
 import net.minecraft.util.math.BlockPos;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class WaypointEntity implements Serializable {
 
@@ -13,6 +14,8 @@ public class WaypointEntity implements Serializable {
     public String world;
 
     public String name;
+
+    public Map<String, String> data;
 
     public WaypointEntity(int x, int y, int z, String name) {
 

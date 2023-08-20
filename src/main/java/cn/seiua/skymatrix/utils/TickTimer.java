@@ -11,10 +11,16 @@ public interface TickTimer {
         return new OneTickTimer(tick, callback);
     }
 
+    static OneTickTimer build(int tick, int st, Run callback) {
+        OneTickTimer tickTimer = build(tick, callback);
+        tickTimer.setTick(st);
+        return tickTimer;
+    }
+
     /**
      * @param tick
      * @param callback
-     * @param times    -1 表示无线
+     * @param times    -1 表示无
      * @return
      */
     static CycleTickTimer build(int tick, Run callback, int times) {

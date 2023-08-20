@@ -3,6 +3,7 @@ package cn.seiua.skymatrix.utils;
 import cn.seiua.skymatrix.client.module.ModuleManager;
 import cn.seiua.skymatrix.client.module.Signs;
 import cn.seiua.skymatrix.config.option.KeyBind;
+import net.minecraft.util.Util;
 
 import java.io.Serializable;
 
@@ -108,5 +109,9 @@ public class ModuleInfo implements Serializable {
         this.sign = sign;
     }
 
+    public void openDoc() {
+        Util.getOperatingSystem().open("https://docs.seiua.cn/modules/" + this.getName());
+
+    }
 
 }

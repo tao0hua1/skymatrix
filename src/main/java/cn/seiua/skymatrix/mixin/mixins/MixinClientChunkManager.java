@@ -28,6 +28,7 @@ public abstract class MixinClientChunkManager {
     private void onChunkLoad(int x, int z, PacketByteBuf packetByteBuf, NbtCompound
             nbtCompound, Consumer<ChunkData.BlockEntityVisitor> consumer, CallbackInfoReturnable<WorldChunk> info) {
         new ClientChunkEvent(this.world, info.getReturnValue()).call();
+
     }
 
     @Inject(method = "unload", at = @At("TAIL"))

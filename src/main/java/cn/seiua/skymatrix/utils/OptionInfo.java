@@ -1,6 +1,8 @@
 package cn.seiua.skymatrix.utils;
 
 import cn.seiua.skymatrix.client.module.Signs;
+import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 
 import java.io.Serializable;
 
@@ -52,7 +54,7 @@ public class OptionInfo<T> implements Serializable {
     }
 
     public String getName() {
-        return name;
+        return Text.translatable(name).getString();
     }
 
     public void setName(String name) {
@@ -73,5 +75,11 @@ public class OptionInfo<T> implements Serializable {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public void openDoc() {
+
+        Util.getOperatingSystem().open(("https://docs.seiua.cn/modules/" + this.getModule() + "#" + this.getName()).replace("(", " ").replace(")", "").replace(" ", "-"));
+
     }
 }

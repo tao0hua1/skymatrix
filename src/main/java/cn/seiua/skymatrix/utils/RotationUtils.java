@@ -40,6 +40,10 @@ public enum RotationUtils {
         return new Rotation(yaw, pitch);
     }
 
+    public static Rotation toRotation(Entity entity) {
+        return toRotation(entity.getEyePos().subtract(0, 0.2, 0).subtract(SkyMatrix.mc.player.getEyePos()));
+    }
+
     public static Rotation getNeededRotations(Vec3d vec) {
         Vec3d eyesPos = getEyesPos();
 

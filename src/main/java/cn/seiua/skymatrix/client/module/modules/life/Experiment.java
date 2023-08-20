@@ -65,10 +65,11 @@ public class Experiment {
             if (this.type == ExperimentType.ULTRASEQUENCER) {
 
                 if (mapper != null) {
+
                     if (mapper.get(e.getSlot().id) != null) {
                         MatrixStack matrixStack = e.getContext().getMatrices();
                         matrixStack.push();
-                        int scale = UI.getS();
+                        float scale = UI.getS();
                         matrixStack.scale(1f / scale, 1f / scale, 1f / scale);
                         int index = mapper.get(e.getSlot().id);
                         if (index == -1) return;

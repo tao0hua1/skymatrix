@@ -2,6 +2,7 @@ package cn.seiua.skymatrix.gui.ui;
 
 
 import cn.seiua.skymatrix.client.Run;
+import cn.seiua.skymatrix.client.config.Setting;
 import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.RenderUtils;
@@ -14,6 +15,10 @@ public abstract class UI {
     private int x;
     private int y;
     private int z;
+
+    public boolean charTyped(char chr, int modifiers) {
+        return true;
+    }
 
     public int getZ() {
         return z;
@@ -50,9 +55,9 @@ public abstract class UI {
     private int px;
     private int py;
 
-    public static int getS() {
+    public static float getS() {
         int ms = Math.round(MinecraftClient.getInstance().getWindow().getWidth() * 1.0f / MinecraftClient.getInstance().getWindow().getScaledWidth());
-        return ms;
+        return ms * Setting.getInstance().scale.getValue().floatValue();
     }
 
     public static void addRenderDetail(DrawDetial drawDetial) {
@@ -221,9 +226,9 @@ public abstract class UI {
     }
 
 
-    protected void setMouse(double i, double i1) {
+    public void setMouse(double i, double i1) {
 
         this.mouseX = i;
-        this.mouseY = i;
+        this.mouseY = i1;
     }
 }

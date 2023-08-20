@@ -1,5 +1,6 @@
 package cn.seiua.skymatrix.gui.ui;
 
+import cn.seiua.skymatrix.SkyMatrix;
 import cn.seiua.skymatrix.config.option.SingleChoice;
 import cn.seiua.skymatrix.config.option.ValueInput;
 import cn.seiua.skymatrix.gui.ClickGui;
@@ -9,8 +10,10 @@ import cn.seiua.skymatrix.gui.Theme;
 import cn.seiua.skymatrix.utils.OptionInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.Objects;
@@ -148,6 +151,12 @@ public class UISingleChoice extends UI {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (isInBox()) {
+            if (InputUtil.isKeyPressed(SkyMatrix.mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) && button == 1) {
+                this.optionInfo.openDoc();
+                return super.mouseClicked(mouseX, mouseY, button);
+            }
+        }
         if (button == 0) {
             if (isInBox()) {
                 this.optionInfo.getTarget().setSelected((this.optionInfo.getTarget().getSelected() + 1) % this.optionInfo.getTarget().getValue().size());

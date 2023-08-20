@@ -14,12 +14,16 @@ import cn.seiua.skymatrix.font.FontRenderer;
 import cn.seiua.skymatrix.gui.ClickGui;
 import cn.seiua.skymatrix.hud.ClientHud;
 import cn.seiua.skymatrix.hud.Hud;
+import cn.seiua.skymatrix.message.Message;
+import cn.seiua.skymatrix.message.MessageBuilder;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Event
 @Sign(sign = Signs.FREE)
@@ -33,6 +37,7 @@ public class BanInfo implements Hud {
     public HttpClient httpClient;
 
     int tick = 0;
+    private Message message = MessageBuilder.build("Baninfo");
 
     @EventTarget
     public void onTick(ClientTickEvent e) {
@@ -45,9 +50,9 @@ public class BanInfo implements Hud {
                 throw new RuntimeException(ex);
             }
         }
-
-
     }
+
+    public int ban;
 
     public void callBack(BanInfoEntity value, String data) {
         if (last == null) {
@@ -57,6 +62,14 @@ public class BanInfo implements Hud {
         }
         last = currnet;
         currnet = value;
+
+        int v = Math.abs(this.currnet.getRecord().getStaff_total() - this.last.getRecord().getStaff_total());
+        ban = v;
+        if (ban > 19) {
+            this.callBackMap.values().forEach((e) -> e.callBack(v));
+            this.message.sendWarningMessage("ban wave!");
+        }
+
     }
 
     private BanInfoEntity last;
@@ -75,7 +88,7 @@ public class BanInfo implements Hud {
         float startY = y + 12;
         String v = "0";
         if (this.last != null) {
-            v = String.valueOf(Math.abs(this.currnet.getRecord().getStaff_total() - this.last.getRecord().getStaff_total()));
+            v = String.valueOf(ban);
         }
         ClickGui.fontRenderer20.drawString(matrixStack, startX, startY, String.format("Staff banned %s people within 5 minutes", v));
     }
@@ -93,4 +106,20 @@ public class BanInfo implements Hud {
     public int getHudHeight() {
         return 53;
     }
+
+    private final Map<String, BanWaveCallBack> callBackMap = new HashMap<>();
+
+    public void addBanWaveCallBack(String id, BanWaveCallBack callBack) {
+        callBackMap.put(id, callBack);
+    }
+
+    public void removeBanWaveCallBack(String id) {
+        callBackMap.remove(id);
+    }
+
+    public interface BanWaveCallBack {
+        void callBack(int v);
+
+    }
+
 }

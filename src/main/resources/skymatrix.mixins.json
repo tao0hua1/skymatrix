@@ -6,6 +6,7 @@
   "mixins": [
     "MixinBlock",
     "MixinBlockOcclusionCache",
+    "MixinClientWorld",
     "MixinEntity",
     "MixinSodiumFluidRenderer"
   ],

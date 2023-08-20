@@ -11,7 +11,7 @@ public class OneTickTimer implements TickTimer {
 
     OneTickTimer(int tick, Run callBack) {
         this.tick = tick;
-        this.targetTick = targetTick;
+        this.targetTick = tick;
         this.callBack = callBack;
     }
 

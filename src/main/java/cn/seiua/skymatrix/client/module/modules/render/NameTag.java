@@ -56,12 +56,13 @@ public class NameTag {
     @EventTarget
     public void onRender(RenderLabelEvent e) {
         Entity entity = e.getEntity();
+
         if (select.canBeTarget(entity)) {
             if (entity instanceof PlayerEntity) {
-                if (!antiBot.isPlayer(entity.getUuidAsString())) e.setCancelled(true);
+                if (!antiBot.isPlayer(entity.getUuidAsString())) return;
             }
             if (!self.isValue()) {
-                if (entity.equals(SkyMatrix.mc.player)) e.setCancelled(true);
+                if (entity.equals(SkyMatrix.mc.player)) return;
             }
             e.setCancelled(true);
         }

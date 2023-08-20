@@ -27,6 +27,6 @@ public class MixinTerrainRenderContext {
             cancellable = true,
             remap = false)
     private void onTessellateBlock(BlockState blockState, BlockPos blockPos, BakedModel model, MatrixStack matrixStack, CallbackInfo ci) {
-        System.out.println(666 + " nm");
+
     }
 }

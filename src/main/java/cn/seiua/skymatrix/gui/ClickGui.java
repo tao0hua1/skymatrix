@@ -1,6 +1,7 @@
 package cn.seiua.skymatrix.gui;
 
 
+import cn.seiua.skymatrix.ClientInfo;
 import cn.seiua.skymatrix.SkyMatrix;
 import cn.seiua.skymatrix.client.*;
 import cn.seiua.skymatrix.client.component.Component;
@@ -19,6 +20,8 @@ import cn.seiua.skymatrix.utils.CateInfo;
 import cn.seiua.skymatrix.utils.ModuleInfo;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import cn.seiua.skymatrix.utils.UiInfo;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -109,6 +112,14 @@ public class ClickGui extends Screen {
         return focus;
     }
 
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        for (UIModules uiModules : modules.values()) {
+            uiModules.charTyped(chr, modifiers);
+        }
+        return true;
+    }
+
     public void setFocus(UI focus) {
         this.focus = focus;
     }
@@ -195,10 +206,10 @@ public class ClickGui extends Screen {
                 if (!this.modules.containsKey(category)) {
                     u = new UIModules(categorys.get(category));
                     this.modules.put(category, u);
-                    u.setX(500);
-                    u.setY(yt);
+                    u.setX(200 + yt);
+                    u.setY(200);
                     u.update(-1, -1);
-                    yt += 58;
+                    yt += 255;
                 }
                 u = this.modules.get(category);
                 u.addModuleInfo(moduleInfo);
@@ -211,11 +222,26 @@ public class ClickGui extends Screen {
             client.openGui(Waypoint.class);
         }, "waypoint", "Open gui to edit Waypoint!"));
         uiList.add(new UIButton(() -> {
-            client.openGui(HudManager.class);
-        }, "hud", "Open gui to edit hud!"));
+            int a = 1;
+            for (Object key : this.valueHolder.value.keySet()) {
+                if (key.toString().contains("category")) {
+                    UiInfo uiInfo = this.valueHolder.value.get(key);
+                    uiInfo.setX(255 * a++);
+                    uiInfo.setY(200);
+
+
+                }
+
+            }
+            configManager.writeToProfile();
+            configManager.saveProfiles();
+            client.openGui(this.getClass());
+        }, "reset", "reset gui"));
         uiList.add(new UIButton(() -> {
-            client.openGui(HudManager.class);
-        }, "hud", "Open gui to edit hud!"));
+            this.configManager.reloadProfiles();
+            Waypoint.getInstance().loadWaypoints();
+            this.configManager.bindConfigFromProfile();
+        }, "reload", "reload config"));
         new Thread(this::tick1).start();
 
     }
@@ -279,12 +305,32 @@ public class ClickGui extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 
-        int ms = UI.getS();
-        mouseY = mouseY * ms;
-        mouseX = mouseX * ms;
-        int height = this.height * ms;
-        int width = this.width * ms;
+        float ms = UI.getS();
+        mouseY = (int) (mouseY * ms);
+        mouseX = (int) (mouseX * ms);
+        int height = (int) (this.height * ms);
+        int width = (int) (this.width * ms);
         context.getMatrices().scale(1f / UI.getS(), 1f / UI.getS(), 1f / UI.getS());
+
+
+        Optional<ModContainer> optional = FabricLoader.getInstance().getModContainer("skymatrix");
+
+        if (optional.isPresent()) {
+            ModContainer container = optional.get();
+            fontRenderer20.centeredH();
+            fontRenderer20.setColor(new Color(240, 255, 255));
+            int i = 20;
+            fontRenderer20.drawString(context.getMatrices(), 10, i, "CLIENT_ID: " + ClientInfo.ClientID + "  VERSION: " + container.getMetadata().getVersion());
+            i += 25;
+            fontRenderer20.drawString(context.getMatrices(), 10, i, "GITHUB: " + "https://github.com/seiuna/skymatrix");
+            i += 25;
+            fontRenderer20.drawString(context.getMatrices(), 10, i, "AUTHORS: " + "https://github.com/seiuna");
+            i += 25;
+            fontRenderer20.drawString(context.getMatrices(), 10, i, "DOCS: " + "https://docs.seiua.cn/guide/");
+            fontRenderer20.resetCenteredH();
+        }
+
+
         drawMask(context.getMatrices());
         int ap = 0;
         for (UI ui : uiList) {

@@ -58,7 +58,7 @@ public class KeyBind {
     }
 
     public static int getMouseKey(int k) {
-        return k;
+        return k + 10000;
     }
 
     public static int getKeyboardKey(int k) {

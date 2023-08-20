@@ -24,6 +24,7 @@ import cn.seiua.skymatrix.render.BlockLocTarget;
 import cn.seiua.skymatrix.render.BlockTarget;
 import cn.seiua.skymatrix.render.BlockTextTarget;
 import cn.seiua.skymatrix.utils.ColorUtils;
+import cn.seiua.skymatrix.utils.MathUtils;
 import cn.seiua.skymatrix.utils.RenderUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,20 +41,25 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.*;
 
 @Category(name = "waypoint")
 @Event(register = true)
 @Config(name = "waypoint")
 public class Waypoint extends Screen implements Hud {
-    private static enum Status {
+    static enum Status {
         EDIT, NONE
+    }
+
+    private static Waypoint instance;
+
+    public static Waypoint getInstance() {
+        return instance;
     }
 
     Message message = MessageBuilder.build("waypoint");
@@ -68,11 +74,14 @@ public class Waypoint extends Screen implements Hud {
         if (this.waypoints.containsKey(name)) {
             entity = this.waypoints.get(name);
             if (!entity.world.equals(this.way.way())) {
-                lastMessage = "世界不符";
+                lastMessage = "client.warning.waypoint.illegal-world";
                 entity = null;
             }
         } else {
-            lastMessage = "不存在";
+            lastMessage = "client.warning.waypoint.not-found";
+        }
+        if (entity != null) {
+            if (entity.remove) entity = null;
         }
         return entity;
     }
@@ -100,6 +109,10 @@ public class Waypoint extends Screen implements Hud {
             }
         }
 
+    }
+
+    public HashMap<String, WaypointGroupEntity> getWaypoints() {
+        return waypoints;
     }
 
     private void close1() {
@@ -132,7 +145,7 @@ public class Waypoint extends Screen implements Hud {
         }
     }
 
-    private Status status = Status.NONE;
+    public Status status = Status.NONE;
 
     public Waypoint() {
         super(Text.of("HudManager"));
@@ -157,16 +170,38 @@ public class Waypoint extends Screen implements Hud {
                                         ClientCommandManager.argument("name", StringArgumentType.string()).executes(this::addCommand)
                                 )
                         ).then(
+                                ClientCommandManager.literal("data").then(
+                                        ClientCommandManager.argument("name", StringArgumentType.string()).then(ClientCommandManager.argument("value", StringArgumentType.string()).executes(this::addData))
+                                )
+                        ).then(
                                 ClientCommandManager.literal("process").executes(this::processCommand)
                         )
         );
+    }
+
+    private int addData(CommandContext<FabricClientCommandSource> fabricClientCommandSourceCommandContext) {
+        String name = fabricClientCommandSourceCommandContext.getArgument("name", String.class);
+        String value = fabricClientCommandSourceCommandContext.getArgument("value", String.class);
+        if (this.status == Status.EDIT) {
+            WaypointGroupEntity entity = this.getWaypoints().get(this.name);
+            if (entity != null && entity.getWaypoints().size() != 0) {
+                if (entity.getWaypoints().get(entity.getWaypoints().size() - 1).data == null) {
+                    entity.getWaypoints().get(entity.getWaypoints().size() - 1).data = new HashMap<>();
+
+                }
+                entity.getWaypoints().get(entity.getWaypoints().size() - 1).data.put(name, value);
+                this.message.sendMessage(Text.of("ok"));
+            }
+        }
+
+        return 1;
     }
 
     private int processCommand(CommandContext<FabricClientCommandSource> fabricClientCommandSourceCommandContext) {
         if (this.waypoints.get(name) != null && this.waypoints.get(name).getWaypoints().size() != 0) {
             a = 0;
             new Thread(this::run).start();
-            System.out.println(BaritoneAPI.getSettings().assumeSafeWalk.value);
+//            System.out.println(BaritoneAPI.getSettings().assumeSafeWalk.value);
         }
 
         return 1;
@@ -200,6 +235,7 @@ public class Waypoint extends Screen implements Hud {
                 BaritoneAPI.getSettings().allowBreak.value = false;
                 BaritoneAPI.getSettings().allowParkourAscend.value = true;
                 BaritoneAPI.getSettings().renderGoal.value = false;
+                BaritoneAPI.getSettings().allowPlace.value = false;
                 BaritoneAPI.getSettings().renderPath.value = false;
                 BaritoneAPI.getSettings().assumeSafeWalk.value = false;
                 BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalBlock(wp.getX(), wp.getY() + 1, wp.getZ()));
@@ -247,7 +283,7 @@ public class Waypoint extends Screen implements Hud {
         }
     }
 
-    private String name;
+    public String name;
 
 
     private int addCommand(CommandContext<FabricClientCommandSource> fabricClientCommandSourceCommandContext) {
@@ -300,7 +336,8 @@ public class Waypoint extends Screen implements Hud {
     private HashMap<String, WaypointGroupEntity> waypoints;
 
     @Init
-    public void init() {
+    public void init1() {
+        instance = this;
         waypoints = new HashMap<>();
         configManager.addCallBack(this::loadWaypoints);
 
@@ -332,7 +369,8 @@ public class Waypoint extends Screen implements Hud {
     }
 
     public void drawCurrent(MatrixStack matrixStack, float delta, WaypointGroupEntity entity) {
-
+        if (!entity.show) return;
+        if (entity.remove) return;
         RenderSystem.disableDepthTest();
         RenderUtils.translateView(matrixStack);
         BlockPos last = null;
@@ -345,29 +383,57 @@ public class Waypoint extends Screen implements Hud {
                 }
                 last = blockTarget.getPos();
             }
-        }
-        if (last != null) {
-            if (current != null) {
-                RenderUtils.drawLine(matrixStack, last, current);
+            if (last != null) {
+                if (current != null) {
+                    RenderUtils.drawLine(matrixStack, last, current);
+
+                }
             }
 
         }
+        Vec3d vec3d = MathUtils.calculateCenter(entity.getWaypoints());
+        if (vec3d != null) {
+            BlockTarget blockTarget = new BlockTextTarget(new BlockPos((int) vec3d.x, (int) vec3d.y + 5, (int) vec3d.z), new Color(255, 255, 255, 0)::brighter, entity.name);
+            blockTarget.render(matrixStack, delta);
+        }
+
         RenderSystem.enableBlend();
     }
 
+    ArrayList<UIWaypoint> waypointArrayList = new ArrayList<>();
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        int ms = UI.getS();
-        mouseY = mouseY * ms;
-        mouseX = mouseX * ms;
-        int height = this.height * ms;
-        int width = this.width * ms;
+        float ms = UI.getS();
+        mouseY = (int) (mouseY * ms);
+        mouseX = (int) (mouseX * ms);
+        int height = (int) (this.height * ms);
+        int width = (int) (this.width * ms);
         MatrixStack matrixStack = context.getMatrices();
         matrixStack.push();
         matrixStack.scale(1.0f / ms, 1.0f / ms, 1.0f / ms);
-        RenderUtils.setColor(Theme.getInstance().BOARD.geColor());
-        RenderUtils.drawOutlineBox(new Box(100, 100, 1, 700, 200, 1), context.getMatrices());
+        waypointArrayList.clear();
+        float wdit = super.width * ms;
 
+        int x = (int) (wdit / 2);
+        int y = 200;
+        ArrayList<WaypointGroupEntity> entityList = new ArrayList<>(this.waypoints.values());
+        Comparator<WaypointGroupEntity> sortingValueComparator = Comparator.comparingInt(WaypointGroupEntity::c);
+        int t = v;
+        Collections.sort(entityList, sortingValueComparator);
+        for (WaypointGroupEntity entity : entityList) {
+            if (t != 0) {
+                t--;
+                continue;
+            }
+            if (entity.remove) continue;
+            UIWaypoint waypoint = new UIWaypoint(entity);
+            waypointArrayList.add(waypoint);
+            waypoint.update(x, y);
+            waypoint.setMouse(mouseX, mouseY);
+            waypoint.render(context, mouseX, mouseY, delta);
+            y += 80;
+        }
 
         matrixStack.scale(ms, ms, ms);
         matrixStack.pop();
@@ -375,16 +441,34 @@ public class Waypoint extends Screen implements Hud {
         super.render(context, mouseX, mouseY, delta);
     }
 
+    int v = 0;
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+
+        v += amount * -1;
+        if (v < 0) v = 0;
+        return super.mouseScrolled(mouseX, mouseY, amount);
+    }
+
+
     boolean drag;
     float px;
     float py;
 
     @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        super.mouseMoved(mouseX, mouseY);
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int ms = UI.getS();
+        float ms = UI.getS();
         mouseY = mouseY * ms;
         mouseX = mouseX * ms;
-
+        for (UIWaypoint uiWaypoint : waypointArrayList) {
+            uiWaypoint.mouseClicked(mouseX, mouseY, button);
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -395,7 +479,7 @@ public class Waypoint extends Screen implements Hud {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        int ms = UI.getS();
+        float ms = UI.getS();
         mouseY = mouseY * ms;
         mouseX = mouseX * ms;
         return true;
@@ -407,7 +491,7 @@ public class Waypoint extends Screen implements Hud {
         configManager.writeToProfile();
         configManager.saveProfiles();
         notification.push(new Notice("Config", "profile: " + configManager.getCurrent().getName() + " saved successfully", NoticeType.INFO));
-
+        saveWaypoints();
         super.close();
     }
 
